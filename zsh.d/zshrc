@@ -1,0 +1,65 @@
+##KeyBinding
+setopt dvorak
+bindkey -e
+
+##Function of 'cd'
+setopt auto_cd
+setopt auto_pushd
+setopt pushd_ignore_dups
+cdpath=(~)
+#chpwd_functions+=dirs
+
+##History
+HISTFILE=~/.zsh.d/zsh_history
+HISTSIZE=10000
+SAVEHIST=1000000
+setopt extended_history
+setopt hist_ignore_dups
+setopt hist_ignore_space
+setopt inc_append_history
+setopt share_history
+setopt no_flow_control	#For collision of keybind
+
+##Prompt
+RPROMPT="[%c]"
+setopt prompt_subst
+setopt prompt_percent
+setopt transient_rprompt
+
+##Completion
+autoload -U compinit
+compinit
+zstyle ':completion:*' format '%B%d%b'
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:default' menu select=2
+zstyle ':completion:*:default' list-colors ""
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z} r:|[._-]=*'
+zstyle ':completion:*' completer _oldlist _complete _match _history _ignored _approximate _prefix
+zstyle ':completion:*' use-cache yes
+zstyle ':completion:*' verbose yes
+zstyle ':completion:sudo:*' environ PATH="$SUDO_PATH:$PATH"
+setopt complete_in_word
+setopt glob_complete
+setopt hist_expand
+setopt no_beep
+setopt numeric_glob_sort
+setopt auto_remove_slash
+
+##Expansion
+setopt magic_equal_subst
+setopt extended_glob
+setopt mark_dirs
+
+##Alias
+alias -g l="|& $PAGER"
+alias -g g='| grep'
+alias rm="rm -i"
+alias e='emacs '
+alias v='vim '
+alias ls='ls -lh'
+
+##Misc.
+setopt long_list_jobs
+REPORTTIME=10
+WORDCHARS=${WORDCHARS:s,/,,}
+

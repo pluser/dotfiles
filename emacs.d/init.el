@@ -5,6 +5,7 @@
 
 ;;; Set load-path
 (add-to-list 'load-path conf-dir)
+(add-to-list 'load-path (concat conf-dir "elisps/"))
 (add-to-list 'load-path (concat conf-dir "packages/"))
 (let ((default-directory (concat conf-dir "packages/")))
   (normal-top-level-add-subdirs-to-load-path))

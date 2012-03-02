@@ -21,6 +21,9 @@
 ;;; Color Setting
 (when (fboundp 'global-font-lock-mode)
   (global-font-lock-mode t))
+(when (require 'color-theme)
+  (color-theme-initialize)
+  (color-theme-deep-blue))
 
 ;;; Communication with external program
 (setq diff-switches "-u")

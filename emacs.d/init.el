@@ -15,6 +15,11 @@
 (define-key global-map "\C-x\C-h" 'help-command)
 (define-key global-map "\M-/" 'dabbrev-expand)
 
+;;; Font Setting
+(when (equal window-system 'x)
+  (load-file (concat conf-dir "fonts.el"))
+  (set-frame-font "Inconsolata"))
+
 ;;; User Interface Setting
 (tool-bar-mode nil)
 ;(menu-bar-mode nil)

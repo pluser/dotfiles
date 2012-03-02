@@ -1,2 +1,3 @@
 #!/bin/sh
 xset r rate 275 30
+setxkbmap -option ctrl:swapcaps

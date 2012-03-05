@@ -66,7 +66,7 @@ alias v='vim '
 alias l='ls -lh'
 alias s='sudo '
 alias em='emerge -a'
-
+alias c='cat '
 
 ## Misc.
 setopt long_list_jobs

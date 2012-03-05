@@ -1,3 +1,12 @@
 #!/bin/sh
 xset r rate 275 30
 setxkbmap dvorak -option ctrl:swapcaps
+#export XMODIFIERS="@im=ibus"
+#export GTK_IM_MODULE="ibus"
+#export QT_IM_MODULE="xim"
+#ibus-daemon -d -x
+
+export XMODIFIERS=@im=SCIM
+export GTK_IM_MODULE=scim
+export QT_IM_MODULE=scim
+scim -d

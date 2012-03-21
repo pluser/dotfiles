@@ -9,7 +9,7 @@ path=(
 	/opt/bin(N-/)
 	/opt/local/bin(N-/)
 )
-export LANG="ja_JP.utf8"
+#export LANG="ja_JP.utf8"
 export EPREFIX="/home/kaoru/Gentoo"
 #typeset -xT SUPER_PATH super_path
 typeset -U super_path

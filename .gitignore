@@ -3,3 +3,4 @@
 emacs.d/history
 *.dat
 *.elc
+emacs.d/url

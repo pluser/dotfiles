@@ -26,7 +26,10 @@
 ;;; Font Setting
 (when (equal window-system 'x)
   (load-file (concat user-emacs-directory "fonts.el"))
-  (set-frame-font "Inconsolata"))
+  (when (< emacs-major-version 24)
+    (set-face-font 'default "fontset-Aoshima")
+    (set-frame-font "fontset-Aoshima"))
+  (add-to-list 'default-frame-alist '(font . "fontset-Aoshima")))
 
 ;;; User Interface Setting
 (when (require 'helm nil t)		; Extension: helm

@@ -1,5 +1,5 @@
 #!/bin/sh
-xset r rate 275 30
+#xset r rate 275 30
 setxkbmap dvorak -option ctrl:swapcaps
 #export EDITOR="emacsclient"
 
@@ -8,7 +8,19 @@ setxkbmap dvorak -option ctrl:swapcaps
 #export QT_IM_MODULE="xim"
 #ibus-daemon -d -x
 
-export XMODIFIERS=@im=SCIM
-export GTK_IM_MODULE=scim
-export QT_IM_MODULE=scim
-scim -d
+#export XMODIFIERS=@im=SCIM
+#export GTK_IM_MODULE=scim
+#export QT_IM_MODULE=scim
+#scim -d
+
+export XMODIFIERS=@im=uim
+export GTK_IM_MODULE=uim
+export QT_IM_MODULE=uim
+uim-xim &
+uim-toolbar-gtk-systray &
+#uim-toolbar-qt4 &
+
+LANG=C
+
+wpa_gui -t &
+pasystray &

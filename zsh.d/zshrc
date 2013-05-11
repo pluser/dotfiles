@@ -65,7 +65,8 @@ alias e='emacs '
 alias v='vim '
 alias l='ls -lh'
 alias s='sudo '
-alias em='emerge -a'
+alias em='sudo -E emerge --color y -a'
+alias eq='equery'
 alias c='cat '
 
 ## Misc.

@@ -2,6 +2,8 @@
 setopt dvorak
 bindkey -e
 setopt no_flow_control	#For collision of keybind
+bindkey '^p' history-beginning-search-backward
+bindkey '^n' history-beginning-search-forward
 
 ## Function of 'cd'
 setopt auto_cd
@@ -25,8 +27,11 @@ setopt hist_verify
 ## Color
 autoload -U colors
 colors
+export CLICOLOR=true
 
 ## Prompt
+if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="green"; fi
+PROMPT='%{$fg[$NCOLOR]%}%m %#%{$reset_color%} '
 RPROMPT="[%c]"
 setopt prompt_subst
 setopt prompt_percent
@@ -35,15 +40,15 @@ setopt transient_rprompt
 ## Completion
 autoload -U compinit
 compinit
-zstyle ':completion:*' format '%B%d%b'
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*:default' menu select=2
-zstyle ':completion:*:default' list-colors ""
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z} r:|[._-]=*'
-zstyle ':completion:*' completer _oldlist _complete _match _history _ignored _approximate _prefix
-zstyle ':completion:*' use-cache yes
-zstyle ':completion:*' verbose yes
-zstyle ':completion:sudo:*' environ PATH="$SUDO_PATH:$PATH"
+#zstyle ':completion:*' format '%B%d%b'
+#zstyle ':completion:*' group-name ''
+#zstyle ':completion:*:default' menu select=2
+#zstyle ':completion:*:default' list-colors ""
+#zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z} r:|[._-]=*'
+#zstyle ':completion:*' completer _oldlist _complete _match _history _ignored _approximate _prefix
+#zstyle ':completion:*' use-cache yes
+#zstyle ':completion:*' verbose yes
+#zstyle ':completion:sudo:*' environ PATH="$SUDO_PATH:$PATH"
 setopt auto_list
 setopt complete_in_word
 setopt glob_complete
@@ -51,9 +56,10 @@ setopt hist_expand
 setopt no_beep
 setopt numeric_glob_sort
 setopt auto_remove_slash
+setopt correct
+setopt magic_equal_subst
 
 ## Expansion
-setopt magic_equal_subst
 setopt extended_glob
 setopt mark_dirs
 
@@ -61,13 +67,13 @@ setopt mark_dirs
 alias -g p="|& $PAGER"
 alias -g g='| grep'
 alias r="rm -i"
-alias e='emacs '
-alias v='vim '
-alias l='ls -lh'
-alias s='sudo '
+alias e='emacs'
+alias v='vim'
+alias l='ls -lh --color=auto --show-control-chars'
+alias s='sudo'
 alias em='sudo -E emerge --color y -a'
 alias eq='equery'
-alias c='cat '
+alias c='cat'
 
 ## Misc.
 setopt long_list_jobs

@@ -22,5 +22,5 @@ uim-toolbar-gtk-systray &
 
 LANG=C
 
-wpa_gui -t &
-pasystray &
+#wpa_gui -t &
+#pasystray &

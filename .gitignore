@@ -5,3 +5,4 @@ emacs.d/history
 *.elc
 emacs.d/url
 emacs.d/packages
+x.d/background.jpg

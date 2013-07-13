@@ -31,7 +31,20 @@
     (set-frame-font "fontset-Aoshima"))
   (add-to-list 'default-frame-alist '(font . "fontset-Aoshima")))
 
+;;; Hack for Cache
+(setq user-emacs-directory (concat user-emacs-directory "cache/"))
+
+;;; Language Setting
+(set-language-environment 'Japanese)
+(prefer-coding-system 'utf-8)
+(when (require 'skk-autoloads nil t)
+  (setq default-input-method "japanese-skk")
+  (define-key global-map "\C-x\C-j" 'skk-mode)
+  (setq skk-user-directory (concat user-emacs-directory "ddskk/")))
+
 ;;; User Interface Setting
+;(setq visible-bell t)
+(setq ring-bell-function 'ignore)
 (when (require 'helm nil t)		; Extension: helm
   (require 'helm-config))
 (if (< emacs-major-version 24) (tool-bar-mode nil) (tool-bar-mode 0))
@@ -61,9 +74,7 @@
   (define-key evil-emacs-state-map (kbd "<henkan>") 'evil-normal-state)
   (setq evil-default-state 'emacs))
 
-;;; Color Setting
-(when (fboundp 'global-font-lock-mode)
-  (global-font-lock-mode t))
+;;; Color / Theme Setting
 (when (require 'color-theme nil t)	; Extension: color-theme
   (color-theme-initialize)
   (color-theme-deep-blue))
@@ -80,15 +91,16 @@
 (global-font-lock-mode t)
 (show-paren-mode t)
 (setq show-paren-style 'mixed)
-(transient-mark-mode t)
+(transient-mark-mode nil)
+(setq scroll-conservatively 0)
+(line-number-mode t)
 (column-number-mode t)
 ;; Display line number
 ;(when (require 'linum) (global-linum-mode t))
-(setq scroll-conservatively 1)
 
-;;; Code behavior
-(delete-selection-mode t)
-(setq require-final-newline t)
+;;; Behavior
+(delete-selection-mode nil)
+(setq require-final-newline nil)
 
 ;;; Completion
 (when (require 'auto-complete nil t)		; Extension: auto-complete

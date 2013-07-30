@@ -1,0 +1,9 @@
+#!/bin/sh
+#xmonad
+#dunst
+
+#/home/kaoru/Programming/awesome/.build-Luna-x86_64-pc-linux-gnu-4.6.3/awesome
+# -c /home/kaoru/cfg/awesome.d/rc.lua
+
+#awesome -c /home/kaoru/CFG/awesome.d/rc.lua
+awesome

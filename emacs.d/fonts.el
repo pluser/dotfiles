@@ -1,7 +1,7 @@
 ;;; This is Fontset Definition
 
 ;; Make fontsets based on ascii
-(let* ((fontset-name "Aoshima")
+(let* ((fontset-name "Akadori")
        (size 11)
        (asciifont "Inconsolata")
        (jpfont "VL Gothic")
@@ -16,6 +16,18 @@
   (set-fontset-font fsn 'unicode jfontspec nil 'append)
   (set-fontset-font fsn 'unicode ffontspec nil 'append)
 )
+
+(let* ((fontset-name "Aoshima")
+       (asciifont "Inconsolata")
+       (size 11)
+       (weight "normal")
+       (slant "normal")
+       (fsn (create-fontset-from-ascii-font (format "%s-%d:weight=%s:slant=%s" asciifont size weight slant) nil fontset-name)))
+  (set-fontset-font fsn 'unicode (font-spec :family "VL Gothic") nil 'append)
+  (set-fontset-font fsn 'unicode (font-spec :family "IPAGothic") nil 'append)
+  (set-fontset-font fsn 'unicode (font-spec :family "IPAexGothic") nil 'append)
+  (set-fontset-font fsn 'unicode (font-spec :family "IPAmjMincho") nil 'append))
+       
 
 ;; Rescaling
 (dolist

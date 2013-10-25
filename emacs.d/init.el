@@ -1,5 +1,5 @@
 ;;; -*- mode: Emacs-Lisp; coding: -*- ;;;
-;;; This is Emacs Setting file.
+;;; init.el --- A emacs setting file
 
 ;;; Local variable
 (when (< emacs-major-version 23)
@@ -31,16 +31,22 @@
     (set-frame-font "fontset-Aoshima"))
   (add-to-list 'default-frame-alist '(font . "fontset-Aoshima")))
 
-;;; Hack for Cache
+;;; A Hack for Cache
+(setq user-emacs-top-directory user-emacs-directory)
 (setq user-emacs-directory (concat user-emacs-directory "cache/"))
 
 ;;; Language Setting
 (set-language-environment 'Japanese)
 (prefer-coding-system 'utf-8)
 (when (require 'skk-autoloads nil t)
+  (setq skk-user-directory (concat user-emacs-directory "ddskk/"))
   (setq default-input-method "japanese-skk")
   (define-key global-map "\C-x\C-j" 'skk-mode)
-  (setq skk-user-directory (concat user-emacs-directory "ddskk/")))
+  (setq skk-henkan-show-candidates-keys (list ?a ?o ?e ?u ?h ?t ?n))
+  (setq skk-indicator-use-cursor-color nil)
+  (setq skk-kakutei-key (kbd "C-t"))
+  (setq skk-background-mode 'dark) ; For DDSKK 15.1 Hot-Fix
+  (require 'skk-hint nil t))
 
 ;;; User Interface Setting
 ;(setq visible-bell t)
@@ -75,10 +81,11 @@
   (setq evil-default-state 'emacs))
 
 ;;; Color / Theme Setting
-(when (require 'color-theme nil t)	; Extension: color-theme
-  (color-theme-initialize)
-  (color-theme-deep-blue))
-;(load-file (concat user-emacs-directory "modeline2.el"))
+(if (< emacs-major-version 24)
+    (when (require 'color-theme nil t)	; Extension: color-theme
+      (color-theme-initialize)
+      (color-theme-deep-blue))
+  (load-theme 'deeper-blue))
 
 ;;; Communication with external program
 (setq diff-switches "-u")
@@ -91,7 +98,7 @@
 (global-font-lock-mode t)
 (show-paren-mode t)
 (setq show-paren-style 'mixed)
-(transient-mark-mode nil)
+;(transient-mark-mode -1)
 (setq scroll-conservatively 0)
 (line-number-mode t)
 (column-number-mode t)
@@ -99,7 +106,7 @@
 ;(when (require 'linum) (global-linum-mode t))
 
 ;;; Behavior
-(delete-selection-mode nil)
+;(delete-selection-mode nil)
 (setq require-final-newline nil)
 
 ;;; Completion

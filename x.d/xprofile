@@ -1,6 +1,11 @@
 #!/bin/sh
+
+export ZDOTDIR="${HOME}/.zdot/"
+
 #xset r rate 275 30
-setxkbmap dvorak -option ctrl:swapcaps
+#setxkbmap dvorak -option ctrl:swapcaps
+#setxkbmap dvorak
+xset -b
 #export EDITOR="emacsclient"
 
 #export XMODIFIERS="@im=ibus"
@@ -20,7 +25,8 @@ uim-xim &
 uim-toolbar-gtk-systray &
 #uim-toolbar-qt4 &
 
-LANG=C
+export LANG='en_US.utf8'
+#export LC_MESSAGES='en_US.utf8'
 
 #wpa_gui -t &
 #pasystray &

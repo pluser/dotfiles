@@ -8,15 +8,16 @@ path=(
 	$HOME/Gentoo/usr/sbin(N-/)
 	/opt/bin(N-/)
 	/opt/local/bin(N-/)
+	/usr/games/bin(N-/)
 )
 #export LANG="ja_JP.utf8"
-export EPREFIX="/home/kaoru/Gentoo"
-#typeset -xT SUPER_PATH super_path
+#export EPREFIX="/home/kaoru/Gentoo"
+typeset -xT SUPER_PATH super_path
 typeset -U super_path
-super_path=({,/,/usr/local,/usr}/sbin(N-/))
+super_path=({,/usr/local,/usr}/sbin(N-/))
 
-typeset -U lib_path
-lib_path=(./lib)
+#typeset -U lib_path
+#lib_path=(./lib)
 
 email_files=(
 	~/.zsh.d/email(N-.)

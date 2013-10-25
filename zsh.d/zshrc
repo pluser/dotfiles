@@ -4,6 +4,9 @@ bindkey -e
 setopt no_flow_control	#For collision of keybind
 bindkey '^p' history-beginning-search-backward
 bindkey '^n' history-beginning-search-forward
+bindkey '^[[3~' delete-char
+bindkey '^[[1~' beginning-of-line
+bindkey '^[[4~' end-of-line
 
 ## Function of 'cd'
 setopt auto_cd
@@ -13,7 +16,7 @@ cdpath=(~)
 #chpwd_functions+=dirs
 
 ## History
-HISTFILE=~/.zsh.d/zsh_history
+HISTFILE=${ZDOTDIR}/.zsh_history
 HISTSIZE=10000
 SAVEHIST=1000000
 setopt extended_history
@@ -30,25 +33,28 @@ colors
 export CLICOLOR=true
 
 ## Prompt
-if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="green"; fi
-PROMPT='%{$fg[$NCOLOR]%}%m %#%{$reset_color%} '
+autoload -U promptinit
+promptinit
+#if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="green"; fi
+#PROMPT='%{$fg[$NCOLOR]%}%m %#%{$reset_color%} '
 RPROMPT="[%c]"
 setopt prompt_subst
 setopt prompt_percent
 setopt transient_rprompt
+prompt gentoo
 
 ## Completion
 autoload -U compinit
 compinit
+#zstyle ':completion:*' completer _oldlist _complete _match _history _ignored _approximate _prefix
 #zstyle ':completion:*' format '%B%d%b'
 #zstyle ':completion:*' group-name ''
 #zstyle ':completion:*:default' menu select=2
 #zstyle ':completion:*:default' list-colors ""
 #zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z} r:|[._-]=*'
-#zstyle ':completion:*' completer _oldlist _complete _match _history _ignored _approximate _prefix
 #zstyle ':completion:*' use-cache yes
 #zstyle ':completion:*' verbose yes
-#zstyle ':completion:sudo:*' environ PATH="$SUDO_PATH:$PATH"
+zstyle ':completion:*:sudo:*' environ PATH="${SUPER_PATH}:${PATH}"
 setopt auto_list
 setopt complete_in_word
 setopt glob_complete
@@ -58,20 +64,27 @@ setopt numeric_glob_sort
 setopt auto_remove_slash
 setopt correct
 setopt magic_equal_subst
+setopt completealiases
+
+## Correction
+setopt correctall
 
 ## Expansion
 setopt extended_glob
 setopt mark_dirs
 
 ## Alias
-alias -g p="|& $PAGER"
-alias -g g='| grep'
+alias jman='LANG=ja_JP.utf8 man'
+#alias -g p="|& $PAGER"
+#alias -g g='| grep'
 alias r="rm -i"
 alias e='emacs'
 alias v='vim'
 alias l='ls -lh --color=auto --show-control-chars'
-alias s='sudo'
-alias em='sudo -E emerge --color y -a'
+alias la='ls -a'
+alias s='sudo --'
+alias em='sudo -E chrt -b 0 emerge --color y -a'
+alias update='sudo -E chrt -b 0 nice -15 eix-sync'
 alias eq='equery'
 alias c='cat'
 

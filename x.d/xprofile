@@ -5,7 +5,12 @@ export ZDOTDIR="${HOME}/.zdot/"
 #xset r rate 275 30
 #setxkbmap dvorak -option ctrl:swapcaps
 #setxkbmap dvorak
+#setxkbmap -option compose:ralt
 xset -b
+#xkbset bouncekeys 50
+#xkbset exp bouncekeys
+xkbcomp ${HOME}/CFG/x.d/teck.xbd ${DISPLAY}
+
 #export EDITOR="emacsclient"
 
 #export XMODIFIERS="@im=ibus"

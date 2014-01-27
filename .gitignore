@@ -1,7 +1,9 @@
 *~
 \#*#
 emacs.d/history
-emacs.d/cache/
+emacs.d/cache
+emacs.d/local
+emacs.d/private
 *.dat
 *.elc
 emacs.d/url

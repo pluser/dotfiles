@@ -135,5 +135,11 @@
 (define-key global-map "\C-x\C-h" 'help-command)
 ;(define-key global-map "\M-/" 'dabbrev-expand)
 
+;;; Load Private confidential file
+(load-file (concat user-emacs-top-directory "private/email.el"))
+
 ;;; A workaround for Tramp for text corruption.
 (setq tramp-remote-process-environment (quote ("HISTFILE=$HOME/.tramp_history" "HISTSIZE=1" "LC_MESSAGE=C" "TERM=dumb" "EMACS=t" "INSIDE_EMACS='24.3.1,tramp:2.2.6-24.3'" "CDPATH=" "HISTORY=" "MAIL=" "MAILCHECK=" "MAILPATH=" "PAGER=\"\"" "autocorrect=" "correct=")))
+
+;;; Dired Settings
+(setq dired-listing-switches "-alh")

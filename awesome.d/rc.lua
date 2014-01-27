@@ -434,13 +434,13 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 
 -- {{{ UserSetting
 gears.wallpaper.maximized("/home/kaoru/CFG/x.d/background.jpg")
-local APW = require("apw/widget")
-local right_layout = wibox.layout.fixed.horizontal()
-right_layout:add(APW)
-globalkeys = awful.util.table.join(globalkeys,
-   awful.key({}, "XF86AudioMute", APW.ToggleMute),
-   awful.key({}, "XF86AudioLowerVolume", APW.Down),
-   awful.key({}, "XF86AudioRaiseVolume", APW.Up)
-)
+--local APW = require("apw/widget")
+--local right_layout = wibox.layout.fixed.horizontal()
+--right_layout:add(APW)
+--globalkeys = awful.util.table.join(globalkeys,
+--   awful.key({}, "XF86AudioMute", APW.ToggleMute),
+--   awful.key({}, "XF86AudioLowerVolume", APW.Down),
+--   awful.key({}, "XF86AudioRaiseVolume", APW.Up)
+--)
 root.keys(globalkeys)
 -- }}}

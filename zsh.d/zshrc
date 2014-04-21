@@ -1,3 +1,4 @@
+# -*- mode: shell-script -*-
 ## KeyBinding
 setopt dvorak
 bindkey -e
@@ -62,13 +63,13 @@ setopt hist_expand
 setopt no_beep
 setopt numeric_glob_sort
 setopt auto_remove_slash
-unsetopt correct
 setopt magic_equal_subst
 setopt completealiases
 unsetopt equals
 
 ## Correction
-setopt correctall
+setopt correct
+unsetopt correctall
 
 ## Expansion
 setopt extended_glob

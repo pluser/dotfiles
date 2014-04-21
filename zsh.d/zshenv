@@ -1,3 +1,8 @@
+# -*- mode: shell-script -*-
+# Environment Variable Setting File for ZSH
+
+export ZDOTDIR="${HOME}/.zdot/"
+
 typeset -U path
 path=(
 	/bin(N-/)
@@ -10,8 +15,6 @@ path=(
 	/opt/local/bin(N-/)
 	/usr/games/bin(N-/)
 )
-#export LANG="ja_JP.utf8"
-#export EPREFIX="/home/kaoru/Gentoo"
 typeset -xT SUPER_PATH super_path
 typeset -U super_path
 super_path=({,/usr/local,/usr}/sbin(N-/))

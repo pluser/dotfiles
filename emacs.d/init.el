@@ -151,6 +151,9 @@
 ;;; Dired Settings
 (setq dired-listing-switches "-alh")
 
+;;; Ediff Settiings
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

@@ -15,6 +15,9 @@ path=(
 	/opt/local/bin(N-/)
 	/usr/games/bin(N-/)
 )
+
+export CCACHE_TEMPDIR="/tmp/ccache"
+
 typeset -xT SUPER_PATH super_path
 typeset -U super_path
 super_path=({,/usr/local,/usr}/sbin(N-/))
@@ -29,4 +32,5 @@ for email_file in ${email_files}; do
 	export EMAIL=$(cat "$email_file")
 	break
 done
+
 

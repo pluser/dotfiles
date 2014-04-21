@@ -38,7 +38,6 @@ autoload -U promptinit
 promptinit
 #if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="green"; fi
 #PROMPT='%{$fg[$NCOLOR]%}%m %#%{$reset_color%} '
-RPROMPT="[%c]"
 setopt prompt_subst
 setopt prompt_percent
 setopt transient_rprompt
@@ -80,13 +79,42 @@ alias jman='LANG=ja_JP.utf8 man'
 #alias -g p="|& $PAGER"
 #alias -g g='| grep'
 alias r="rm -i"
-alias e='emacs'
-alias v='vim'
+#alias e='emacs'
+#alias v='vi'
 alias l='ls -lh --color=auto --show-control-chars'
 alias la='ls -a'
 alias s='sudo --'
-alias em='sudo -E chrt -b 0 emerge --color y -a'
-alias update='sudo -E chrt -b 0 nice -15 eix-sync'
+alias dvorak='xkbcomp ~/CFG/x.d/teck.xkb $DISPLAY -w0'
+alias lhand='xinput set-button-map "Kensington      Kensington Expert Mouse" 3 2 1 4 5 6 7 8 9 10 11 12'
+alias rhand='xinput set-button-map "Kensington      Kensington Expert Mouse" 1 2 3 4 5 6 7 8 9 10 11 12'
+#alias ems="$(if [ "$(mount -l | grep ${HOME}/.ccache)" ]; then echo export FEATURES=\"${FEATURES} ccache\"; fi); sudo -E chrt -b 0 emerge --color y -a"
+function em() {
+	local cmd="sudo -E chrt -b 0 emerge --color y -a"
+### for Automounter
+#	touch -c /mnt/ccache/
+#	if [ -e "/mnt/ccache/" -a -n "$(mount -l | grep /mnt/ccache)" ]; then
+#		cmd="FEATURES='ccache ${FEATURES}' $cmd $*"
+#	else
+#		cmd="$cmd $*"
+#	fi
+	local already_mounted=0
+	if [ -n "$(mount -l | grep /var/tmp/ccache)" ]; then
+		already_mounted=1
+	elif [ -z "$(sudo mount /var/tmp/ccache)" ]; then
+		already_mounted=2
+	fi
+	if [ $already_mounted -ne 0 ]; then
+		cmd="FEATURES='ccache ${FEATURES}' $cmd $*"
+	else
+		cmd="$cmd $*"
+	fi
+	eval $cmd
+	if [ $already_mounted -eq 2 ]; then
+		sudo umount /var/tmp/ccache
+	fi
+}
+compdef em=emerge
+alias update='EIX_SYNC_OPTS=* sudo -E chrt -b 0 nice -15 eix-sync'
 alias eq='equery'
 alias c='cat'
 

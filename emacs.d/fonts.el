@@ -2,7 +2,7 @@
 
 ;; Make fontsets based on ascii
 (let* ((fontset-name "Akadori")
-       (size 11)
+       (size 12)
        (asciifont "Inconsolata")
        (jpfont "VL Gothic")
        (failfont "IPAGothic")
@@ -19,7 +19,7 @@
 
 (let* ((fontset-name "Aoshima")
        (asciifont "Inconsolata")
-       (size 11)
+       (size 12)
        (weight "normal")
        (slant "normal")
        (fsn (create-fontset-from-ascii-font (format "%s-%d:weight=%s:slant=%s" asciifont size weight slant) nil fontset-name)))

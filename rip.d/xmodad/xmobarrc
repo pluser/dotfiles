@@ -1,0 +1,22 @@
+Config { font = "xft:Ubuntu:size=10:antialias=true"
+       , borderColor = "black"
+       , border = TopB
+       , bgColor = "black"
+       , fgColor = "grey"
+       , position = Top
+       , lowerOnStart = True
+       , commands = [ Run Weather "RJTT" ["-t","Tokyo Int. Airport: <tempC>C, <rh>%, <pressure>hPa","-L","18","-H","25","--normal","green","--high","red","--low","lightblue"] 36000
+                    , Run Network "wlp3s0" ["-t","<rx>KB <tx>KB","-L","0","-H","32","--normal","green","--high","red"] 10
+                    , Run Network "enp3s0" ["-t","<rx>KB <tx>KB","-L","0","-H","32","--normal","green","--high","red"] 10
+                    , Run Cpu ["-t","CPU: to:<total>% sys:<system>% iow:<iowait>%","-L","3","-H","50","--normal","green","--high","red"] 10
+		    , Run CpuFreq ["-t","<cpu0>","-L","0","-H","2","--low","lightblue","--normal","green","--high","red"] 50
+                    , Run Memory ["-t","Mem: <usedratio>%"] 10
+                    , Run Swap [] 10
+		    , Run DiskIO [("/", "<read> <write>"), ("sda2", "<total>")] [] 10
+                    , Run Com "uname" ["-s","-r"] "" 36000
+    		    , Run Date "%a %b %_d %Y %H:%M:%S" "date" 10
+                    ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = "%cpu% / %cpufreq% | %memory% * %swap% | Net: %wlp3s0% * %enp3s0% | Disk: %diskio% }{ <fc=#ee9a00>%date%</fc>| %RJTT% | %uname%"
+       }

@@ -9,7 +9,8 @@ export ZDOTDIR="${HOME}/.zdot/"
 xset -b
 #xkbset bouncekeys 50
 #xkbset exp bouncekeys
-xkbcomp ${HOME}/CFG/x.d/teck.xbd ${DISPLAY}
+#xkbcomp ${HOME}/CFG/x.d/teck.xkb ${DISPLAY} -w0
+xinput set-button-map 'Kensington      Kensington Expert Mouse' 3 2 1 4 5 6 7 8 9 10 11 12
 
 #export EDITOR="emacsclient"
 
@@ -27,7 +28,7 @@ export XMODIFIERS=@im=uim
 export GTK_IM_MODULE=uim
 export QT_IM_MODULE=uim
 uim-xim &
-uim-toolbar-gtk-systray &
+#uim-toolbar-gtk-systray &
 #uim-toolbar-qt4 &
 
 export LANG='en_US.utf8'

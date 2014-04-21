@@ -42,11 +42,14 @@
   (setq skk-user-directory (concat user-emacs-directory "ddskk/"))
   (setq default-input-method "japanese-skk")
   (define-key global-map "\C-x\C-j" 'skk-mode)
-  (setq skk-henkan-show-candidates-keys (list ?a ?o ?e ?u ?h ?t ?n))
+  (setq skk-henkan-show-candidates-keys (list ?a ?o ?e ?u ?h ?t ?n ?s))
   (setq skk-indicator-use-cursor-color nil)
   (setq skk-kakutei-key (kbd "C-t"))
   (setq skk-background-mode 'dark) ; For DDSKK 15.1 Hot-Fix
-  (require 'skk-hint nil t))
+  (require 'skk-hint nil t)
+  (when (require 'skk-search-web nil t)
+;    (add-to-list 'skk-search-prog-list '(skk-search-web 'skk-google-cgi-api-for-japanese-input) t)
+    (add-to-list 'skk-search-prog-list '(skk-search-web 'skk-google-suggest) t)))
 
 ;;; User Interface Setting
 ;(setq visible-bell t)

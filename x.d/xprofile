@@ -1,6 +1,7 @@
 #!/bin/sh
 
 export ZDOTDIR="${HOME}/.zdot/"
+export TERMINAL="/usr/bin/sakura"
 
 #xset r rate 275 30
 #setxkbmap dvorak -option ctrl:swapcaps

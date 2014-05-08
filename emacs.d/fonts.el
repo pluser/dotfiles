@@ -1,4 +1,5 @@
-;;; This is Fontset Definition
+;;; -*- mode: Emacs-Lisp -*- ;;;
+;;; font.el --- A emacs external setting file (fontset definition)
 
 ;; Make fontsets based on ascii
 (let* ((fontset-name "Akadori")
@@ -19,7 +20,7 @@
 
 (let* ((fontset-name "Aoshima")
        (asciifont "Inconsolata")
-       (size 12)
+       (size 16)
        (weight "normal")
        (slant "normal")
        (fsn (create-fontset-from-ascii-font (format "%s-%d:weight=%s:slant=%s" asciifont size weight slant) nil fontset-name)))

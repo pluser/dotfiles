@@ -25,7 +25,7 @@
   (package-initialize))
 
 ;;; Font Setting
-(when (equal window-system 'x)
+(when (and (display-graphic-p) (file-readable-p (concat user-emacs-directory "fonts.el")))
   (load-file (concat user-emacs-directory "fonts.el"))
   (when (< emacs-major-version 24)
     (set-face-font 'default "fontset-Aoshima")

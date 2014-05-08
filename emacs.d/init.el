@@ -6,8 +6,9 @@
   (defvar user-emacs-directory (file-name-directory (or buffer-file-name load-file-name))))
 
 ;;; Set load-path
-(add-to-list 'load-path user-emacs-directory)
+;(add-to-list 'load-path user-emacs-directory)
 (add-to-list 'load-path (concat user-emacs-directory "elisps/"))
+(add-to-list 'load-path (concat user-emacs-directory "monkeys/"))
 (when (< emacs-major-version 24)	; for no 'package env.
  (add-to-list 'load-path (concat user-emacs-directory "packages/"))
  (let ((default-directory (concat user-emacs-directory "packages/")))
@@ -20,7 +21,7 @@
 (when (require 'package nil t)
   (add-to-list 'package-archives '("melpa". "http://melpa.milkbox.net/packages/") t)
   (add-to-list 'package-archives '("marmalade". "http://marmalade-repo.org/packages/") t)
-  (setq package-user-dir(concat user-emacs-directory "packages/"))
+  (setq package-user-dir (concat user-emacs-directory "packages/"))
   (package-initialize))
 
 ;;; Font Setting
@@ -30,6 +31,10 @@
     (set-face-font 'default "fontset-Aoshima")
     (set-frame-font "fontset-Aoshima"))
   (add-to-list 'default-frame-alist '(font . "fontset-Aoshima")))
+
+;;; Custom Patch Loading
+(when (file-readable-p (concat user-emacs-directory "monkey.el"))
+  (load-file (concat user-emacs-directory "monkey.el")))
 
 ;;; A Hack for Cache
 (setq user-emacs-top-directory user-emacs-directory)
@@ -154,25 +159,7 @@
 ;;; Ediff Settiings
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
-)
- '(explicit-shell-file-name "/bin/zsh"))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(compilation-error ((t (:foreground "yellow"))) t)
- '(error ((t (:foreground "yellow" :weight bold))))
- '(term-color-black ((t (:background "gray5" :foreground "gray5"))))
- '(term-color-blue ((t (:background "slate blue" :foreground "slate blue"))))
- '(term-color-cyan ((t (:background "deep sky blue" :foreground "deep sky blue"))))
- '(term-color-green ((t (:background "SpringGreen3" :foreground "SpringGreen3"))))
- '(term-color-magenta ((t (:background "maroon1" :foreground "maroon1"))))
- '(term-color-red ((t (:background "#ee5533" :foreground "#ee5533"))))
- '(term-color-white ((t (:background "gainsboro" :foreground "gainsboro"))))
- '(term-color-yellow ((t (:background "yellow2" :foreground "yellow2")))))
+;;; Customize Settings
+(setq custom-file (concat user-emacs-top-directory "customize.el"))
+(load custom-file)
+

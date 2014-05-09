@@ -132,7 +132,7 @@
   (define-key ac-mode-map "\M-/" 'auto-complete))
 
 ;;; SKK Settings
-(package-config 'skk-autoloads		; Extension: SKK
+(package-config 'skk		; Extension: SKK
   (setq skk-user-directory (concat user-emacs-directory "ddskk/"))
   (setq default-input-method "japanese-skk")
   (define-key global-map "\C-x\C-j" 'skk-mode)

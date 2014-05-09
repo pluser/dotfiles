@@ -6,6 +6,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(company-preview-common ((t (:inherit company-preview :foreground "orange"))))
  '(compilation-error ((t (:foreground "yellow"))) t)
  '(error ((t (:foreground "yellow" :weight bold))))
  '(term-color-black ((t (:background "gray5" :foreground "gray5"))))

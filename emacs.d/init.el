@@ -116,7 +116,7 @@
 
 ;;; Company Settings
 (package-config 'company		; Extension: company
-  (global-company-mode))
+  )
 
 ;;; Magit Settings
 (package-config 'magit		; Extension: magit

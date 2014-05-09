@@ -118,6 +118,10 @@
 (package-config 'company		; Extension: company
   (global-company-mode))
 
+;;; Magit Settings
+(package-config 'magit		; Extension: magit
+  (setq magit-auto-revert-mode nil))
+
 ;;; Auto-Complete Settings
 (package-config 'auto-complete		; Extension: auto-complete
 ;  (add-to-list 'ac-dictionary-directories (concat user-emacs-directory "acdict/"))

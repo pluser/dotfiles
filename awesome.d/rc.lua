@@ -73,7 +73,7 @@ local layouts =
 -- {{{ Wallpaper
 if beautiful.wallpaper then
     for s = 1, screen.count() do
-        gears.wallpaper.maximized(beautiful.wallpaper, s, true)
+        gears.wallpaper.maximized(os.getenv("USER_CONF") .. "x.d/background.jpg" or beautiful.wallpaper, s, true)
     end
 end
 -- }}}
@@ -83,7 +83,7 @@ end
 tags = {}
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
-    tags[s] = awful.tag({ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, s, layouts[1])
+    tags[s] = awful.tag({ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, s, layouts[10])
 end
 -- }}}
 
@@ -315,16 +315,20 @@ for i = 1, 9 do
                   end),
         awful.key({ modkey, "Shift" }, "#" .. i + 9,
                   function ()
-                      local tag = awful.tag.gettags(client.focus.screen)[i]
-                      if client.focus and tag then
-                          awful.client.movetotag(tag)
+                      if client.focus then
+                          local tag = awful.tag.gettags(client.focus.screen)[i]
+                          if tag then
+                              awful.client.movetotag(tag)
+                          end
                      end
                   end),
         awful.key({ modkey, "Control", "Shift" }, "#" .. i + 9,
                   function ()
-                      local tag = awful.tag.gettags(client.focus.screen)[i]
-                      if client.focus and tag then
-                          awful.client.toggletag(tag)
+                      if client.focus then
+                          local tag = awful.tag.gettags(client.focus.screen)[i]
+                          if tag then
+                              awful.client.toggletag(tag)
+                          end
                       end
                   end))
 end
@@ -430,17 +434,4 @@ end)
 
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
--- }}}
-
--- {{{ UserSetting
-gears.wallpaper.maximized("/home/kaoru/CFG/x.d/background.jpg")
---local APW = require("apw/widget")
---local right_layout = wibox.layout.fixed.horizontal()
---right_layout:add(APW)
---globalkeys = awful.util.table.join(globalkeys,
---   awful.key({}, "XF86AudioMute", APW.ToggleMute),
---   awful.key({}, "XF86AudioLowerVolume", APW.Down),
---   awful.key({}, "XF86AudioRaiseVolume", APW.Up)
---)
-root.keys(globalkeys)
 -- }}}

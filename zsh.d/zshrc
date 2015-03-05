@@ -1,125 +1,56 @@
 # -*- mode: shell-script -*-
-## KeyBinding
-setopt dvorak
-bindkey -e
-setopt no_flow_control	#For collision of keybind
-bindkey '^p' history-beginning-search-backward
-bindkey '^n' history-beginning-search-forward
-bindkey '^[[3~' delete-char
-bindkey '^[[1~' beginning-of-line
-bindkey '^[[4~' end-of-line
+if [[ -n "$ZSH_VERSION" ]]
+then
+    unsetopt flow_control # for ^Q/^S keys pillaged by terminal
+    # local/global variables {{{
+    typeset -xTU SU_PATH su_path
+    su_path=({,/usr/local,/usr}/sbin(N-/) ${path}(N-/))
+    #}}}
+    # lazy loadings {{{
+    autoload -U promptinit
+    autoload -U compinit
+    autoload -U predict-on
+    autoload -U color
+    source ~/CFG/zsh.d/antigen/antigen.zsh
+    #}}}
+    # keybinding {{{
+    bindkey '^?' delete-char
+    bindkey -M isearch '^M' accept-search
+    bindkey '^p' history-beginning-search-backward
+    bindkey '^n' history-beginning-search-forward
+    #}}}
+    # completion/predict {{{
+    compinit
+#    predict-on
+    zstyle ':completion:*:sudo:*' environ PATH="${SU_PATH}"
+    zstyle ':completion:*' use-cache yes
+    # expansion/globbing {{{
+    setopt extended_glob
+    #}}}
+    # prompt ornament {{{
+    promptinit
+    prompt gentoo
+    #}}}
+    # retrieve directory {{{
+    setopt auto_cd
+    cdpath=(~ /tmp/ /use/portage/)
+    #}}}
+    # history {{{
+    HISTFILE=~/.zsh_history
+    HISTSIZE=10000
+    SAVEHIST=1000000
+    setopt extended_history
+    setopt hist_reduce_blanks
+    setopt hist_ignore_dups
+    setopt hist_ignore_space
+    setopt hist_verify
+    #}}}
+fi
 
-## Function of 'cd'
-setopt auto_cd
-setopt auto_pushd
-setopt pushd_ignore_dups
-cdpath=(~)
-#chpwd_functions+=dirs
-
-## History
-HISTFILE=${ZDOTDIR}/.zsh_history
-HISTSIZE=10000
-SAVEHIST=1000000
-setopt extended_history
-setopt hist_ignore_dups
-setopt hist_ignore_all_dups
-setopt hist_ignore_space
-setopt inc_append_history
-setopt share_history
-setopt hist_verify
-
-## Color
-autoload -U colors
-colors
-export CLICOLOR=true
-
-## Prompt
-autoload -U promptinit
-promptinit
-#if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="green"; fi
-#PROMPT='%{$fg[$NCOLOR]%}%m %#%{$reset_color%} '
-setopt prompt_subst
-setopt prompt_percent
-setopt transient_rprompt
-prompt gentoo
-
-## Completion
-autoload -U compinit
-compinit
-#zstyle ':completion:*' completer _oldlist _complete _match _history _ignored _approximate _prefix
-#zstyle ':completion:*' format '%B%d%b'
-#zstyle ':completion:*' group-name ''
-#zstyle ':completion:*:default' menu select=2
-#zstyle ':completion:*:default' list-colors ""
-#zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z} r:|[._-]=*'
-#zstyle ':completion:*' use-cache yes
-#zstyle ':completion:*' verbose yes
-zstyle ':completion:*:sudo:*' environ PATH="${SUPER_PATH}:${PATH}"
-setopt auto_list
-setopt complete_in_word
-setopt glob_complete
-setopt hist_expand
-setopt no_beep
-setopt numeric_glob_sort
-setopt auto_remove_slash
-setopt magic_equal_subst
-setopt completealiases
-unsetopt equals
-
-## Correction
-setopt correct
-unsetopt correctall
-
-## Expansion
-setopt extended_glob
-setopt mark_dirs
-
-## Alias
-alias jman='LANG=ja_JP.utf8 man'
-#alias -g p="|& $PAGER"
-#alias -g g='| grep'
-alias r="rm -i"
-#alias e='emacs'
-#alias v='vi'
-alias l='ls -lh --color=auto --show-control-chars'
-alias la='ls -a'
-alias s='sudo --'
+# aliases
 alias dvorak='xkbcomp ~/CFG/x.d/teck.xkb $DISPLAY -w0'
 alias lhand='xinput set-button-map "Kensington      Kensington Expert Mouse" 3 2 1 4 5 6 7 8 9 10 11 12'
 alias rhand='xinput set-button-map "Kensington      Kensington Expert Mouse" 1 2 3 4 5 6 7 8 9 10 11 12'
-#alias ems="$(if [ "$(mount -l | grep ${HOME}/.ccache)" ]; then echo export FEATURES=\"${FEATURES} ccache\"; fi); sudo -E chrt -b 0 emerge --color y -a"
-function em() {
-	local cmd="sudo -E chrt -b 0 emerge --color y -a"
-### for Automounter
-#	touch -c /mnt/ccache/
-#	if [ -e "/mnt/ccache/" -a -n "$(mount -l | grep /mnt/ccache)" ]; then
-#		cmd="FEATURES='ccache ${FEATURES}' $cmd $*"
-#	else
-#		cmd="$cmd $*"
-#	fi
-	local already_mounted=0
-	if [ -n "$(mount -l | grep /var/tmp/ccache)" ]; then
-		already_mounted=1
-	elif [ -z "$(sudo mount /var/tmp/ccache)" ]; then
-		already_mounted=2
-	fi
-	if [ $already_mounted -ne 0 ]; then
-		cmd="FEATURES='ccache ${FEATURES}' $cmd $*"
-	else
-		cmd="$cmd $*"
-	fi
-	eval $cmd
-	if [ $already_mounted -eq 2 ]; then
-		sudo umount /var/tmp/ccache
-	fi
-}
-#compdef em=emerge
+alias em='sudo -E chrt -b 0 emerge --ask'
 alias update='EIX_SYNC_OPTS=* sudo -E chrt -b 0 nice -15 eix-sync'
-alias eq='equery'
-alias c='cat'
-
-## Misc.
-setopt long_list_jobs
-REPORTTIME=10
-WORDCHARS=${WORDCHARS:s,/,,}
-
+alias blackout='xset dpms force off'

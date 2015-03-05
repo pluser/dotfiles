@@ -1,0 +1,8 @@
+logsize=4096
+fontsize=21
+use_anti_alias=true
+fg_color=#aaaaaa
+bg_color=#181a26
+use_scrollbar=false
+mod_meta_key=alt
+mod_meta_mode=esc

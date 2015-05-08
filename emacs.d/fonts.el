@@ -2,7 +2,8 @@
 ;;; font.el --- A emacs external setting file (fontset definition)
 
 ;; Make fontsets based on ascii
-(let* ((fontset-name "Akadori")
+
+(let* ((fontset-name "akadori")
        (size 12)
        (asciifont "Inconsolata")
        (jpfont "VL Gothic")
@@ -18,7 +19,7 @@
   (set-fontset-font fsn 'unicode ffontspec nil 'append)
 )
 
-(let* ((fontset-name "Aoshima")
+(let* ((fontset-name "aoshima")
        (asciifont "Inconsolata")
        (size 16)
        (weight "normal")
@@ -28,7 +29,14 @@
   (set-fontset-font fsn 'unicode (font-spec :family "IPAGothic") nil 'append)
   (set-fontset-font fsn 'unicode (font-spec :family "IPAexGothic") nil 'append)
   (set-fontset-font fsn 'unicode (font-spec :family "IPAmjMincho") nil 'append))
-       
+
+(defun set-frame-fontset (fontset)
+  "I cannot set fontset to the current frame with set-frame-font function.
+If you want to set fontset to current frame, use set-frame-perameter instead of set-frame-font (see bug-report#11722)."
+  (interactive "sfontset name: ")
+  (if (string-match "^fontset-" fontset)
+      (set-frame-parameter nil 'font fontset)
+    (set-frame-parameter nil 'font (concat "fontset-" fontset))))
 
 ;; Rescaling
 (dolist

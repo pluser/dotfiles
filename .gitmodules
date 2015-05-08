@@ -1,3 +1,6 @@
 [submodule "zsh.d/antigen"]
 	path = zsh.d/antigen
 	url = https://github.com/zsh-users/antigen.git
+[submodule "bin.d/pushbullet-bash"]
+	path = bin.d/pushbullet-bash
+	url = https://github.com/Red5d/pushbullet-bash.git

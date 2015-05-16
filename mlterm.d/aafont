@@ -1,2 +1,2 @@
-DEFAULT=Ubuntu Mono
-JISX0213_2000_2=IPAGothic
+DEFAULT = IPAGothic
+ISO8859_1 = UbuntuMono

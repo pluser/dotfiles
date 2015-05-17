@@ -5,16 +5,18 @@ then
     # local/global variables {{{
     typeset -xTU SU_PATH su_path
     su_path=({,/usr/local,/usr}/sbin(N-/) ${path}(N-/))
+	#zcfg_path="$(cd "$(dirname "${BASH_SOURCE:-${(%):-%N}}")"; pwd)"
+	zcfg_path=(${ZDOTDIR:-$HOME}/.zshrc(:A:h))
     #}}}
     # lazy loadings {{{
     autoload -U promptinit
     autoload -U compinit
     autoload -U predict-on
     autoload -U color
-    source ~/CFG/zsh.d/antigen/antigen.zsh
+    source "${zcfg_path}/antigen/antigen.zsh"
     #}}}
     # keybinding {{{
-    bindkey '^?' delete-char
+#    bindkey '^?' delete-char
     bindkey -M isearch '^M' accept-search
     bindkey '^p' history-beginning-search-backward
     bindkey '^n' history-beginning-search-forward
@@ -33,10 +35,10 @@ then
     #}}}
     # retrieve directory {{{
     setopt auto_cd
-    cdpath=(~ /tmp/ /use/portage/)
+    cdpath=(.. ~ /tmp/)
     #}}}
     # history {{{
-    HISTFILE=~/.zsh_history
+    HISTFILE="${zcfg_path}/.zsh_history"
     HISTSIZE=10000
     SAVEHIST=1000000
     setopt extended_history
@@ -52,5 +54,6 @@ alias dvorak='xkbcomp ~/CFG/x.d/teck.xkb $DISPLAY -w0'
 alias lhand='xinput set-button-map "Kensington      Kensington Expert Mouse" 3 2 1 4 5 6 7 8 9 10 11 12'
 alias rhand='xinput set-button-map "Kensington      Kensington Expert Mouse" 1 2 3 4 5 6 7 8 9 10 11 12'
 alias em='sudo -E chrt -b 0 emerge --ask'
-alias update='EIX_SYNC_OPTS=* sudo -E chrt -b 0 nice -15 eix-sync'
+#alias update='EIX_SYNC_OPTS=* sudo -E chrt -b 0 nice -15 eix-sync'
+alias update='sudo -E chrt -b 0 nice -15 eix-sync'
 alias blackout='xset dpms force off'

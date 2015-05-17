@@ -10,3 +10,4 @@ emacs.d/url
 emacs.d/packages
 mlterm.d/msg.log
 mlterm.d/challenge
+zsh.d/.zsh_history

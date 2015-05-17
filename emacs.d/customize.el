@@ -33,5 +33,5 @@
  '(make-backup-files nil)
  '(package-selected-packages
    (quote
-	(company-web company-jedi pyvenv jinja2-mode python-mode company helm web-mode sunrise-commander php-mode markdown-mode magit idomenu flycheck evil elpy dired+ dic-lookup-w3m ddskk company-c-headers ace-isearch)))
+	(projectile company-web company-jedi pyvenv jinja2-mode python-mode company helm web-mode sunrise-commander php-mode markdown-mode magit idomenu flycheck evil elpy dired+ dic-lookup-w3m ddskk company-c-headers ace-isearch)))
  '(tab-width 4))

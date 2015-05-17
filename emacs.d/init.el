@@ -141,7 +141,12 @@
 
 ;;; Magit Settings
 (package-config 'magit		; Extension: magit
-  (define-key global-map (kbd "<f12>") 'magit-status))
+  (define-key global-map (kbd "<f12>") 'magit-status)
+  (setq magit-last-seen-setup-instruction "1.4.0"))
+
+;;; Projectile Settings
+(package-config 'projectile	; Extension: projectile
+  (setq projectile-mode-line (format " Proj[%s]" (projectile-project-name))))
 
 ;;; Auto-Complete Settings
 (package-config 'auto-complete		; Extension: auto-complete

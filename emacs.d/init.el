@@ -25,6 +25,7 @@
   (add-to-list 'package-archives '("elpy" . "http://jorgenschaefer.github.io/packages/") t)
   (setq package-user-dir (concat user-emacs-directory "packages/"))
   (package-initialize))
+
 (defmacro package-config (package &rest body)
   "Load and set package settings."
   (declare (indent defun))
@@ -62,13 +63,13 @@
 
 ;;; Color / Theme Setting
 (if (< emacs-major-version 24)
-    (when (require 'color-theme nil t)	; Extension: color-theme
+    (when (require 'color-theme nil t)		; Extension: color-theme
       (color-theme-initialize)
       (color-theme-deep-blue))
   (load-theme 'deeper-blue))
 
 ;;; File Opener
-(when (require 'filecache nil t)	; Extension: filecache
+(when (require 'filecache nil t)		; Extension: filecache
   (file-cache-add-file (concat user-emacs-top-directory "init.el")))
 
 ;;; Diff Setting
@@ -83,6 +84,7 @@
 
 ;;; Code styling
 (setq require-final-newline nil)
+(setq mode-require-final-newline nil)
 
 ;;; Completion
 (setq completion-ignore-case t)
@@ -115,7 +117,7 @@
   (define-key helm-read-file-map (kbd "C-z") 'helm-select-action)
   (define-key helm-find-files-map (kbd "TAB") 'helm-execute-persistent-action)
   (define-key helm-find-files-map (kbd "TAB") 'helm-select-action))
-(add-hook 'after-init-hook 'helm-mode)
+(add-hook 'emacs-startup-hook 'helm-mode)
 
 ;;; Evil Settings
 (package-config 'evil		; Extension: evil
@@ -134,13 +136,12 @@
   (setq evil-echo-state nil)
   (setq evil-insert-state-cursor nil)
   (eval-after-load 'help-mode '(evil-make-overriding-map help-mode-map)))
-(add-hook 'after-init-hook 'evil-mode)
 
 ;;; Company Settings
 (package-config 'company		; Extension: company
   (define-key global-map (kbd "<henkan>") 'company-complete)
   (setq company-idle-delay nil))
-(add-hook 'after-init-hook 'global-company-mode)
+(add-hook 'emacs-startup-hook 'global-company-mode)
 
 ;;; Magit Settings
 (package-config 'magit		; Extension: magit
@@ -148,7 +149,7 @@
   (setq magit-last-seen-setup-instruction "1.4.0"))
 
 ;;; Projectile Settings
-(package-config 'projectile	; Extension: projectile
+(package-config 'projectile		; Extension: projectile
   (setq projectile-mode-line (format " Proj[%s]" (projectile-project-name))))
 
 ;;; Auto-Complete Settings

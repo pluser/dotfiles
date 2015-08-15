@@ -136,6 +136,7 @@
   (setq evil-echo-state nil)
   (setq evil-insert-state-cursor nil)
   (eval-after-load 'help-mode '(evil-make-overriding-map help-mode-map)))
+(add-hook 'emacs-startup-hook 'evil-mode)
 
 ;;; Company Settings
 (package-config 'company		; Extension: company
@@ -151,6 +152,7 @@
 ;;; Projectile Settings
 (package-config 'projectile		; Extension: projectile
   (setq projectile-mode-line (format " Proj[%s]" (projectile-project-name))))
+(add-hook 'emacs-startup-hook 'projectile-mode)
 
 ;;; Auto-Complete Settings
 (package-config 'auto-complete		; Extension: auto-complete
@@ -193,9 +195,8 @@
 ;;; Skk Settings
 (setq skk-user-directory (concat user-emacs-directory "ddskk/"))
 (package-config 'skk		; Extension: SKK
-  (setq skk-user-directory (concat user-emacs-directory "ddskk/"))
   (setq default-input-method "japanese-skk")
-  (define-key global-map "\C-x\C-j" 'skk-mode)
+  ;;  (define-key global-map "\C-x\C-j" 'skk-mode)
   (setq skk-henkan-show-candidates-keys (list ?a ?o ?e ?u ?h ?t ?n ?s))
   (setq skk-indicator-use-cursor-color nil)
   (setq skk-kakutei-key (kbd "C-t"))
@@ -204,6 +205,7 @@
   (when (require 'skk-search-web nil t)
 ;   (add-to-list 'skk-search-prog-list '(skk-search-web 'skk-google-cgi-api-for-japanese-input) t)
     (add-to-list 'skk-search-prog-list '(skk-search-web 'skk-google-suggest) t)))
+(add-hook 'text-mode-hook 'skk-preload)
 
 ;;; w3m Settings
 (package-config 'w3m-filter		; Extension: w3m

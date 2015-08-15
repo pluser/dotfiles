@@ -17,6 +17,21 @@
 (let ((default-directory (concat user-emacs-directory "local/")))
  (normal-top-level-add-subdirs-to-load-path))
 
+;;; External file loader
+(defun ext-config (filename &optional ignore-missing)
+  "Load and eval the file, if it exist.
+If the file does not exist, issue an warning message but error.
+If IGNORE-MISSING is non-nil, the warning message will be suppress even if the file does not exist."
+  (let ((filepath (if (boundp 'user-emacs-top-directory)
+					  (concat user-emacs-top-directory filename)
+					(concat user-emacs-directory filename))))
+	(if (file-readable-p filepath)
+		(load-file filepath)
+	  (when (not ignore-missing)
+		(warn "Failed to load file '%s' by '%s'."
+			  filename
+			  (file-name-nondirectory (or buffer-file-name load-file-name)))))))
+
 ;;; Package Managing
 (when (require 'package nil t)
   (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
@@ -33,15 +48,14 @@
 
 ;;; Font Setting
 (when (and (display-graphic-p) (file-readable-p (concat user-emacs-directory "fonts.el")))
-  (load-file (concat user-emacs-directory "fonts.el"))
+  (ext-config "fonts.el")
   (when (< emacs-major-version 24)
     (set-face-font 'default "fontset-Aoshima")
     (set-frame-font "fontset-Aoshima"))
   (add-to-list 'default-frame-alist '(font . "fontset-Aoshima")))
 
 ;;; Custom Patch Loading
-(when (file-readable-p (concat user-emacs-directory "monkey.el"))
-  (load-file (concat user-emacs-directory "monkey.el")))
+(ext-config "monkey.el" t)
 
 ;;; A Hack for Cache
 (setq user-emacs-top-directory user-emacs-directory)
@@ -106,7 +120,7 @@
 (define-key global-map (kbd "<menu>") 'repeat)
 
 ;;; Load Private confidential file
-(load-file (concat user-emacs-top-directory "private/email.el"))
+(ext-config "private/email.el" t)
 
 ;;; Helm Settings
 (package-config 'helm-mode		; Extension: helm

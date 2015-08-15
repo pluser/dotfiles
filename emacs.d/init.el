@@ -182,6 +182,13 @@
 (package-config 'undo-tree		; Extension: undo-tree
   (setq undo-tree-mode-lighter " Ut"))
 
+;;; Whitespace Settiongs
+(package-config 'whitespace		; Extension: whitespace
+  (setq whitespace-style '(face tabs trailing space-before-tab empty tab-mark))
+  (add-hook 'find-file-hook 'whitespace-mode)
+  )
+(add-hook 'emacs-startup-hook 'whitespace-mode)
+
 ;;; Skk Settings
 (setq skk-user-directory (concat user-emacs-directory "ddskk/"))
 (package-config 'skk		; Extension: SKK

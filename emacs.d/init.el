@@ -27,24 +27,33 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 					(concat user-emacs-directory filename))))
 	(if (file-readable-p filepath)
 		(load-file filepath)
-	  (when (not ignore-missing)
+	  (unless ignore-missing
 		(warn "Failed to load file '%s' by '%s'."
 			  filename
 			  (file-name-nondirectory (or buffer-file-name load-file-name)))))))
 
 ;;; Package Managing
-(when (require 'package nil t)
-  (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
-  (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
-  (add-to-list 'package-archives '("sc" . "http://joseito.republika.pl/sunrise-commander/") t)
-  (add-to-list 'package-archives '("elpy" . "http://jorgenschaefer.github.io/packages/") t)
-  (setq package-user-dir (concat user-emacs-directory "packages/"))
-  (package-initialize))
-
 (defmacro package-config (package &rest body)
   "Load and set package settings."
   (declare (indent defun))
   `(eval-after-load ,package (lambda () ,@body)))
+
+(defun package-invoke (package-initiater &optional hook)
+  "Set the package up in startup sequence.
+If HOOK is non-nil, throw invoking package into HOOK instead of startup sequence."
+  (if (fboundp package-initiater)
+	  (add-hook (or hook 'emacs-startup-hook) package-initiater)
+	(unless (require package-initiater nil t)
+	  (warn "Failed to start up a package '%s'." package-initiater))))
+
+(package-config 'package
+  (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+  ;;(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
+  ;;(add-to-list 'package-archives '("sc" . "http://joseito.republika.pl/sunrise-commander/") t)
+  ;;(add-to-list 'package-archives '("elpy" . "http://jorgenschaefer.github.io/packages/") t)
+  (setq package-user-dir (concat user-emacs-directory "packages/"))
+  (package-initialize))
+(package-invoke 'package)
 
 ;;; Font Setting
 (when (and (display-graphic-p) (file-readable-p (concat user-emacs-directory "fonts.el")))
@@ -67,6 +76,7 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 (prefer-coding-system 'utf-8)
 (reset-language-environment)
 ;;(set-charset-priority 'unicode)
+(setq default-input-method 'japanese-google-cgiapi-jp-uim)
 
 ;;; User Interface Setting
 (setq transient-mark-mode nil)
@@ -76,15 +86,17 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 (if (< emacs-major-version 24) (menu-bar-mode nil) (menu-bar-mode 0))
 
 ;;; Color / Theme Setting
-(if (< emacs-major-version 24)
-    (when (require 'color-theme nil t)		; Extension: color-theme
-      (color-theme-initialize)
-      (color-theme-deep-blue))
-  (load-theme 'deeper-blue))
+(if (fboundp 'load-theme)
+	(load-theme 'deeper-blue)
+  (package-config 'color-theme		; Extension: color-theme
+	(color-theme-initialize)
+	(color-theme-deep-blue))
+  (package-invoke 'color-theme))
 
 ;;; File Opener
-(when (require 'filecache nil t)		; Extension: filecache
+(package-config 'filecache
   (file-cache-add-file (concat user-emacs-top-directory "init.el")))
+(package-invoke 'filecache)
 
 ;;; Diff Setting
 (setq diff-switches "-u")
@@ -131,7 +143,7 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
   (define-key helm-read-file-map (kbd "C-z") 'helm-select-action)
   (define-key helm-find-files-map (kbd "TAB") 'helm-execute-persistent-action)
   (define-key helm-find-files-map (kbd "TAB") 'helm-select-action))
-(add-hook 'emacs-startup-hook 'helm-mode)
+(package-invoke 'helm-mode)
 
 ;;; Evil Settings
 (package-config 'evil		; Extension: evil
@@ -141,22 +153,21 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
     (define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "n") 'evil-previous-line)
     (define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "s") 'evil-forward-char)
 	(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "j") 'evil-find-char-to)
-	(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "J") 'evil-find-char-to-backward
-))
+	(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "J") 'evil-find-char-to-backward))
   (define-key evil-insert-state-map (kbd "M-SPC") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-e") nil)
   (setq evil-move-cursor-back nil)
-  (setq evil-default-state 'emacs)
+  ;;(setq evil-default-state 'emacs)
   (setq evil-echo-state nil)
   (setq evil-insert-state-cursor nil)
   (eval-after-load 'help-mode '(evil-make-overriding-map help-mode-map)))
-(add-hook 'emacs-startup-hook 'evil-mode)
+;(add-hook 'emacs-startup-hook 'evil-mode)
 
 ;;; Company Settings
 (package-config 'company		; Extension: company
   (define-key global-map (kbd "<henkan>") 'company-complete)
   (setq company-idle-delay nil))
-(add-hook 'emacs-startup-hook 'global-company-mode)
+(package-invoke 'global-company-mode)
 
 ;;; Magit Settings
 (package-config 'magit		; Extension: magit
@@ -166,7 +177,7 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 ;;; Projectile Settings
 (package-config 'projectile		; Extension: projectile
   (setq projectile-mode-line (format " Proj[%s]" (projectile-project-name))))
-(add-hook 'emacs-startup-hook 'projectile-mode)
+(package-invoke 'projectile-mode)
 
 ;;; Auto-Complete Settings
 (package-config 'auto-complete		; Extension: auto-complete
@@ -184,7 +195,7 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
   (setq web-mode-markup-indent-offset 2))
 
 ;;; Python-mode Settings
-(package-config 'python	; Extension: python-mode
+(package-config 'python		; Extension: python-mode
   (add-hook 'python-mode-hook
 			(lambda ()
 			  (setq indent-tabs-mode t)
@@ -192,24 +203,16 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 			  (setq tab-width 4))))
 
 ;;; Elpy Settings
-(package-config 'elpy
+(package-config 'elpy		; Extension: elpy
   (setq elpy-modules (delete 'elpy-module-highlight-indentation elpy-modules)))
 
 ;;; Undo-Tree Settings
 (package-config 'undo-tree		; Extension: undo-tree
   (setq undo-tree-mode-lighter " Ut"))
 
-;;; Whitespace Settiongs
-(package-config 'whitespace		; Extension: whitespace
-  (setq whitespace-style '(face tabs trailing space-before-tab empty tab-mark))
-  (add-hook 'find-file-hook 'whitespace-mode)
-  )
-(add-hook 'emacs-startup-hook 'whitespace-mode)
-
 ;;; Skk Settings
 (setq skk-user-directory (concat user-emacs-directory "ddskk/"))
 (package-config 'skk		; Extension: SKK
-  (setq default-input-method "japanese-skk")
   ;;  (define-key global-map "\C-x\C-j" 'skk-mode)
   (setq skk-henkan-show-candidates-keys (list ?a ?o ?e ?u ?h ?t ?n ?s))
   (setq skk-indicator-use-cursor-color nil)
@@ -219,7 +222,7 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
   (when (require 'skk-search-web nil t)
 ;   (add-to-list 'skk-search-prog-list '(skk-search-web 'skk-google-cgi-api-for-japanese-input) t)
     (add-to-list 'skk-search-prog-list '(skk-search-web 'skk-google-suggest) t)))
-(add-hook 'text-mode-hook 'skk-preload)
+(package-invoke 'skk-preload 'text-mode-hook)
 
 ;;; w3m Settings
 (package-config 'w3m-filter		; Extension: w3m
@@ -227,6 +230,15 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
   (defun w3m-filter-alc-lay (url) (w3m-filter-delete-regions url "<!-- interest_match_relevant_zone_start -->" "<!-- ▼ 検索結果本体 ▼ -->"))
   (add-to-list 'w3m-filter-configuration '(t "Suck!" "\\`http://eow\\.alc\\.co\\.jp/search" w3m-filter-alc-lay)))
 
+;;; Whitespace Settiongs
+(package-config 'whitespace		; Extension: whitespace
+  (setq whitespace-style '(face tabs trailing space-before-tab empty tab-mark)))
+(package-invoke 'whitespace-mode 'find-file-hook)
+
+;;; Uniquify Settings
+(package-config 'uniquify
+  (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
+(package-invoke 'uniquify)
 
 ;;; Tramp Settings
 ;; A workaround for Tramp for text corruption.
@@ -235,10 +247,6 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 ;;; Terminal Emulator Settings
 ;(when (require 'term+ nil t)
 ;  (require 'xterm-256color nil t))
-
-;;; Uniquify Settings
-(when (require 'uniquify nil t)
-  (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
 
 ;;; Dired Settings
 (setq dired-listing-switches "-alh")

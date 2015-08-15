@@ -47,8 +47,11 @@
 (setq user-emacs-directory (concat user-emacs-directory "cache/"))
 
 ;;; Language Setting
-(set-language-environment 'Japanese)
+;;;  If you want to know charset priority, (print (charset-priority-list))
+;; (set-language-environment 'Japanese)	; set for using japanese ONLY
 (prefer-coding-system 'utf-8)
+(reset-language-environment)
+;;(set-charset-priority 'unicode)
 
 ;;; User Interface Setting
 (setq transient-mark-mode nil)

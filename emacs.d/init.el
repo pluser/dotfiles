@@ -212,11 +212,17 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Python-mode Settings
 (package-config 'python		; Extension: python-mode
-  (add-hook 'python-mode-hook
-			(lambda ()
-			  (setq indent-tabs-mode t)
-			  (setq python-indent-offset 4)
-			  (setq tab-width 4))))
+  (defun my/setting-python-mode ()
+	(setq indent-tabs-mode t)
+	(setq python-indent-offset 4)
+	(setq tab-width 4))
+  (defun my/enable-company-jedi ()
+	(add-to-list 'company-backends 'company-jedi))
+  (add-hook 'python-mode-hook 'my/setting-python-mode)
+  (add-hook 'python-mode-hook 'my/enable-company-jedi))
+
+(package-config 'jinja2-mode
+  (add-to-list 'auto-mode-alist '("\\.tmpl\\'" . jinja2-mode)))
 
 ;;; Elpy Settings
 (package-config 'elpy		; Extension: elpy

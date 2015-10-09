@@ -36,7 +36,9 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 (defmacro package-config (package &rest body)
   "Load and set package settings."
   (declare (indent defun))
-  `(eval-after-load ,package (lambda () ,@body)))
+  (if (fboundp 'with-eval-after-load)
+	  `(with-eval-after-load ,package ,@body)	; with-eval- is more better.
+	  `(eval-after-load ,package (lambda () ,@body))))
 
 (defun package-invoke (package-initiater &optional hook)
   "Set the package up in startup sequence.

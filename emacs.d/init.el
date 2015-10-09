@@ -134,6 +134,18 @@ If HOOK is non-nil, throw invoking package into HOOK instead of startup sequence
 ;;; Load Private confidential file
 (ext-config "private/email.el" t)
 
+;;; Org-mode Settings
+(package-config 'org-faces
+  (defun advice-org-override-variable ()
+	(setq org-plain-link-re
+		  (concat "\\<" (regexp-opt org-link-types t) ":"
+				  ;;(org-re "\\(//\\|/\\)[a-zA-Z0-9.:_---?/%\t]*\\>"))))
+				  ;;(org-re "\\(//\\|/\\)[^][<>\t*^`\{}]*\\>"))))
+				  (org-re "//?\\([a-zA-Z0-9]\\.\\|[a-zA-Z0-9---@:]\\)*/?\
+\\(%[a-fA-F0-9][a-fA-F0-9]\\|[a-zA-Z0-9---._~!$&'()*+,;=:@/?]\\)*#?\
+\\(%[a-fA-F0-9][a-fA-F0-9]\\|[a-zA-Z0-9---._~!$&'()*+,;=:@/?]\\)*"))))
+  (advice-add 'org-make-link-regexps :after 'advice-org-override-variable))
+
 ;;; Helm Settings
 (package-config 'helm-mode		; Extension: helm
   (require 'helm-config)

@@ -207,6 +207,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Web-mode Settings
 (package-config 'web-mode		; Extension: web-mode
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode))
   (setq web-mode-code-indent-offset 2)
   (setq web-mode-markup-indent-offset 2))
 

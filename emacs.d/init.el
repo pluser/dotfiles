@@ -86,6 +86,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (setq transient-mark-mode nil)
 (setq visible-bell t)
 (setq ring-bell-function 'ignore)
+(setq use-dialog-box nil)
 (if (< emacs-major-version 24) (tool-bar-mode nil) (tool-bar-mode 0))
 (if (< emacs-major-version 24) (menu-bar-mode nil) (menu-bar-mode 0))
 
@@ -281,3 +282,4 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Customize Settings
 (setq custom-file (concat user-emacs-top-directory "customize.el"))
 (load custom-file)
+(put 'downcase-region 'disabled nil)

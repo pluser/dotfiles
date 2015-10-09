@@ -36,6 +36,6 @@ uim-xim > /dev/null &
 export LANG='en_US.utf8'
 #export LC_MESSAGES='en_US.utf8'
 
-eval gpg-agent --daemon --use-standard-socket --pinentry-program /usr/bin/pinentry-qt4
+eval gpg-agent --daemon --use-standard-socket --pinentry-program /usr/bin/pinentry
 #wpa_gui -t &
 #pasystray &

@@ -191,6 +191,10 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
   (define-key global-map (kbd "<f12>") 'magit-status)
   (setq magit-last-seen-setup-instruction "1.4.0"))
 
+;;; Yasnippet Settings
+(package-config 'yasnippet		; Extension: yasnippet
+  (setq yas-snippet-dirs (list (concat user-emacs-top-directory "yasnippets/"))))
+
 ;;; Projectile Settings
 (package-config 'projectile		; Extension: projectile
   (setq projectile-mode-line (format " Proj[%s]" (projectile-project-name))))

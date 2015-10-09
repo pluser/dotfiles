@@ -42,7 +42,7 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 
 (defun package-invoke (package-initiater &optional hook)
   "Set the package up in startup sequence.
-If HOOK is non-nil, throw invoking package into HOOK instead of startup sequence."
+If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence."
   (if (fboundp package-initiater)
 	  (add-hook (or hook 'emacs-startup-hook) package-initiater)
 	(unless (require package-initiater nil t)

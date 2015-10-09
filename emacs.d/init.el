@@ -78,7 +78,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (prefer-coding-system 'utf-8)
 (reset-language-environment)
 ;;(set-charset-priority 'unicode)
-(setq default-input-method 'japanese-google-cgiapi-jp-uim)
+(package-config 'uim
+  (setq default-input-method 'japanese-google-cgiapi-jp-uim))
+;;(package-invoke 'uim-leim)
 
 ;;; User Interface Setting
 (setq transient-mark-mode nil)

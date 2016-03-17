@@ -156,10 +156,11 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
   (require 'helm-config)
   (define-key global-map (kbd "C-x b") 'helm-buffers-list)
   (define-key global-map (kbd "C-x f") 'helm-find-files)
-  (define-key helm-read-file-map (kbd "TAB") 'helm-execute-persistent-action)
-  (define-key helm-read-file-map (kbd "C-z") 'helm-select-action)
-  (define-key helm-find-files-map (kbd "TAB") 'helm-execute-persistent-action)
-  (define-key helm-find-files-map (kbd "TAB") 'helm-select-action))
+  (define-key global-map (kbd "M-x") 'helm-M-x)
+  (define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
+  (define-key helm-map (kbd "C-z") 'helm-select-action)
+  (setq helm-autoresize-max-height 80)
+  (helm-autoresize-mode t))
 (package-invoke 'helm-mode)
 
 ;;; Evil Settings

@@ -7,7 +7,7 @@
 
 ;; Make fontsets based on ascii
 
-(let* ((fontset-name "akadori")
+(let* ((fontset-name "suzume")
        (size 12)
        (asciifont "Inconsolata")
        (jpfont "VL Gothic")
@@ -23,7 +23,7 @@
   (set-fontset-font fsn 'unicode jfontspec nil 'append)
   (set-fontset-font fsn 'unicode ffontspec nil 'append))
 
-(let* ((fontset-name "aoshima")
+(let* ((fontset-name "karasu")
        (asciifont "Inconsolata")
        (size 14)
        (weight "normal")
@@ -35,6 +35,19 @@
   (set-fontset-font fsn 'japanese-jisx0213.2004-1 (font-spec :family "IPAGothic") nil 'append)
   ;(set-fontset-font fsn 'han (font-spec :family "IPAmjMincho") nil 'append)
   (set-fontset-font fsn nil (font-spec :family "Noto Sans CJK") nil 'append)
+  )
+
+(let* ((fontset-name "turu")
+       (asciifont "Inconsolata")
+       (size 14)
+       (weight "normal")
+       (slant "normal")
+       (fsn (create-fontset-from-ascii-font (format "%s-%d:weight=%s:slant=%s" asciifont size weight slant) nil fontset-name)))
+  (set-fontset-font fsn 'latin (font-spec :family "Inconsolata") nil 'append)
+  (set-fontset-font fsn 'kana (font-spec :family "Noto Sans Mono CJK JP") nil 'append)
+  (set-fontset-font fsn 'japanese-jisx0208 (font-spec :family "Noto Sans Mono CJK JP") nil 'append)
+  (set-fontset-font fsn 'japanese-jisx0213.2004-1 (font-spec :family "Noto Sans Mono CJK JP") nil 'append)
+  ;(set-fontset-font fsn 'han (font-spec :family "IPAmjMincho") nil 'append)
   )
 
 (defun set-frame-fontset (fontset)

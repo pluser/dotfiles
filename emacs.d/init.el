@@ -61,9 +61,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (when (and (display-graphic-p) (file-readable-p (concat user-emacs-directory "fonts.el")))
   (ext-config "fonts.el")
   (when (< emacs-major-version 24)
-    (set-face-font 'default "fontset-Aoshima")
-    (set-frame-font "fontset-Aoshima"))
-  (add-to-list 'default-frame-alist '(font . "fontset-Aoshima")))
+    (set-face-font 'default "fontset-turu")
+    (set-frame-font "fontset-turu"))
+  (add-to-list 'default-frame-alist '(font . "fontset-turu")))
 
 ;;; Custom Patch Loading
 (ext-config "monkey.el" t)

@@ -1,8 +1,8 @@
 *~
 \#*#
 emacs.d/history
-emacs.d/cache
-emacs.d/local
+emacs.d/cache/
+emacs.d/local/
 emacs.d/private
 *.dat
 *.elc
@@ -13,3 +13,4 @@ mlterm.d/challenge
 mlterm.d/*.rgs
 mlterm.d/*.six
 zsh.d/.zsh_history
+fonts.d/

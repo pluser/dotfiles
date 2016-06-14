@@ -31,7 +31,11 @@ then
     #}}}
     # prompt ornament {{{
     promptinit
-    prompt gentoo
+if [[ "$(expr substr $(uname -s) 1 5" == "Linux" ]]; then
+	if [[ "$(lsb-release --id --short)" == "Gentoo" ]]; then
+		prompt gentoo
+	fi
+fi
     #}}}
     # retrieve directory {{{
     setopt auto_cd

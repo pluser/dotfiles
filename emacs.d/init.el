@@ -76,11 +76,16 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;;  If you want to know charset priority, (print (charset-priority-list))
 ;; (set-language-environment 'Japanese)	; set for using japanese ONLY
 (prefer-coding-system 'utf-8)
+(when (eq system-type 'darwin)
+  (require 'ucs-normalize)
+  (set-file-name-coding-system 'utf-8-hfs))
 (reset-language-environment)
 ;;(set-charset-priority 'unicode)
 (package-config 'uim
   (setq default-input-method 'japanese-google-cgiapi-jp-uim))
 ;;(package-invoke 'uim-leim)
+(when (eq window-system 'mac)
+  (mac-auto-ascii-mode))
 
 ;;; User Interface Setting
 (setq transient-mark-mode nil)
@@ -139,6 +144,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Load Private confidential file
 (ext-config "private/email.el" t)
 
+;;; Suppress warning
+(setq ad-redefinition-action 'accept)
+
 ;;; Org-mode Settings
 (package-config 'org-faces
   (defun advice-org-override-variable ()
@@ -184,7 +192,10 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Company Settings
 (package-config 'company		; Extension: company
   (define-key global-map (kbd "<henkan>") 'company-complete)
-  (setq company-idle-delay nil))
+  (setq company-idle-delay nil)
+  (setq company-selection-wrap-around t)
+  (package-config 'company-math		; Extension: company-math
+	(add-to-list 'company-backends 'company-math-symbols-unicode)))
 (package-invoke 'global-company-mode)
 
 ;;; Magit Settings
@@ -259,10 +270,18 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
   (defun w3m-filter-alc-lay (url) (w3m-filter-delete-regions url "<!-- interest_match_relevant_zone_start -->" "<!-- ▼ 検索結果本体 ▼ -->"))
   (add-to-list 'w3m-filter-configuration '(t "Suck!" "\\`http://eow\\.alc\\.co\\.jp/search" w3m-filter-alc-lay)))
 
-;;; Whitespace Settiongs
+;;; Whitespace Settings
 (package-config 'whitespace		; Extension: whitespace
   (setq whitespace-style '(face tabs trailing space-before-tab empty tab-mark)))
 (package-invoke 'whitespace-mode 'find-file-hook)
+(defface dspace-emphasis '((t :background "red")) "Used for dspace emphasis")
+(defun emphasis-dspace ()
+  (font-lock-add-keywords nil '(("　" . dspace-emphasis))))
+(font-lock-add-keywords 'lisp-mode '(("b" . (0 highlight t t))))
+
+;;; Xah-math-input-mode Settings
+(package-config 'xah-math-input
+  (puthash "wb" "◦" xah-math-input-abrvs))
 
 ;;; Uniquify Settings
 (package-config 'uniquify

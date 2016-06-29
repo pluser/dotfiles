@@ -11,6 +11,7 @@
  '(compilation-error ((t (:foreground "yellow"))))
  '(error ((t (:foreground "yellow" :weight bold))))
  '(flycheck-error ((t (:underline (:color "chartreuse" :style wave)))))
+ '(mode-line ((t (:background "gold" :foreground "black" :box nil))))
  '(term-color-black ((t (:background "gray5" :foreground "gray5"))))
  '(term-color-blue ((t (:background "slate blue" :foreground "slate blue"))))
  '(term-color-cyan ((t (:background "deep sky blue" :foreground "deep sky blue"))))

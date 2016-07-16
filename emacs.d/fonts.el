@@ -39,7 +39,7 @@
 
 (let* ((fontset-name "turu")
        (asciifont "Inconsolata")
-       (size 14)
+       (size 12)
        (weight "normal")
        (slant "normal")
        (fsn (create-fontset-from-ascii-font (format "%s-%d:weight=%s:slant=%s" asciifont size weight slant) nil fontset-name)))

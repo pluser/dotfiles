@@ -1,0 +1,49 @@
+Host saturn.eska
+	Hostname	saturn.eska
+	IdentityFile	~/.ssh/saturn.eska
+	User	root
+
+Host haumea.eska
+	Hostname	haumea.eska
+	IdentityFile	~/.ssh/haumea.eska
+	User	root
+
+Host eris.eska
+	Hostname	eris.eska
+	IdentityFile	~/.ssh/eris.eska
+	User	root
+
+Host bitbucket.org
+	Hostname	bitbucket.org
+	IdentityFile	~/.ssh/bitbucket.org
+	User	git
+
+Host bitbucket.pluser.org
+	Hostname	bitbucket.pluser.net
+	IdentityFile	~/.ssh/bitbucket.org
+	User	git
+
+Host github.com
+	Hostname	github.com
+	IdentityFile	~/.ssh/github.com
+	User	git
+
+Host github.pluser.net
+	Hostname	github.com
+	IdentityFile	~/.ssh/github.com
+	User	git
+
+Host gist.github.com
+	Hostname	gist.github.com
+	IdentityFile	~/.ssh/github.com
+	User	git
+
+Host www.aoikamome.jp
+	Hostname	www.aoikamome.jp
+	IdentityFile	~/.ssh/www.aoikamome.jp
+	User	aoikamome
+
+Host saitama-u
+	Hostname	zenith.edu.ics.saitama-u.ac.jp
+	IdentityFile	~/.ssh/zenith.edu.ics.saitama-u.ac.jp
+	User	s16ti033

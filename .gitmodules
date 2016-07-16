@@ -4,3 +4,9 @@
 [submodule "bin.d/pushbullet-bash"]
 	path = bin.d/pushbullet-bash
 	url = https://github.com/Red5d/pushbullet-bash.git
+[submodule "stumpwm.d/contrib"]
+	path = stumpwm.d/contrib
+	url = https://github.com/stumpwm/stumpwm-contrib.git
+[submodule "stumpwm.d/modules"]
+	path = stumpwm.d/modules
+	url = https://github.com/stumpwm/stumpwm-contrib.git

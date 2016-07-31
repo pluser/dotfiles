@@ -79,7 +79,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (when (eq system-type 'darwin)
   (require 'ucs-normalize)
   (set-file-name-coding-system 'utf-8-hfs))
-(reset-language-environment)
+;(reset-language-environment)
 ;;(set-charset-priority 'unicode)
 (package-config 'uim
   (setq default-input-method 'japanese-google-cgiapi-jp-uim))

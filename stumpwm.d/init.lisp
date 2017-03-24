@@ -2,7 +2,7 @@
 (in-package :stumpwm)
 ;(setq *debug-level* 9)
 ;(set-font "--Inconsolata-----30-------")
-;(set-font "Inconsolata")
+(set-font "Inconsolata")
 ;(if (not (head-mode-line (current-head)))
 ;	(toggle-mode-line (current-screen) (current-head)))
 ;(load-module "ttf-fonts")

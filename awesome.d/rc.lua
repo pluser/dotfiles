@@ -1,3 +1,4 @@
+local leader = require("leader")
 -- Standard awesome library
 local gears = require("gears")
 local awful = require("awful")
@@ -37,13 +38,14 @@ end
 -- }}}
 
 -- {{{ Variable definitions
--- Themes define colours, icons, and wallpapers
+-- Themes define colours, icons, font and wallpapers.
 beautiful.init("/usr/share/awesome/themes/default/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
 terminal = "mlterm"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
+conf_dir = os.getenv("USER_CONF") or os.getenv("HOME") .. "/.CFG/"
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -73,7 +75,8 @@ local layouts =
 -- {{{ Wallpaper
 if beautiful.wallpaper then
     for s = 1, screen.count() do
-        gears.wallpaper.maximized(os.getenv("USER_CONF") .. "x.d/background.jpg" or beautiful.wallpaper, s, true)
+        gears.wallpaper.maximized(conf_dir .. "x.d/background.jpg", s, true)
+        -- gears.wallpaper.maximized(conf_dir .. "x.d/background.jpg" or beautiful.wallpaper, s, true)
     end
 end
 -- }}}
@@ -148,7 +151,9 @@ mytasklist.buttons = awful.util.table.join(
                                                   instance:hide()
                                                   instance = nil
                                               else
-                                                  instance = awful.menu.clients({ width=250 })
+                                                  instance = awful.menu.clients({
+                                                      theme = { width = 250 }
+                                                  })
                                               end
                                           end),
                      awful.button({ }, 4, function ()
@@ -211,6 +216,12 @@ root.buttons(awful.util.table.join(
 -- }}}
 
 -- {{{ Key bindings
+--globalkeys = awful.util.table.join(awful.key({ "Control", }, "t", leader.get_leader()))
+--leader.add_key("ab",
+--	function ()
+--		awful.client.run_or_raise("firefox", function (c) return awful.rules.match(c, {class = "Firefox"}) end)
+--		awful.tag.viewonly(awful.tag.gettags(mouse.screen)[2])
+--	 end)
 globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
@@ -243,6 +254,21 @@ globalkeys = awful.util.table.join(
         end),
 
     -- Standard program
+    awful.key({ modkey, 	  }, "b",
+	function ()
+		awful.client.run_or_raise("firefox", function (c) return awful.rules.match(c, {class = "Firefox"}) end)
+		awful.tag.viewonly(awful.tag.gettags(mouse.screen)[2])
+	 end),
+    awful.key({ modkey, 	  }, "e",
+	function ()
+		awful.client.run_or_raise("emacs", function (c) return awful.rules.match(c, {class = "Emacs"}) end)
+		awful.tag.viewonly(awful.tag.gettags(mouse.screen)[1])
+	 end),
+    awful.key({ modkey, 	  }, "m",
+	function ()
+		awful.client.run_or_raise("mlterm", function (c) return awful.rules.match(c, {class = "mlterm"}) end)
+		awful.tag.viewonly(awful.tag.gettags(mouse.screen)[3])
+	 end),
     awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
     awful.key({ modkey, "Control" }, "r", awesome.restart),
     awful.key({ modkey, "Shift"   }, "q", awesome.quit),
@@ -269,12 +295,7 @@ globalkeys = awful.util.table.join(
                   awful.util.getdir("cache") .. "/history_eval")
               end),
     -- Menubar
-    awful.key({ modkey }, "p", function() menubar.show() end),
-
-    -- System Utility
-    awful.key({ modkey }, "XF86AudioPrev", function() awful.util.spawn("xbacklight -dec 10") end),
-    awful.key({ modkey }, "XF86AudioPlay", function() awful.util.spawn("xlock -mode rain") end),
-    awful.key({ modkey }, "XF86AudioNext", function() awful.util.spawn("xbacklight -inc 10") end)
+    awful.key({ modkey }, "p", function() menubar.show() end)
 )
 
 clientkeys = awful.util.table.join(
@@ -302,6 +323,7 @@ clientkeys = awful.util.table.join(
 -- This should map on the top row of your keyboard, usually 1 to 9.
 for i = 1, 9 do
     globalkeys = awful.util.table.join(globalkeys,
+        -- View tag only.
         awful.key({ modkey }, "#" .. i + 9,
                   function ()
                         local screen = mouse.screen
@@ -310,6 +332,7 @@ for i = 1, 9 do
                            awful.tag.viewonly(tag)
                         end
                   end),
+        -- Toggle tag.
         awful.key({ modkey, "Control" }, "#" .. i + 9,
                   function ()
                       local screen = mouse.screen
@@ -318,6 +341,7 @@ for i = 1, 9 do
                          awful.tag.viewtoggle(tag)
                       end
                   end),
+        -- Move client to tag.
         awful.key({ modkey, "Shift" }, "#" .. i + 9,
                   function ()
                       if client.focus then
@@ -327,6 +351,7 @@ for i = 1, 9 do
                           end
                      end
                   end),
+        -- Toggle tag.
         awful.key({ modkey, "Control", "Shift" }, "#" .. i + 9,
                   function ()
                       if client.focus then
@@ -348,12 +373,14 @@ root.keys(globalkeys)
 -- }}}
 
 -- {{{ Rules
+-- Rules to apply to new clients (through the "manage" signal).
 awful.rules.rules = {
     -- All clients will match this rule.
     { rule = { },
       properties = { border_width = beautiful.border_width,
                      border_color = beautiful.border_normal,
                      focus = awful.client.focus.filter,
+                     raise = true,
                      keys = clientkeys,
                      buttons = clientbuttons } },
     { rule = { class = "MPlayer" },
@@ -362,10 +389,10 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "gimp" },
       properties = { floating = true } },
-    { rule = { instance = "plugin-container" },
-      properties = { floating = true } },
-    { rule = { class = "Qjackctl" },
-      properties = { floating = true } },
+--    { rule = { class = "emacs" },
+--      properties = { tag = tags[1][1] } },
+--    { rule = { class = "Firefox"},
+--      properties = { tag = tags[1][2] } }, 
     -- Set Firefox to always map on tags number 2 of screen 1.
     -- { rule = { class = "Firefox" },
     --   properties = { tag = tags[1][2] } },
@@ -444,24 +471,3 @@ end)
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
-
--- {{{ AutoStart
-function run_once(prg,arg_string,pname,screen)
-    if not prg then
-        do return nil end
-    end
-
-    if not pname then
-       pname = prg
-    end
-
-    if not arg_string then 
-        awful.util.spawn_with_shell("pgrep -f -u $USER -x '" .. pname .. "' || (" .. prg .. ")",screen)
-    else
-        awful.util.spawn_with_shell("pgrep -f -u $USER -x '" .. pname .. " ".. arg_string .."' || (" .. prg .. " " .. arg_string .. ")",screen)
-    end
-end
-
-run_once("skype")
-run_once("blueman-applet")
----]]]

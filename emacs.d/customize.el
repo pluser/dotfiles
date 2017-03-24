@@ -11,6 +11,8 @@
  '(compilation-error ((t (:foreground "yellow"))))
  '(error ((t (:foreground "yellow" :weight bold))))
  '(flycheck-error ((t (:underline (:color "chartreuse" :style wave)))))
+ '(flycheck-info ((t (:underline (:color "deep sky blue" :style wave)))))
+ '(flycheck-warning ((t (:underline (:color "medium spring green" :style wave)))))
  '(mode-line ((t (:background "gold" :foreground "black" :box nil))))
  '(term-color-black ((t (:background "gray5" :foreground "gray5"))))
  '(term-color-blue ((t (:background "slate blue" :foreground "slate blue"))))
@@ -36,5 +38,5 @@
  '(make-backup-files nil)
  '(package-selected-packages
    (quote
-	(editorconfig yasnippet mozc-im narrow-reindent company-statistics flycheck-pyflakes company-math helm-company projectile company-web company-jedi pyvenv jinja2-mode python-mode company helm web-mode sunrise-commander php-mode markdown-mode magit idomenu flycheck evil elpy dired+ dic-lookup-w3m ddskk company-c-headers ace-isearch)))
+	(which-key auctex-latexmk auctex ein editorconfig yasnippet mozc-im narrow-reindent company-statistics flycheck-pyflakes company-math helm-company projectile company-web company-jedi pyvenv jinja2-mode python-mode company helm web-mode sunrise-commander php-mode markdown-mode magit idomenu flycheck evil elpy dired+ dic-lookup-w3m ddskk company-c-headers ace-isearch)))
  '(tab-width 4))

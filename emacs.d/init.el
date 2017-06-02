@@ -90,7 +90,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(package-invoke 'mac-auto-ascii-mode))
 
 ;;; User Interface Setting
-(setq transient-mark-mode nil)
+(transient-mark-mode 0)
 (setq visible-bell t)
 (setq ring-bell-function 'ignore)
 (setq use-dialog-box nil)
@@ -154,6 +154,15 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Suppress warning
 (setq ad-redefinition-action 'accept)
+
+;;; Which-Key Settings
+(package-config 'which-key		; Extension: which-key
+	(which-key-setup-side-window-right-bottom))
+(package-invoke 'which-key-mode)
+
+;;; Gtags(GNU GLOBAL) Settings
+(package-config 'gtags)		; Extension: gtags
+(package-invoke 'gtags-mode 'prog-mode-hook)
 
 ;;; Flycheck Settings
 (package-config 'flycheck)		; Extension: flycheck
@@ -230,7 +239,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Company Settings
 (package-config 'company		; Extension: company
-	(define-key global-map (kbd "C-t") 'company-complete)
+	;;(define-key global-map (kbd "C-t") 'company-complete)
+	;;(define-key company-active-map 'company-complete-common nil)
+	(define-key company-mode-map (kbd "C-t") 'company-complete-common)
 	(setq company-idle-delay nil)
 	(setq company-selection-wrap-around t)
 	(package-config 'company-math		; Extension: company-math
@@ -264,8 +275,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (package-config 'web-mode		; Extension: web-mode
 	(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 	(add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode))
-	(setq web-mode-code-indent-offset 2)
-	(setq web-mode-markup-indent-offset 2))
+	(setq web-mode-code-indent-offset 4)
+	(setq web-mode-markup-indent-offset 4))
 
 ;;; Python-mode Settings
 (package-config 'python		; Extension: python-mode

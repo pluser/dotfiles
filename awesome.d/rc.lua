@@ -43,9 +43,10 @@ end
 beautiful.init(awful.util.get_themes_dir() .. "default/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
-terminal = "xterm"
+terminal = "mlterm"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
+conf_dir = os.getenv("USER_CONF") or os.getenv("HOME") .. "/.CFG/"
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -165,7 +166,8 @@ local tasklist_buttons = gears.table.join(
 local function set_wallpaper(s)
     -- Wallpaper
     if beautiful.wallpaper then
-        local wallpaper = beautiful.wallpaper
+        -- local wallpaper = beautiful.wallpaper
+	wallpaper = conf_dir .. "x.d/background.jpg"
         -- If wallpaper is a function, call it with the screen
         if type(wallpaper) == "function" then
             wallpaper = wallpaper(s)
@@ -480,7 +482,7 @@ awful.rules.rules = {
 
     -- Add titlebars to normal clients and dialogs
     { rule_any = {type = { "normal", "dialog" }
-      }, properties = { titlebars_enabled = true }
+      }, properties = { titlebars_enabled = false }
     },
 
     -- Set Firefox to always map on the tag named "2" on screen 1.

@@ -47,3 +47,4 @@ Host saitama-u
 	Hostname	zenith.edu.ics.saitama-u.ac.jp
 	IdentityFile	~/.ssh/zenith.edu.ics.saitama-u.ac.jp
 	User	s16ti033
+	ForwardX11	yes

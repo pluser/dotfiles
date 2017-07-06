@@ -19,6 +19,10 @@
 (let ((default-directory (concat user-emacs-directory "local/")))
 	(normal-top-level-add-subdirs-to-load-path))
 
+;;; Set exec-path
+(add-to-list 'exec-path (concat user-emacs-directory "external-tools/npm/bin"))
+(add-to-list 'exec-path "~/.local/bin")
+
 ;;; External file loader
 (defun ext-config (filename &optional ignore-missing)
 	"Load and eval the file, if it exist.
@@ -239,13 +243,29 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Company Settings
 (package-config 'company		; Extension: company
+	(setq company-transformers '(company-sort-by-backend-importance company-sort-by-occurrence))
+	(package-config 'company-statistics		; Extension: company-statistics
+		(add-to-list 'company-transformars 'company-sort-by-statistics))
+	(setq company-frontends '(company-pseudo-tooltip-unless-just-one-frontend-with-delay company-echo-metadata-frontend company-preview-frontend))
 	;;(define-key global-map (kbd "C-t") 'company-complete)
 	;;(define-key company-active-map 'company-complete-common nil)
 	(define-key company-mode-map (kbd "C-t") 'company-complete-common)
-	(setq company-idle-delay nil)
+	(setq company-idle-delay 0.5)
+	(setq company-tooltip-idle-delay 0.5)
 	(setq company-selection-wrap-around t)
+	(setq company-show-numbers t)
 	(package-config 'company-math		; Extension: company-math
-		(add-to-list 'company-backends 'company-math-symbols-unicode)))
+		(add-to-list 'company-backends 'company-math-symbols-unicode))
+	(package-config 'company-tern		; Extension: company-tern
+		(setq company-tern-property-marker nil))
+	(defun my/company-jedi-enable ()
+		(make-local-variable 'company-backends)
+		(add-to-list 'company-backends 'company-jedi))
+	(defun my/company-tern-enable ()
+		(interactive)
+		(tern-mode t)
+		(make-local-variable 'company-backends)
+		(add-to-list 'company-backends '(company-tern :with company-dabbrev-code))))
 (package-invoke 'company-mode 'prog-mode-hook)
 
 ;;; Magit Settings
@@ -278,17 +298,19 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(setq web-mode-code-indent-offset 4)
 	(setq web-mode-markup-indent-offset 4))
 
+;;; JS2-mode Settings
+(package-config 'js2-mode		; Extension: js2-mode
+	(add-to-list 'auto-mode-alist '("\\.html?\\'" . js2-mode))
+	(add-hook 'js-mode-hook 'my/company-tern-enable))
+
 ;;; Python-mode Settings
 (package-config 'python		; Extension: python-mode
 	(defun my/setting-python-mode ()
 		(setq indent-tabs-mode t)
 		(setq python-indent-offset 4)
 		(setq tab-width 4))
-	(defun my/enable-company-jedi ()
-		(make-local-variable 'company-backends)
-		(add-to-list 'company-backends 'company-jedi))
 	(add-hook 'python-mode-hook 'my/setting-python-mode)
-	(add-hook 'python-mode-hook 'my/enable-company-jedi))
+	(add-hook 'python-mode-hook 'my/company-jedi-enable))
 
 (package-config 'jinja2-mode
 	(add-to-list 'auto-mode-alist '("\\.tmpl\\'" . jinja2-mode)))

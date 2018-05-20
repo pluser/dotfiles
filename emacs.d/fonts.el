@@ -50,6 +50,22 @@
   ;(set-fontset-font fsn 'han (font-spec :family "IPAmjMincho") nil 'append)
   )
 
+(let* ((fontset-name "mejiro")
+	   (asciifont "Inconsolata")
+	   (size 12)
+	   (weight "normal")
+	   (slant "normal")
+	   (fsn (create-fontset-from-ascii-font (format "%s-%d:weight=%s:slant=%s" asciifont size weight slant) nil fontset-name)))
+  (set-fontset-font fsn 'unicode (font-spec :family "Migu 1M") nil 'append))
+
+(let* ((fontset-name "kawasemi")
+	   (asciifont "Inconsolata")
+	   (size 12)
+	   (weight "normal")
+	   (slant "normal")
+	   (fsn (create-fontset-from-ascii-font (format "%s-%d:weight=%s:slant=%s" asciifont size weight slant) nil fontset-name)))
+  (set-fontset-font fsn 'unicode (font-spec :family "Migu 1C") nil 'prepend))
+
 (defun set-frame-fontset (fontset)
   "I cannot set fontset to the current frame with set-frame-font function.
 If you want to set fontset to current frame, use set-frame-perameter instead of set-frame-font (see bug-report #11722)."

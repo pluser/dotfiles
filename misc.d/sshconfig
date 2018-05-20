@@ -1,3 +1,7 @@
+Host eska.pluser.net
+	Hostname	eska.pluser.net
+	IdentityFile	~/.ssh/sshpiper
+
 Host saturn.eska
 	Hostname	saturn.eska
 	IdentityFile	~/.ssh/saturn.eska
@@ -11,6 +15,21 @@ Host haumea.eska
 Host eris.eska
 	Hostname	eris.eska
 	IdentityFile	~/.ssh/eris.eska
+	User	root
+
+Host charon.eska
+	Hostname	charon.eska
+	IdentityFile	~/.ssh/charon.eska
+	User	root
+
+Host gitlab.pluser.net
+	Hostname	gitlab.pluser.net
+	Identityfile	~/.ssh/gitlab.pluser.net
+	User	git
+
+Host linuxdesktop.eska
+	Hostname	linuxdesktop.eska
+	IdentityFile	~/.ssh/linuxdesktop.eska
 	User	root
 
 Host bitbucket.org
@@ -43,8 +62,14 @@ Host www.aoikamome.jp
 	IdentityFile	~/.ssh/www.aoikamome.jp
 	User	aoikamome
 
+Host blog.pluser.net
+        Hostname        blog.pluser.net
+        IdentityFile    ~/.ssh/www.aoikamome.jp
+        User    aoikamome
+
 Host saitama-u
 	Hostname	zenith.edu.ics.saitama-u.ac.jp
 	IdentityFile	~/.ssh/zenith.edu.ics.saitama-u.ac.jp
 	User	s16ti033
 	ForwardX11	yes
+

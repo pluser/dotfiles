@@ -1,0 +1,5 @@
+#!/bin/zsh
+# -*- mode: shell-script -*-
+
+typeset -U path
+path=(~/.go/bin(N-/) ~/.local/bin(N-/) ${path[@]})

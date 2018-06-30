@@ -1,63 +1,16 @@
+#!/bin/zsh
 # -*- mode: shell-script -*-
-if [[ -n "$ZSH_VERSION" ]]
-then
-    unsetopt flow_control # for ^Q/^S keys pillaged by terminal
-    # local/global variables {{{
-    typeset -xTU SU_PATH su_path
-    su_path=({,/usr/local,/usr}/sbin(N-/) ${path}(N-/))
-	#zcfg_path="$(cd "$(dirname "${BASH_SOURCE:-${(%):-%N}}")"; pwd)"
-	zcfg_path=(${ZDOTDIR:-$HOME}/.zshrc(:A:h))
-    #}}}
-    # lazy loadings {{{
-    autoload -U promptinit
-    autoload -U compinit
-    autoload -U predict-on
-    autoload -U color
-    source "${zcfg_path}/antigen/antigen.zsh"
-    #}}}
-    # keybinding {{{
-    bindkey '^[[3~' delete-char
-    bindkey -M isearch '^M' accept-search
-    bindkey '^p' history-beginning-search-backward
-    bindkey '^n' history-beginning-search-forward
-    #}}}
-    # completion/predict {{{
-    compinit
-#    predict-on
-    zstyle ':completion:*:sudo:*' environ PATH="${SU_PATH}"
-    zstyle ':completion:*' use-cache yes
-    # expansion/globbing {{{
-    setopt extended_glob
-    #}}}
-    # prompt ornament {{{
-    promptinit
-if [[ "$(expr substr $(uname -s) 1 5" == "Linux" ]]; then
-	if [[ "$(lsb-release --id --short)" == "Gentoo" ]]; then
-		prompt gentoo
-	fi
-fi
-    #}}}
-    # retrieve directory {{{
-    setopt auto_cd
-    cdpath=(.. ~ /tmp/)
-    #}}}
-    # history {{{
-    HISTFILE="${zcfg_path}/.zsh_history"
-    HISTSIZE=10000
-    SAVEHIST=1000000
-    setopt extended_history
-    setopt hist_reduce_blanks
-    setopt hist_ignore_dups
-    setopt hist_ignore_space
-    setopt hist_verify
-    #}}}
-fi
 
-# aliases
-alias dvorak='xkbcomp ~/CFG/x.d/teck.xkb $DISPLAY -w0'
-alias lhand='xinput set-button-map "Kensington      Kensington Expert Mouse" 3 2 1 4 5 6 7 8 9 10 11 12'
-alias rhand='xinput set-button-map "Kensington      Kensington Expert Mouse" 1 2 3 4 5 6 7 8 9 10 11 12'
-alias em='sudo -E chrt -b 0 emerge --ask'
-#alias update='EIX_SYNC_OPTS=* sudo -E chrt -b 0 nice -15 eix-sync'
-alias update='sudo -E chrt -b 0 nice -15 eix-sync'
-alias blackout='xset dpms force off'
+source ~/.zplug/init.zsh
+
+zplug 'zplug/zplug', hook-build:'zplug --self-manage' from:github
+
+zplug "zsh-users/zsh-syntax-highlighting", from:github, defer:2
+zplug "zsh-users/zsh-autosuggestions", from:github
+zplug "zsh-users/zsh-completions", from:github
+
+#zplug "denysdovhan/spaceship-prompt", use:spaceship.zsh, from:github, as:theme
+zplug "mafredri/zsh-async", from:github
+zplug "sindresorhus/pure", use:pure.zsh,  from:github, as:theme
+
+zplug load --verbose

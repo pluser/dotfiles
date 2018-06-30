@@ -3,49 +3,59 @@
 ;;;  Heavily personalized Emacs configuration file
 ;;; Code:
 
-(defvar init/autoinstall-packages
-	'(avy
-		company
-		ddskk
-		evil
-		flycheck
-		general
-		helm
-		origami
-		projectile))
-
 ;;; Local variable {{{
 (when (< emacs-major-version 23)
 	(defvar user-emacs-directory (file-name-directory (or buffer-file-name load-file-name))))
 ;;; }}}
 
+;;; A hack for cache {{{
+(defvar user-emacs-top-directory user-emacs-directory)
+(setq user-emacs-directory (expand-file-name "cache/" (or user-emacs-top-directory user-emacs-directory)))
+(defun init/locate-user-config (filename)
+	"Return an path for Emacs configuration FILENAME."
+	(let ((user-emacs-directory user-emacs-top-directory))
+		(locate-user-emacs-file filename)))
+;;; }}}
+
 ;;; Set load-path {{{
 ;;(add-to-list 'load-path user-emacs-directory)
-(add-to-list 'load-path (concat user-emacs-directory "elisps/"))
-(add-to-list 'load-path (concat user-emacs-directory "monkeys/"))
+(add-to-list 'load-path (init/locate-user-config "elisps/"))
+(add-to-list 'load-path (init/locate-user-config "monkeys/"))
 (when (< emacs-major-version 24)	; if emacs didn't have package system
-	(add-to-list 'load-path (concat user-emacs-directory "packages/"))
-	(let ((default-directory (concat user-emacs-directory "packages/")))
+	(add-to-list 'load-path (init/locate-user-config "packages/"))
+	(let ((default-directory (init/locate-user-config "packages/")))
 		(normal-top-level-add-subdirs-to-load-path)))
-(add-to-list 'load-path (concat user-emacs-directory "local/"))
-(let ((default-directory (concat user-emacs-directory "local/")))
+(add-to-list 'load-path (init/locate-user-config "local/"))
+(let ((default-directory (init/locate-user-config "local/")))
 	(normal-top-level-add-subdirs-to-load-path))
 ;;; }}}
 
 ;;; Set exec-path {{{
-(add-to-list 'exec-path (concat user-emacs-directory "external-tools/npm/bin/"))
-(add-to-list 'exec-path "~/.local/bin/")
-(add-to-list 'exec-path "~/.go/bin/")
+(defun init/add-exec-path (path-list)
+	"Add valid PATH-LIST or PATH to 'exec-path."
+	(interactive "sAdd 'exec-path: ")
+	(if (listp path-list)
+			(dolist (path path-list)
+				(when (file-directory-p path)
+					(add-to-list 'exec-path path)))
+		(when (file-directory-p path-list)
+			(add-to-list 'exec-path path-list))))
+(defun init/add-exec-path-from-shell ()
+	"Get and add PATH to 'exec-path from shell."
+	(let ((path-from-shell (split-string (replace-regexp-in-string "[ \t\n]*" "" (shell-command-to-string "${SHELL} -c 'echo ${PATH}'")) path-separator)))
+		(init/add-exec-path path-from-shell)))
+(init/add-exec-path (init/locate-user-config "external-tools/npm/bin/"))
+(init/add-exec-path-from-shell)
+;;(add-to-list 'exec-path "~/.local/bin/")
+;;(add-to-list 'exec-path "~/.go/bin/")
 ;;; }}}
 
 ;;; External file loader {{{
 (defun ext-config (filename &optional ignore-missing)
-	"Load and eval the file, if it exist.
+	"Load FILENAME and evaluate it, if it exist.
 If the file does not exist, issue an warning message but error.
 If IGNORE-MISSING is non-nil, the warning message will be suppress even if the file does not exist."
-	(let ((filepath (if (boundp 'user-emacs-top-directory)
-											(concat user-emacs-top-directory filename)
-										(concat user-emacs-directory filename))))
+	(let ((filepath (init/locate-user-config filename)))
 		(if (file-readable-p filepath)
 				(load-file filepath)
 			(unless ignore-missing
@@ -54,17 +64,32 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 							(file-name-nondirectory (or buffer-file-name load-file-name)))))))
 ;;; }}}
 
+;;; Font Setting {{{
+(when (and (display-graphic-p) (file-readable-p (init/locate-user-config "fonts.el")))
+	(ext-config "fonts.el")
+	(if (< emacs-major-version 24)
+		(progn (set-face-font 'default "fontset-mejiro")
+					 (set-frame-font "fontset-kawasemi"))
+		(progn (add-to-list 'default-frame-alist '(font . "fontset-mejiro"))
+					 (set-face-attribute 'variable-pitch nil :fontset "fontset-kawasemi")
+					 (set-face-attribute 'fixed-pitch nil :fontset "fontset-mejiro"))))
+;;; }}}
+
+;;; Custom Patch Loading {{{
+(ext-config "monkey.el" t)
+;;; }}}
+
 ;;; Package Management {{{
 (defmacro package-config (package &rest body)
-	"Load and set package settings."
+	"If loaded PACKAGE, evaluate BODY."
 	(declare (indent defun))
 	(if (fboundp 'with-eval-after-load)
 			`(with-eval-after-load ,package ,@body)	; with-eval- is more better.
 		`(eval-after-load ,package (lambda () ,@body))))
 
 (defun package-invoke (package-initiater &optional hook autoinstall)
-	"Set the package up in startup sequence.
-If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence."
+	"Set the up PACKAGE-INITIATER in startup sequence.
+If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.  If AUTOINSTALL is non-nil and the package was not installed, installed automatically."
 	(if (fboundp package-initiater)
 			(add-hook (or hook 'emacs-startup-hook) package-initiater)
 		(unless (require package-initiater nil t)
@@ -94,36 +119,13 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 					("gnu" . 7)
 					("melpa-stable" . 3)
 					("org" . 6)))
-	(setq package-user-dir (concat user-emacs-directory "packages/"))
+	(set-variable 'package-user-dir (init/locate-user-config "packages/"))
 	(package-initialize))
 ;	(dolist (pkg init/autoinstall-packages)
 ;		(unless (package-installed-p pkg)
 ;			(unless package-archive-contents (package-refresh-contents))
 ;			(package-install pkg))))
 (package-invoke 'package)
-;;; }}}
-
-;;; Font Setting {{{
-(when (and (display-graphic-p) (file-readable-p (concat user-emacs-directory "fonts.el")))
-	(ext-config "fonts.el")
-	(when (< emacs-major-version 24)
-		;(set-face-font 'default "fontset-mejiro")
-		;(set-frame-font "fontset-kawasemi")
-		)
-
-	(add-to-list 'default-frame-alist '(font . "fontset-mejiro"))
-	(set-face-attribute 'variable-pitch nil :fontset "fontset-kawasemi")
-	(set-face-attribute 'fixed-pitch nil :fontset "fontset-mejiro")
-	)
-;;; }}}
-
-;;; Custom Patch Loading {{{
-(ext-config "monkey.el" t)
-;;; }}}
-
-;;; A hack for scattering cache or auto generated files. {{{
-(setq user-emacs-top-directory user-emacs-directory)
-(setq user-emacs-directory (concat user-emacs-directory "cache/"))
 ;;; }}}
 
 ;;; Language Setting {{{
@@ -136,17 +138,18 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;(reset-language-environment)
 ;;(set-charset-priority 'unicode)
 (package-config 'uim
-	(setq default-input-method 'japanese-google-cgiapi-jp-uim))
+	(set-variable 'default-input-method 'japanese-google-cgiapi-jp-uim))
 ;;(package-invoke 'uim-leim)
 (when (eq window-system 'mac)
 	(package-invoke 'mac-auto-ascii-mode))
 ;;; }}}
 
 ;;; User Interface Setting {{{
+(set-frame-parameter nil 'inhibit-double-buffering t) ; workaround for inordinate cursor blinking.
 (transient-mark-mode 0)
-(setq visible-bell t)
-(setq ring-bell-function 'ignore)
-(setq use-dialog-box nil)
+(set-variable 'visible-bell t)
+(set-variable 'ring-bell-function 'ignore)
+(set-variable 'use-dialog-box nil)
 (if (< emacs-major-version 24) (tool-bar-mode nil) (tool-bar-mode 0))
 (if (< emacs-major-version 24) (menu-bar-mode nil) (menu-bar-mode 0))
 ;;; }}}
@@ -162,46 +165,52 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; File Opener {{{
 (package-config 'filecache
-	(file-cache-add-file (concat user-emacs-top-directory "init.el")))
+	(file-cache-add-file (init/locate-user-config "init.el")))
 (package-invoke 'filecache)
 (package-config 'recentf
-	(setq recentf-max-saved-items 2000))
+	(set-variable 'recentf-max-saved-items 2000))
 (package-invoke 'recentf-mode)
 ;;; }}}
 
 ;;; Diff Setting {{{
-(setq diff-switches "-u")
+(package-config 'diff)
 ;;; }}}
 
 ;;; Code ornament / Visual {{{
 (show-paren-mode t)
-(setq show-paren-style 'mixed)
-(setq scroll-conservatively 1) ; amount of scrolling
-;(setq scroll-margin 5) ; keep lines on scrolling
-(line-number-mode t) ; show line number at modeline
-(column-number-mode t) ; show column number at modeline
+(set-variable 'show-paren-style 'mixed)
+(set-variable 'scroll-conservatively 1) ; amount of scrolling
+;(set-variable 'scroll-margin 5) ; keep lines on scrolling
+(set-variable 'line-number-mode t) ; show line number at modeline
+(set-variable 'column-number-mode t) ; show column number at modeline
 (setq-default truncate-lines nil)
-;(global-linum-mode t) ; show line number at left margin
+(set-variable 'auto-hscroll-mode 'current-line) ; scroll one line or whole screen
+(when (< emacs-major-version 26) (global-linum-mode t)) ; show line number at left margin
+(setq-default tab-width 4)
 (global-hl-line-mode t) ; highlight a line cursor is on
+(defun init/prog-mode-editor-style ()
+	"Settings for 'prog-mode."
+	(set-variable 'display-line-numbers 'relative))
+(add-hook 'prog-mode-hook 'init/prog-mode-editor-style)
 ;;; }}}
 
 ;;; Code styling {{{
 (setq-default indent-tabs-mode t)
 (setq-default c-basic-offset 4)
-(setq require-final-newline nil)
-(setq mode-require-final-newline nil)
+;;(setq-default require-final-newline nil)
+;;(set-variable 'mode-require-final-newline nil)
 ;;; }}}
 
 ;;; Completion {{{
 (setq completion-ignore-case t)
 ;;(setq read-file-name-completion-ignore-case t)
 ;;(partial-completion-mode t)
-(icomplete-mode t)
+;;(icomplete-mode t)
 ;;; }}}
 
 ;;; History {{{
 (package-config 'savehist
-	(setq history-length 10000))
+	(set-variable 'history-length 100000))
 (package-invoke 'savehist-mode)
 ;;; }}}
 
@@ -216,15 +225,19 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Load Private confidential file {{{
-(ext-config "private/email.el" t)
+(ext-config "private.el" t)
 ;;; }}}
 
 ;;; Cleaning major/minor mode in modeline {{{
 (defvar init/mode-line-cleaner-alist
 	'((emacs-lisp-mode . "ELisp")
+		(helm-mode . "")
+		(company-mode . "")
 		(whitespace-mode . "")
-		(which-key-mode . "")))
+		(which-key-mode . "")
+		(yas-minor-mode . "")))
 (defun init/clean-modeline ()
+	"Cleaning modeline up."
 	(dolist (mode init/mode-line-cleaner-alist)
 		(when (eq (car mode) major-mode)
 			(setq mode-name (cdr mode)))
@@ -232,10 +245,19 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 			(let ((m (assq (car mode) minor-mode-alist)))
 				(setcdr m (list (cdr mode)))))))
 (add-hook 'after-change-major-mode-hook 'init/clean-modeline)
+(add-hook 'emacs-startup-hook 'init/clean-modeline)
 ;;;}}}
 
 ;;; Suppress warning {{{
 ;(setq ad-redefinition-action 'accept)
+;;; }}}
+
+;;; Backcup, Autosave and Locking Settings {{{
+(set-variable 'auto-save-list-file-prefix (locate-user-emacs-file "auto-save-list/autosaves-")) ; the variable sat at very early on emacs startup, so it should be set again.
+(add-to-list 'auto-save-file-name-transforms `(".*" ,(locate-user-emacs-file "auto-save/\\2") t))
+(add-to-list 'backup-directory-alist `(".*" . ,(locate-user-emacs-file "backup-files/")))
+(set-variable 'kept-new-versions 10)
+(set-variable 'version-control t)
 ;;; }}}
 
 ;;; CC-Mode Settings {{{
@@ -243,6 +265,13 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(package-depend 'ensime-mode
 		(add-hook 'java-mode-hook 'ensime-mode)))
 ;;; }}}
+
+;;; File Local Variable Settings {{{
+(package-config 'files
+	(add-to-list 'safe-local-variable-values '(origami-fold-style . triple-braces))
+	(add-to-list 'safe-local-eval-forms '(outline-minor-mode t)))
+;;; }}}
+
 
 ;;; Extensions {{{
 
@@ -273,7 +302,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; TeX/LaTeX Settings {{{
 (package-config 'tex		; Extension: tex
-	(setq-default TeX-engine 'luatex)
+	(set-variable 'TeX-engine 'luatex)
 	(add-to-list 'TeX-view-program-list '("MuPDF" "mupdf %o"))
 	(setq TeX-view-program-selection '((output-pdf "MuPDF"))))
 
@@ -288,18 +317,20 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 					(args (append (latex-math-preview-get-command-option command) (list input output))))
 			(cons out args)))
 	;(setq-default latex-math-preview-trim-image t)
-	(latex-math-preview-define-convert-function convert))
+	(latex-math-preview-define-convert-function 'convert))
 ;;; }}}
 
 ;;; Org-mode Settings {{{
 (package-config 'org		; Extension: org
-	(setq org-babel-no-eval-on-ctrl-c-ctrl-c t)
-	(setq org-startup-truncated nil)
+	;;(set-variable 'org-babel-no-eval-on-ctrl-c-ctrl-c t)
+	;;(set-variable 'org-startup-truncated nil)
 	(org-babel-do-load-languages
 	 'org-babel-load-languages
 	 '((emacs-lisp . t) (dot . t)))
+	(package-config 'ox
+		(set-variable 'org-export-allow-bind-keywords t))
 	(package-config 'ox-pandoc
-		(setq org-pandoc-options-for-latex-pdf '((latex-engine . "lualatex"))))
+		(set-variable 'org-pandoc-options-for-latex-pdf '((pdf-engine . "lualatex"))))
 	(package-config 'ox-latex
 		(add-to-list
 		 'org-latex-classes
@@ -309,8 +340,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 			 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
 			 ("\\paragraph{%s}" . "\\paragraph*{%s}")
 			 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-		(setq org-latex-default-class "ltjsarticle"))
-		(setq org-latex-compiler "lualatex"))
+		(set-variable 'org-latex-default-class "ltjsarticle"))
+		(set-variable 'org-latex-compiler "lualatex"))
 ;;; }}}
 
 ;;; Helm Settings {{{
@@ -321,8 +352,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(define-key global-map (kbd "M-x") 'helm-M-x)
 	(define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
 	(define-key helm-map (kbd "C-z") 'helm-select-action)
-	(setq helm-autoresize-max-height 80)
-	(helm-autoresize-mode t))
+	(set-variable 'helm-autoresize-max-height 80)
+	(set-variable 'helm-autoresize-mode t))
 (package-invoke 'helm-mode nil 'helm)
 ;;; }}}
 
@@ -337,10 +368,10 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "J") 'evil-find-char-to-backward))
 	(define-key evil-insert-state-map (kbd "M-SPC") 'evil-normal-state)
 	(define-key evil-insert-state-map (kbd "C-e") nil)
-	(setq evil-move-cursor-back nil)
-	;;(setq evil-default-state 'emacs)
-	(setq evil-echo-state nil)
-	(setq evil-insert-state-cursor nil)
+	(set-variable 'evil-move-cursor-back nil)
+	;;(set-variable 'evil-default-state 'emacs)
+	(set-variable 'evil-echo-state nil)
+	(set-variable 'evil-insert-state-cursor nil)
 	(eval-after-load 'help-mode '(evil-make-overriding-map help-mode-map))
 	(when (require 'evil-surround nil t)
 		(global-evil-surround-mode)))
@@ -351,21 +382,21 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Company Settings {{{
 (package-config 'company		; Extension: company
-	(setq company-transformers '(company-sort-by-backend-importance company-sort-by-occurrence))
+	(set-variable 'company-transformers '(company-sort-by-backend-importance company-sort-by-occurrence))
 	(package-config 'company-statistics		; Extension: company-statistics
 		(add-to-list 'company-transformars 'company-sort-by-statistics))
-	(setq company-frontends '(company-pseudo-tooltip-unless-just-one-frontend-with-delay company-echo-metadata-frontend company-preview-frontend))
+	(set-variable 'company-frontends '(company-pseudo-tooltip-unless-just-one-frontend-with-delay company-echo-metadata-frontend company-preview-frontend))
 	;;(define-key global-map (kbd "C-t") 'company-complete)
 	;;(define-key company-active-map 'company-complete-common nil)
 	(define-key company-mode-map (kbd "C-t") 'company-complete-common)
-	(setq company-idle-delay 0.5)
-	(setq company-tooltip-idle-delay 0.5)
-	(setq company-selection-wrap-around t)
-	(setq company-show-numbers t)
+	(set-variable 'company-idle-delay 0.5)
+	(set-variable 'company-tooltip-idle-delay 0.5)
+	(set-variable 'company-selection-wrap-around t)
+	(set-variable 'company-show-numbers t)
 	(package-config 'company-math		; Extension: company-math
 		(add-to-list 'company-backends 'company-math-symbols-unicode))
 	(package-config 'company-tern		; Extension: company-tern
-		(setq company-tern-property-marker nil))
+		(set-variable 'company-tern-property-marker nil))
 	(defun init/company-jedi-enable ()
 		(make-local-variable 'company-backends)
 		(add-to-list 'company-backends 'company-jedi))
@@ -399,28 +430,30 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Magit Settings {{{
 (package-config 'magit		; Extension: magit
 	(define-key global-map (kbd "<f12>") 'magit-status)
-	(setq magit-last-seen-setup-instruction "1.4.0"))
+	(set-variable 'magit-last-seen-setup-instruction "1.4.0"))
 (package-invoke 'magit)
 ;;; }}}
 
 ;;; Yasnippet Settings {{{
 (package-config 'yasnippet		; Extension: yasnippet
-	(setq yas-snippet-dirs (list (concat user-emacs-top-directory "yasnippets/"))))
+	(set-variable 'yas-snippet-dirs (list (init/locate-user-config "yasnippets/"))))
+(package-invoke 'yas-minor-mode 'prog-mode-hook 'yasnippet)
+(package-invoke 'yas-minor-mode 'org-mode-hook 'yasnippet)
 ;;; }}}
 
 ;;; Projectile Settings {{{
 (package-config 'projectile		; Extension: projectile
-	(setq projectile-mode-line (format " Proj[%s]" (projectile-project-name))))
+	(set-variable 'projectile-mode-line (format " Proj[%s]" (projectile-project-name))))
 (package-invoke 'projectile-mode nil 'projectile)
 ;;; }}}
 
 ;;; Auto-Complete Settings {{{
 (package-config 'auto-complete		; Extension: auto-complete
-	;;(add-to-list 'ac-dictionary-directories (concat user-emacs-directory "acdict/"))
+	;;(add-to-list 'ac-dictionary-directories (locate-user-emacs-file "acdict/"))
 	(require 'auto-complete-config)
 	(ac-config-default)
-	(setq ac-auto-show-menu nil)
-	(setq ac-use-quick-help nil)
+	(set-variable 'ac-auto-show-menu nil)
+	(set-variable 'ac-use-quick-help nil)
 	;;(define-key ac-mode-map "\M-/" 'auto-complete)
 	)
 ;;; }}}
@@ -429,9 +462,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (package-config 'web-mode		; Extension: web-mode
 	(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 	(add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode))
-	(setq web-mode-code-indent-offset 4)
-	(setq web-mode-markup-indent-offset 4)
-	(setq web-mode-style-padding 4))
+	(set-variable 'web-mode-code-indent-offset 4)
+	(set-variable 'web-mode-markup-indent-offset 4)
+	(set-variable 'web-mode-style-padding 4))
 ;;; }}}
 
 ;;; JS2-mode Settings {{{
@@ -445,9 +478,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Python-mode Settings {{{
 (package-config 'python		; Extension: python-mode
 	(defun init/setting-python-mode ()
-		(setq indent-tabs-mode t)
-		(setq python-indent-offset 4)
-		(setq tab-width 4))
+		(set-variable 'indent-tabs-mode t)
+		(set-variable 'python-indent-offset 4)
+		(set-variable 'tab-width 4))
 	(add-hook 'python-mode-hook 'init/setting-python-mode)
 	(package-depend 'lsp-mode
 		(add-hook 'python-mode-hook 'init/lsp-python-enable))
@@ -462,26 +495,29 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Elpy Settings {{{
 (package-config 'elpy		; Extension: elpy
-	(setq elpy-modules (delete 'elpy-module-highlight-indentation elpy-modules)))
+	(set-variable 'elpy-modules (delete 'elpy-module-highlight-indentation elpy-modules)))
 ;;; }}}
 
 ;;; Undo-Tree Settings {{{
 (package-config 'undo-tree		; Extension: undo-tree
-	(setq undo-tree-mode-lighter ""))
+	(set-variable 'undo-tree-mode-lighter ""))
 ;;; }}}
 
 ;;; Mozc Settings {{{
+(package-config 'mozc		; Extension: mozc
+	(set-variable 'mozc-candidate-style 'echo-area))
 (package-invoke 'mozc)
 ;;; }}}
 
 ;;; Skk Settings {{{
-(setq skk-user-directory (concat user-emacs-directory "ddskk/"))
+(setq skk-user-directory (locate-user-emacs-file "ddskk/"))
 (package-config 'skk		; Extension: SKK
 	;;(define-key global-map "\C-x\C-j" 'skk-mode)
-	(setq skk-henkan-show-candidates-keys (list ?a ?o ?e ?u ?h ?t ?n ?s))
-	(setq skk-indicator-use-cursor-color nil)
-	(setq skk-kakutei-key (kbd "C-t"))
-	(setq skk-background-mode 'dark) ; For DDSKK 15.1 Hot-Fix
+	(set-variable 'skk-henkan-show-candidates-keys (list ?a ?o ?e ?u ?h ?t ?n ?s))
+	(set-variable 'skk-indicator-use-cursor-color nil)
+	(set-variable 'skk-kakutei-key (kbd "C-t"))
+	(set-variable 'skk-use-auto-kutouten t)
+	(set-variable 'skk-background-mode 'dark) ; For DDSKK 15.1 Hot-Fix
 	(require 'skk-hint nil t)
 	(when (require 'skk-search-web nil t)
 		;;(add-to-list 'skk-search-prog-list '(skk-search-web 'skk-google-cgi-api-for-japanese-input) t)
@@ -498,7 +534,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Whitespace Settings {{{
 (package-config 'whitespace		; Extension: whitespace
-	(setq whitespace-style '(face tabs trailing space-before-tab empty tab-mark)))
+	(set-variable 'whitespace-style '(face tabs trailing space-before-tab empty tab-mark)))
 (package-invoke 'whitespace-mode 'prog-mode-hook)
 (defface dspace-emphasis '((t :background "red")) "Used for dspace emphasis")
 (defun init/emphasis-dspace ()
@@ -513,7 +549,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Uniquify Settings {{{
 (package-config 'uniquify
-	(setq uniquify-buffer-name-style 'post-forward-angle-brackets))
+	(set-variable 'uniquify-buffer-name-style 'post-forward-angle-brackets))
 (package-invoke 'uniquify)
 ;;; }}}
 
@@ -521,7 +557,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Tramp Settings {{{
 ;; A workaround for Tramp for text corruption.
-;;(setq tramp-remote-process-environment (quote ("HISTFILE=$HOME/.tramp_history" "HISTSIZE=1" "LC_MESSAGE=C" "TERM=dumb" "EMACS=t" "INSIDE_EMACS='24.3.1,tramp:2.2.6-24.3'" "CDPATH=" "HISTORY=" "MAIL=" "MAILCHECK=" "MAILPATH=" "PAGER=\"\"" "autocorrect=" "correct=")))
+;;(set-variable 'tramp-remote-process-environment (quote ("HISTFILE=$HOME/.tramp_history" "HISTSIZE=1" "LC_MESSAGE=C" "TERM=dumb" "EMACS=t" "INSIDE_EMACS='24.3.1,tramp:2.2.6-24.3'" "CDPATH=" "HISTORY=" "MAIL=" "MAILCHECK=" "MAILPATH=" "PAGER=\"\"" "autocorrect=" "correct=")))
 ;;; }}}
 
 ;;; Terminal Emulator Settings {{{
@@ -531,18 +567,18 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Dired Settings {{{
 (package-config 'dired
-	(setq dired-listing-switches "-alh")
-	(setq dired-dwim-target t))
+	(set-variable 'dired-listing-switches "-alh")
+	(set-variable 'dired-dwim-target t))
 ;;; }}}
 
 ;;; Ediff Settiings {{{
 (package-config 'ediff
-	(setq ediff-window-setup-function 'ediff-setup-windows-plain))
+	(set-variable 'ediff-window-setup-function 'ediff-setup-windows-plain))
 ;;; }}}
 
 ;;; Spacemacs {{{
 (setenv "SPACEMACSDIR" "/tmp/spacemacsconf")
-(setq spacemacs-start-directory (concat user-emacs-top-directory "spacemacs/"))
+(setq spacemacs-start-directory (init/locate-user-config "spacemacs/"))
 (setq-default dotspacemacs-themes '(deeper-blue))
 (setq-default dotspacemacs-default-font '("Inconsolata"
                                           :size 24
@@ -553,7 +589,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Customize Settings {{{
-(setq custom-file (concat user-emacs-top-directory "customize.el"))
+(setq custom-file (init/locate-user-config "customize.el"))
 (load custom-file)
 ;;; }}}
 
@@ -566,4 +602,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; lisp-body-indent: 2
 ;;; tab-width: 2
 ;;; origami-fold-style: triple-braces
+;;; eval: (outline-minor-mode t)
+;;; outline-regexp: ";;;.* {{{"
 ;;; End:

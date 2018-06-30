@@ -8,3 +8,6 @@
 	path = zsh.d/zplug
 	url = https://github.com/zplug/zplug.git
 	ignore = dirty
+[submodule "private.d"]
+	path = private.d
+	url = https://gitlab.pluser.net/pluser/dotfiles-private.git

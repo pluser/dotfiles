@@ -3,7 +3,6 @@
 emacs.d/history
 emacs.d/cache/
 emacs.d/local/
-emacs.d/private.el
 *.dat
 *.elc
 emacs.d/url

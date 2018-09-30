@@ -1,5 +1,9 @@
 #!/bin/zsh
 # -*- mode: shell-script -*-
 
-typeset -U path
-path=(~/.go/bin(N-/) ~/.local/bin(N-/) ${path[@]})
+typeset -U fpath path manpath
+typeset -TU INFOPATH infopath
+fpath=(${fpath[@]} ~/.local/share/zsh(N-/) ~/.linuxbrew/share/zsh/site-functions(N-/))
+path=(${path[@]} ~/.go/bin(N-/) ~/.local/bin(N-/) ~/.linuxbrew/bin(N-/))
+manpath=(${manpath[@]} ~/.local/share/man(N-/) ~/.linuxbrew/share/man(N-/))
+infopath=(${infopath[@]} ~/.local/share/info(N-/) ~/.linuxbrew/share/info(N-/))

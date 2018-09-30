@@ -90,7 +90,7 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 (defun package-invoke (package-initiater &optional hook autoinstall)
 	"Set the up PACKAGE-INITIATER in startup sequence.
 If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.  If AUTOINSTALL is non-nil and the package was not installed, installed automatically."
-	(if (fboundp package-initiater)
+	(if (and (fboundp package-initiater) (not (equal hook 'require-only)))
 			(add-hook (or hook 'emacs-startup-hook) package-initiater)
 		(unless (require package-initiater nil t)
 			(if (featurep 'package)
@@ -104,7 +104,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (defmacro package-depend (package &rest body)
 	"Declare the BODY depends on PACKAGE."
 	(declare (indent defun))
-	`(when (featurep ,package) ,@body))
+	`(when (or (featurep ,package) (fboundp ,package)) ,@body))
 
 (package-config 'package
 	(let ((pkgs
@@ -192,6 +192,12 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	"Settings for 'prog-mode."
 	(set-variable 'display-line-numbers 'relative))
 (add-hook 'prog-mode-hook 'init/prog-mode-editor-style)
+(defface dspace-emphasis '((t :background "red")) "Used for dspace emphasis")
+(defun init/emphasis-dspace ()
+	"Emphasis ideographic space."
+	(font-lock-add-keywords nil '(("　" 0 'dspace-emphasis t))))
+(add-hook 'prog-mode-hook 'init/emphasis-dspace)
+
 ;;; }}}
 
 ;;; Code styling {{{
@@ -254,16 +260,12 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Backcup, Autosave and Locking Settings {{{
 (set-variable 'auto-save-list-file-prefix (locate-user-emacs-file "auto-save-list/autosaves-")) ; the variable sat at very early on emacs startup, so it should be set again.
-(add-to-list 'auto-save-file-name-transforms `(".*" ,(locate-user-emacs-file "auto-save/\\2") t))
+(add-to-list 'auto-save-file-name-transforms `(".*" ,(locate-user-emacs-file "auto-save/") t))
 (add-to-list 'backup-directory-alist `(".*" . ,(locate-user-emacs-file "backup-files/")))
 (set-variable 'kept-new-versions 10)
+(set-variable 'kept-old-versions 0)
 (set-variable 'version-control t)
-;;; }}}
-
-;;; CC-Mode Settings {{{
-(package-config 'cc-mode
-	(package-depend 'ensime-mode
-		(add-hook 'java-mode-hook 'ensime-mode)))
+(set-variable 'delete-old-versions t)
 ;;; }}}
 
 ;;; File Local Variable Settings {{{
@@ -272,6 +274,55 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(add-to-list 'safe-local-eval-forms '(outline-minor-mode t)))
 ;;; }}}
 
+
+;;; Major Mode {{{
+
+;;; Web-mode Settings {{{
+(package-config 'web-mode		; Extension: web-mode
+	(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+	(add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode))
+	(set-variable 'web-mode-code-indent-offset 4)
+	(set-variable 'web-mode-markup-indent-offset 4)
+	(set-variable 'web-mode-style-padding 4))
+;;; }}}
+
+;;; JS2-mode Settings {{{
+(package-config 'js2-mode		; Extension: js2-mode
+	(add-to-list 'auto-mode-alist '("\\.html?\\'" . js2-mode))
+	;;(add-hook 'js-mode-hook 'init/company-tern-enable)
+	(package-depend 'lsp-mode
+		(add-hook 'js2-mode-hook 'lsp-jts-enable)))
+;;; }}}
+
+;;; Python-mode Settings {{{
+(package-config 'python		; Extension: python-mode
+	(defun init/setting-python-mode ()
+		(setq indent-tabs-mode t)
+		(setq python-indent-offset 4)
+		(setq tab-width 4))
+	(add-hook 'python-mode-hook 'init/setting-python-mode)
+	(package-depend 'lsp-mode
+		(add-hook 'python-mode-hook 'lsp-pyls-enable))
+	;;(add-hook 'python-mode-hook 'init/company-jedi-enable)
+	)
+;;; }}}
+
+;;; CC-Mode Settings {{{
+(package-config 'cc-mode
+	(package-depend 'ensime-mode
+		(add-hook 'java-mode-hook 'ensime-mode))
+	(package-depend 'lsp-mode
+		(package-depend 'cquery
+			(add-hook 'c-mode-hook 'lsp-cquery-enable)))
+	(package-invoke 'cquery))
+;;; }}}
+
+;;; Jinja2 Settings {{{
+(package-config 'jinja2-mode
+	(add-to-list 'auto-mode-alist '("\\.tmpl\\'" . jinja2-mode)))
+;;; }}}
+
+;;; Major Mode }}}
 
 ;;; Extensions {{{
 
@@ -323,10 +374,14 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Org-mode Settings {{{
 (package-config 'org		; Extension: org
 	;;(set-variable 'org-babel-no-eval-on-ctrl-c-ctrl-c t)
-	;;(set-variable 'org-startup-truncated nil)
+	(set-variable 'org-startup-truncated nil)
 	(org-babel-do-load-languages
 	 'org-babel-load-languages
 	 '((emacs-lisp . t) (dot . t)))
+	(string-match "\\\\documentclass{article}" org-format-latex-header)
+	(set-variable 'org-format-latex-header (replace-match "\\documentclass[autodetect-engine,dvipdfmx-if-dvi,ja=standard,enablejfam=true]{bxjsarticle}" t t org-format-latex-header))
+	(add-to-list 'org-preview-latex-process-alist '(xelatex-dvisvgm :programs ("xelatex" "dvisvgm") :description "xdv > svg" :message "you need to install the programs: xelatex and dvisvgm." :use-xcolor t :image-input-type "xdv" :image-output-type "svg" :image-size-adjust (2.0 . 2.0) :latex-compiler ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f") :image-converter ("dvisvgm %f -n -b min -c %S -o %O")))
+	(set-variable 'org-preview-latex-default-process 'xelatex-dvisvgm)
 	(package-config 'ox
 		(set-variable 'org-export-allow-bind-keywords t))
 	(package-config 'ox-pandoc
@@ -334,19 +389,28 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(package-config 'ox-latex
 		(add-to-list
 		 'org-latex-classes
-		 '("ltjsarticle" "\\documentclass[]{ltjsarticle}"
+		 '("ltjsarticle" "\\documentclass[autodetect-engine,dvipdfmx-if-dvi,ja=standard]{bxjsarticle}"
 			 ("\\section{%s}" . "\\section*{%s}")
 			 ("\\subsection{%s}" . "\\subsection*{%s}")
 			 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
 			 ("\\paragraph{%s}" . "\\paragraph*{%s}")
 			 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-		(set-variable 'org-latex-default-class "ltjsarticle"))
-		(set-variable 'org-latex-compiler "lualatex"))
+		(add-to-list
+		 'org-latex-classes
+		 '("jxelatex" "\\documentclass[autodetect-engine,dvipdfmx-if-dvi,ja=standard,enablejfam=true]{bxjsarticle}"
+			 ("\\section{%s}" . "\\section*{%s}")
+			 ("\\subsection{%s}" . "\\subsection*{%s}")
+			 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+			 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+			 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+		(set-variable 'org-latex-default-class "ltjsarticle")
+		(set-variable 'org-latex-compiler "lualatex")
+		))
 ;;; }}}
 
 ;;; Helm Settings {{{
 (package-config 'helm-mode		; Extension: helm
-	(require 'helm-config)
+	(package-invoke 'helm-config 'require-only)
 	(define-key global-map (kbd "C-x b") 'helm-buffers-list)
 	(define-key global-map (kbd "C-x f") 'helm-find-files)
 	(define-key global-map (kbd "M-x") 'helm-M-x)
@@ -373,11 +437,14 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-variable 'evil-echo-state nil)
 	(set-variable 'evil-insert-state-cursor nil)
 	(eval-after-load 'help-mode '(evil-make-overriding-map help-mode-map))
-	(when (require 'evil-surround nil t)
-		(global-evil-surround-mode)))
+	(package-depend
+		(global-evil-surround-mode))
+	(add-to-list 'evil-emacs-state-modes 'text-mode)
+	(add-to-list 'evil-emacs-state-modes 'org-mode))
 ;(autoload 'evil-local-mode "evil"); to support lazy load of eval-local-mode minor mode
 ;(package-invoke 'evil-local-mode 'prog-mode-hook 'evil)
 (package-invoke 'evil-mode 'prog-mode-hook 'evil)
+(package-invoke 'evil-surround 'evil-mode-hook)
 ;;; }}}
 
 ;;; Company Settings {{{
@@ -397,6 +464,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(add-to-list 'company-backends 'company-math-symbols-unicode))
 	(package-config 'company-tern		; Extension: company-tern
 		(set-variable 'company-tern-property-marker nil))
+	(defun init/company-lsp-enable ()
+		(make-local-variable 'company-backends)
+		(add-to-list 'company-backends 'company-lsp))
 	(defun init/company-jedi-enable ()
 		(make-local-variable 'company-backends)
 		(add-to-list 'company-backends 'company-jedi))
@@ -409,22 +479,21 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; LSP Settings {{{
-(package-config 'lsp-mode		; Extension:  lsp-mode
-	(lsp-define-stdio-client
-	 lsp-python-mode
-	 "python"
-	 (lambda () default-directory)
-	 '("pyls"))
-	(defun init/lsp-python-enable ()
-		(lsp-python-mode-enable))
-	(lsp-define-stdio-client
-	 lsp-javascript-mode
-	 "javascript"
-	 (lambda () default-directory)
-	 '("javascript-typescript-stdio"))
-	(defun init/lsp-javascript-enable ()
-		(lsp-javascript-mode-enable)))
-(package-invoke 'lsp-mode)
+(package-config 'lsp-mode		; Extension: lsp-mode
+	(package-invoke 'lsp-ui-mode 'lsp-mode-hook)
+	(lsp-define-stdio-client lsp-pyls "python" (lambda () default-directory) '("pyls"))
+	(lsp-define-stdio-client lsp-jts "javascript" (lambda () default-directory) '("javascript-typescript-stdio"))
+	(lsp-define-stdio-client lsp-clangd "c" (lambda () default-directory) '("clangd")))
+(package-config 'lsp-ui		; Extension: lsp-ui
+	(set-variable 'lsp-ui-sideline-enable nil))
+(package-invoke 'lsp-mode 'require-only)
+;;; }}}
+
+;;; Company-LSP Settings {{{		; Extension: company-lsp
+(defun init/enable-company-lsp ()
+	(package-depend 'company
+		(add-to-list 'company-backends 'company-lsp)))
+(add-hook 'lsp-mode-hook 'init/enable-company-lsp)
 ;;; }}}
 
 ;;; Magit Settings {{{
@@ -456,41 +525,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-variable 'ac-use-quick-help nil)
 	;;(define-key ac-mode-map "\M-/" 'auto-complete)
 	)
-;;; }}}
-
-;;; Web-mode Settings {{{
-(package-config 'web-mode		; Extension: web-mode
-	(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-	(add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode))
-	(set-variable 'web-mode-code-indent-offset 4)
-	(set-variable 'web-mode-markup-indent-offset 4)
-	(set-variable 'web-mode-style-padding 4))
-;;; }}}
-
-;;; JS2-mode Settings {{{
-(package-config 'js2-mode		; Extension: js2-mode
-	(add-to-list 'auto-mode-alist '("\\.html?\\'" . js2-mode))
-	;;(add-hook 'js-mode-hook 'init/company-tern-enable)
-	(package-depend 'lsp-mode
-		(add-hook 'js2-mode-hook 'init/lsp-javascript-enable)))
-;;; }}}
-
-;;; Python-mode Settings {{{
-(package-config 'python		; Extension: python-mode
-	(defun init/setting-python-mode ()
-		(set-variable 'indent-tabs-mode t)
-		(set-variable 'python-indent-offset 4)
-		(set-variable 'tab-width 4))
-	(add-hook 'python-mode-hook 'init/setting-python-mode)
-	(package-depend 'lsp-mode
-		(add-hook 'python-mode-hook 'init/lsp-python-enable))
-	;;(add-hook 'python-mode-hook 'init/company-jedi-enable)
-	)
-;;; }}}
-
-;;; Jinja2 Settings {{{
-(package-config 'jinja2-mode
-	(add-to-list 'auto-mode-alist '("\\.tmpl\\'" . jinja2-mode)))
 ;;; }}}
 
 ;;; Elpy Settings {{{
@@ -536,10 +570,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (package-config 'whitespace		; Extension: whitespace
 	(set-variable 'whitespace-style '(face tabs trailing space-before-tab empty tab-mark)))
 (package-invoke 'whitespace-mode 'prog-mode-hook)
-(defface dspace-emphasis '((t :background "red")) "Used for dspace emphasis")
-(defun init/emphasis-dspace ()
-	(font-lock-add-keywords nil '(("　" . init/dspace-emphasis))))
-(font-lock-add-keywords 'lisp-mode '(("b" . (0 highlight t t))))
 ;;; }}}
 
 ;;; Xah-math-input-mode Settings {{{

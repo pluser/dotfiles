@@ -343,7 +343,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Gtags(GNU GLOBAL) Settings {{{
 (package-config 'gtags)		; Extension: gtags
-(package-invoke 'gtags-mode 'prog-mode-hook)
+;(package-invoke 'gtags-mode 'prog-mode-hook)
 ;;; }}}
 
 ;;; Flycheck Settings {{{
@@ -480,7 +480,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; LSP Settings {{{
 (package-config 'lsp-mode		; Extension: lsp-mode
-	(package-invoke 'lsp-ui-mode 'lsp-mode-hook)
+	(package-invoke 'lsp-ui-mode 'lsp-mode-hook 'lsp-ui)
 	(lsp-define-stdio-client lsp-pyls "python" (lambda () default-directory) '("pyls"))
 	(lsp-define-stdio-client lsp-jts "javascript" (lambda () default-directory) '("javascript-typescript-stdio"))
 	(lsp-define-stdio-client lsp-clangd "c" (lambda () default-directory) '("clangd")))

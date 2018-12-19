@@ -290,8 +290,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (package-config 'js2-mode		; Extension: js2-mode
 	(add-to-list 'auto-mode-alist '("\\.html?\\'" . js2-mode))
 	;;(add-hook 'js-mode-hook 'init/company-tern-enable)
-	(package-depend 'lsp-mode
-		(add-hook 'js2-mode-hook 'lsp-jts-enable)))
+	(package-depend 'lsp
+		(add-hook 'js2-mode-hook 'lsp)))
 ;;; }}}
 
 ;;; Python-mode Settings {{{
@@ -301,20 +301,16 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(setq python-indent-offset 4)
 		(setq tab-width 4))
 	(add-hook 'python-mode-hook 'init/setting-python-mode)
-	(package-depend 'lsp-mode
-		(add-hook 'python-mode-hook 'lsp-pyls-enable))
-	;;(add-hook 'python-mode-hook 'init/company-jedi-enable)
-	)
+	(package-depend 'lsp
+		(package-invoke 'lsp 'python-mode-hook)))
 ;;; }}}
 
 ;;; CC-Mode Settings {{{
 (package-config 'cc-mode
 	(package-depend 'ensime-mode
 		(add-hook 'java-mode-hook 'ensime-mode))
-	(package-depend 'lsp-mode
-		(package-depend 'cquery
-			(add-hook 'c-mode-hook 'lsp-cquery-enable)))
-	(package-invoke 'cquery))
+	(package-depend 'lsp
+		(package-invoke 'lsp 'c-mode-hook)))
 ;;; }}}
 
 ;;; Jinja2 Settings {{{
@@ -479,21 +475,14 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; LSP Settings {{{
-(package-config 'lsp-mode		; Extension: lsp-mode
-	(package-invoke 'lsp-ui-mode 'lsp-mode-hook 'lsp-ui)
-	(lsp-define-stdio-client lsp-pyls "python" (lambda () default-directory) '("pyls"))
-	(lsp-define-stdio-client lsp-jts "javascript" (lambda () default-directory) '("javascript-typescript-stdio"))
-	(lsp-define-stdio-client lsp-clangd "c" (lambda () default-directory) '("clangd")))
+(package-config 'lsp		; Extension: lsp-mode
+	(package-invoke 'lsp-clients 'require-only))
 (package-config 'lsp-ui		; Extension: lsp-ui
 	(set-variable 'lsp-ui-sideline-enable nil))
-(package-invoke 'lsp-mode 'require-only)
+(package-invoke 'lsp 'require-only)
 ;;; }}}
 
 ;;; Company-LSP Settings {{{		; Extension: company-lsp
-(defun init/enable-company-lsp ()
-	(package-depend 'company
-		(add-to-list 'company-backends 'company-lsp)))
-(add-hook 'lsp-mode-hook 'init/enable-company-lsp)
 ;;; }}}
 
 ;;; Magit Settings {{{

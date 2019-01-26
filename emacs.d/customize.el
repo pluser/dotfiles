@@ -30,13 +30,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(c-default-style
-   (quote
-	((c++-mode . "stroustrup")
-	 (java-mode . "java")
-	 (awk-mode . "awk")
-	 (other . "gnu"))))
- '(c-tab-always-indent nil)
  '(package-selected-packages
    (quote
-	(lsp-ui-mode cquery lsp-ui pdf-tools ob-sagemath sage-shell-mode ensime company-lsp lsp-mode google-translate ox-pandoc latex-preview-pane latex-math-preview origami indium lsp-java eclim yaml-mode helm-gtags ein evil-surround expand-region js2-mode company-tern lsp-python which-key auctex-latexmk auctex editorconfig yasnippet mozc-im narrow-reindent company-statistics flycheck-pyflakes company-math helm-company projectile company-web company-jedi pyvenv jinja2-mode python-mode company helm web-mode sunrise-commander php-mode markdown-mode magit idomenu flycheck evil elpy dired+ dic-lookup-w3m ddskk company-c-headers ace-isearch))))
+	(company-lsp ccls ox-pandoc dart-mode lsp-ui swift-mode cquery evil magit yasnippet projectile company helm flycheck origami which-key web-mode markdown-mode idomenu ddskk))))

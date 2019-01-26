@@ -176,7 +176,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (package-config 'diff)
 ;;; }}}
 
-;;; Code ornament / Visual {{{
+;;; Code Ornament / Visual {{{
 (show-paren-mode t)
 (set-variable 'show-paren-style 'mixed)
 (set-variable 'scroll-conservatively 1) ; amount of scrolling
@@ -186,7 +186,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (setq-default truncate-lines nil)
 (set-variable 'auto-hscroll-mode 'current-line) ; scroll one line or whole screen
 (when (< emacs-major-version 26) (global-linum-mode t)) ; show line number at left margin
-(setq-default tab-width 4)
 (global-hl-line-mode t) ; highlight a line cursor is on
 (defun init/prog-mode-editor-style ()
 	"Settings for 'prog-mode."
@@ -197,12 +196,19 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	"Emphasis ideographic space."
 	(font-lock-add-keywords nil '(("　" 0 'dspace-emphasis t))))
 (add-hook 'prog-mode-hook 'init/emphasis-dspace)
-
 ;;; }}}
 
 ;;; Code styling {{{
+;; tabs and indentation
 (setq-default indent-tabs-mode t)
 (setq-default c-basic-offset 4)
+(setq-default tab-width 4)
+(set-variable 'c-default-style
+			'((c++-mode . "k&r")
+				(java-mode . "java")
+				(awk-mode . "awk")
+				(other . "gnu")))
+(set-variable 'c-tab-always-indent 'indent)
 ;;(setq-default require-final-newline nil)
 ;;(set-variable 'mode-require-final-newline nil)
 ;;; }}}
@@ -307,9 +313,11 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; CC-Mode Settings {{{
 (package-config 'cc-mode
+	(set-default 'c-hungry-delete-key t)
 	(package-depend 'ensime-mode
 		(add-hook 'java-mode-hook 'ensime-mode))
 	(package-depend 'lsp
+		(require 'ccls nil t) ; load ccls if it exists
 		(package-invoke 'lsp 'c-mode-hook)))
 ;;; }}}
 
@@ -447,10 +455,11 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "t") 'evil-next-line)
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "n") 'evil-previous-line)
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "s") 'evil-forward-char)
-		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "j") 'evil-find-char-to)
-		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "J") 'evil-find-char-to-backward))
+		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "m") 'evil-search-next)
+		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "M") 'evil-search-previous))
 	(define-key evil-insert-state-map (kbd "M-SPC") 'evil-normal-state)
 	(define-key evil-insert-state-map (kbd "C-e") nil)
+	(define-key evil-insert-state-map (kbd "C-t") nil)
 	(set-variable 'evil-move-cursor-back nil)
 	;;(set-variable 'evil-default-state 'emacs)
 	(set-variable 'evil-echo-state nil)
@@ -483,29 +492,30 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(add-to-list 'company-backends 'company-math-symbols-unicode))
 	(package-config 'company-tern		; Extension: company-tern
 		(set-variable 'company-tern-property-marker nil))
-	(defun init/company-lsp-enable ()
-		(make-local-variable 'company-backends)
-		(add-to-list 'company-backends 'company-lsp))
 	(defun init/company-jedi-enable ()
-		(make-local-variable 'company-backends)
+		;(make-local-variable 'company-backends)
 		(add-to-list 'company-backends 'company-jedi))
 	(defun init/company-tern-enable ()
 		(interactive)
 		(tern-mode t)
-		(make-local-variable 'company-backends)
+		;(make-local-variable 'company-backends)
 		(add-to-list 'company-backends '(company-tern :with company-dabbrev-code))))
 (package-invoke 'company-mode 'prog-mode-hook 'company)
 ;;; }}}
 
 ;;; LSP Settings {{{
 (package-config 'lsp		; Extension: lsp-mode
-	(package-invoke 'lsp-clients 'require-only))
+	(package-invoke 'lsp-clients 'require-only)
+	(set-variable 'lsp-enable-indentation nil)
+	(set-variable 'lsp-prefer-flymake nil)
+	(package-depend 'company-lsp
+		(defun init/company-lsp-enable ()
+			(add-to-list 'company-backends 'company-lsp))
+		(add-hook 'lsp-mode-hook 'init/company-lsp-enable)))
 (package-config 'lsp-ui		; Extension: lsp-ui
-	(set-variable 'lsp-ui-sideline-enable nil))
+	(set-variable 'lsp-ui-sideline-enable nil)
+	(set-variable 'lsp-ui-doc-enable nil))
 (package-invoke 'lsp 'require-only)
-;;; }}}
-
-;;; Company-LSP Settings {{{		; Extension: company-lsp
 ;;; }}}
 
 ;;; Magit Settings {{{

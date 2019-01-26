@@ -4,6 +4,16 @@
 typeset -U fpath path manpath
 typeset -TU INFOPATH infopath
 fpath=(${fpath[@]} ~/.local/share/zsh(N-/) ~/.linuxbrew/share/zsh/site-functions(N-/))
-path=(${path[@]} ~/.go/bin(N-/) ~/.local/bin(N-/) ~/.linuxbrew/bin(N-/))
-manpath=(${manpath[@]} ~/.local/share/man(N-/) ~/.linuxbrew/share/man(N-/))
-infopath=(${infopath[@]} ~/.local/share/info(N-/) ~/.linuxbrew/share/info(N-/))
+path=(${path[@]} ~/.local/*/bin(N-/) ~/.local/bin(N-/) ~/.linuxbrew/bin(N-/))
+manpath=(${manpath[@]} ~/.local/*/share/man(N-/) ~/.local/share/man(N-/) ~/.linuxbrew/share/man(N-/))
+infopath=(${infopath[@]} ~/.local/*/share/info(N-/) ~/.local/share/info(N-/) ~/.linuxbrew/share/info(N-/))
+
+typeset -xTU ANDROID_HOME android_home
+android_home=(~/.local/Android/Sdk(N-/))
+path=(${path[@]} ~/.local/Android/Sdk/platform-tools(N-/) ~/.local/Android/Sdk/tools(N-/))
+
+typeset -xTU GOPATH gopath
+gopath=(~/.local/go(N-/))
+
+typeset -xTU PUB_CACHE pub_cache
+pub_cache=(~/.local/dart-package(N-/))

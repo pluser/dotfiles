@@ -318,6 +318,29 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(add-to-list 'auto-mode-alist '("\\.tmpl\\'" . jinja2-mode)))
 ;;; }}}
 
+;;; Dart Settings {{{
+(package-config 'dart-mode
+	(defun init/setting-dart-mode ()
+		(setq tab-width 4))
+	(package-depend 'lsp
+		(set-variable 'lsp-clients-dart-server-command "~/.local/dart-package/bin/dart_language_server")
+		(package-invoke 'lsp 'dart-mode-hook))
+	(defun init/flutter-hot-reload ()
+		(interactive)
+			"Send a signal to daemon to hot reload."
+			;;(start-process-shell-command "emacs-flutter-hot-reloader" "testproc" "kill -SIGUSR1 \"$(pgrep -f flutter_tool)\"")
+			(start-process "emacs-flutter-hot-reloader" nil "pkill" "-SIGUSR1" "-f" "flutter_tool"))
+	(defun init/flutter-hot-reload-enable()
+		(interactive)
+			"Enable flutter hot reload on save."
+		(add-hook 'after-save-hook 'init/flutter-hot-reload t t))
+	(defun init/flutter-hot-reload-disable()
+		(interactive)
+			"Disable flutter hot reload on save."
+			(remove-hook 'after-save-hook 'init/flutter-hot-reload t))
+	(add-hook 'dart-mode-hook 'init/setting-dart-mode)
+	(add-hook 'dart-mode-hook 'init/flutter-hot-reload-enable))
+;;; }}}
 ;;; Major Mode }}}
 
 ;;; Extensions {{{

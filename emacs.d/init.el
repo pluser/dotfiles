@@ -155,8 +155,11 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Color / Theme Setting {{{
+(set-variable 'custom-theme-directory (init/locate-user-config "theme/"))
 (if (fboundp 'load-theme)
-		(load-theme 'deeper-blue)
+		(progn
+			(load-theme 'deeper-blue)
+			(load-theme 'pluser-deeper-blue t))
 	(package-config 'color-theme		; Extension: color-theme
 		(color-theme-initialize)
 		(color-theme-deep-blue))

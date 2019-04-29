@@ -11,3 +11,6 @@
 [submodule "private.d"]
 	path = private.d
 	url = https://gitlab.pluser.net/pluser/dotfiles-private.git
+[submodule "zsh.d/zplugin"]
+	path = zsh.d/zplugin
+	url = https://github.com/zdharma/zplugin.git

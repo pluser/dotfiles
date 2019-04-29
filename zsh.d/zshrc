@@ -1,16 +1,52 @@
 #!/bin/zsh
 # -*- mode: shell-script -*-
 
-source ~/.zplug/init.zsh
+### Added by Zplugin's installer
+source "${HOME}/.zplugin/bin/zplugin.zsh"
+autoload -Uz _zplugin
+(( ${+_comps} )) && _comps[zplugin]=_zplugin
+### End of Zplugin's installer chunk
 
-zplug 'zplug/zplug', hook-build:'zplug --self-manage' from:github
+zplugin ice pick"async.zsh" src"pure.zsh"
+zplugin light sindresorhus/pure
 
-zplug "zsh-users/zsh-syntax-highlighting", from:github, defer:2
-zplug "zsh-users/zsh-autosuggestions", from:github
-zplug "zsh-users/zsh-completions", from:github
+zplugin light zsh-users/zsh-completions
+zplugin light zsh-users/zsh-autosuggestions
 
-#zplug "denysdovhan/spaceship-prompt", use:spaceship.zsh, from:github, as:theme
-zplug "mafredri/zsh-async", from:github
-zplug "sindresorhus/pure", use:pure.zsh,  from:github, as:theme
+autoload compinit
+compinit
 
-zplug load --verbose
+zplugin light zdharma/fast-syntax-highlighting
+
+### zplug related setting
+##source ~/.zplug/init.zsh
+##
+##zplug 'zplug/zplug', hook-build:'zplug --self-manage' from:github
+##
+##zplug "zsh-users/zsh-syntax-highlighting", from:github, defer:2
+##zplug "zsh-users/zsh-autosuggestions", from:github
+##zplug "zsh-users/zsh-completions", from:github
+##
+##if (( $+commands[fzf] )); then
+##echo "fzf is installed"
+##zplug "b4b4r07/enhancd", from:github, use:init.sh
+##fi
+##
+###zplug "denysdovhan/spaceship-prompt", use:spaceship.zsh, from:github, as:theme
+##zplug "mafredri/zsh-async", from:github
+##zplug "sindresorhus/pure", use:pure.zsh,  from:github, as:theme
+##
+##zplug load --verbose
+
+
+# history related
+HISTFILE="~/.zsh-history"
+HISTSIZE=100000
+SAVEHIST=1000000
+setopt inc_append_history
+setopt share_history
+
+# chdir related
+#autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+#add-zsh-hook chpwd chpwd_recent_dirs
+#zstyle ':completion:*:*:cdr:*:*' menu selection

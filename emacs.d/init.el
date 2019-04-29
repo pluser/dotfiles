@@ -37,9 +37,9 @@
 	(if (listp path-list)
 			(dolist (path path-list)
 				(when (file-directory-p path)
-					(add-to-list 'exec-path path)))
+					(add-to-list 'exec-path path t)))
 		(when (file-directory-p path-list)
-			(add-to-list 'exec-path path-list))))
+			(add-to-list 'exec-path path-list t))))
 (defun init/add-exec-path-from-shell ()
 	"Get and add PATH to 'exec-path from shell."
 	(let ((path-from-shell (split-string (replace-regexp-in-string "[ \t\n]*" "" (shell-command-to-string "${SHELL} -c 'echo ${PATH}'")) path-separator)))
@@ -316,7 +316,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; CC-Mode Settings {{{
 (package-config 'cc-mode
-	(set-default 'c-hungry-delete-key t)
+	;;(set-default 'c-hungry-delete-key t)
 	(package-depend 'ensime-mode
 		(add-hook 'java-mode-hook 'ensime-mode))
 	(package-depend 'lsp
@@ -445,9 +445,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(define-key global-map (kbd "C-x f") 'helm-find-files)
 	(define-key global-map (kbd "M-x") 'helm-M-x)
 	(define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
-	(define-key helm-map (kbd "C-z") 'helm-select-action)
-	(set-variable 'helm-autoresize-max-height 80)
-	(set-variable 'helm-autoresize-mode t))
+	(define-key helm-map (kbd "C-z") 'helm-select-action))
 (package-invoke 'helm-mode nil 'helm)
 ;;; }}}
 
@@ -509,15 +507,16 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; LSP Settings {{{
 (package-config 'lsp		; Extension: lsp-mode
 	(package-invoke 'lsp-clients 'require-only)
-	(set-variable 'lsp-enable-indentation nil)
-	(set-variable 'lsp-prefer-flymake nil)
+	;(set-variable 'lsp-enable-indentation nil)
+	(set-variable 'lsp-prefer-flymake :none)
 	(package-depend 'company-lsp
 		(defun init/company-lsp-enable ()
 			(add-to-list 'company-backends 'company-lsp))
 		(add-hook 'lsp-mode-hook 'init/company-lsp-enable)))
 (package-config 'lsp-ui		; Extension: lsp-ui
-	(set-variable 'lsp-ui-sideline-enable nil)
-	(set-variable 'lsp-ui-doc-enable nil))
+	;(set-variable 'lsp-ui-sideline-enable nil)
+	;(set-variable 'lsp-ui-doc-enable nil)
+	)
 (package-invoke 'lsp 'require-only)
 ;;; }}}
 

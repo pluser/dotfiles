@@ -1,7 +1,7 @@
 ;;; pluser-deeper-blue-theme.el --- An custom theme for emacs
 ;;; Commentary:
-;;; Use this theme with built-in deeper-blue theme.
 ;;; This theme is just an 'overlay' of the deeper-blue theme.
+;;; Use this theme with built-in deeper-blue theme.
 ;;; Code:
 
 (deftheme pluser-deeper-blue
@@ -26,8 +26,8 @@
  '(term-color-magenta ((t (:background "maroon1" :foreground "maroon1"))))
  '(term-color-red ((t (:background "#ee5533" :foreground "#ee5533"))))
  '(term-color-white ((t (:background "gainsboro" :foreground "gainsboro"))))
- '(term-color-yellow ((t (:background "yellow2" :foreground "yellow2")))))
-
+ '(term-color-yellow ((t (:background "yellow2" :foreground "yellow2"))))
+ '(whitespace-tab ((t (:foreground "darkgray")))))
 (custom-theme-set-variables
  'pluser-deeper-blue
  '(ansi-color-names-vector

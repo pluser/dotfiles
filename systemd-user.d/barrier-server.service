@@ -1,0 +1,12 @@
+[Unit]
+Description=Server of synergy, input device sharing system
+ConditionPathExists=/usr/bin/barriers
+
+[Service]
+ExecStart=/usr/bin/barriers --no-daemon
+Type=simple
+Restart=on-failure
+RestartSec=3s
+
+[Install]
+WantedBy=default.target

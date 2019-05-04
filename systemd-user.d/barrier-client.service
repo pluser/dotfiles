@@ -1,0 +1,12 @@
+[Unit]
+Description=Client of synergy, input device sharing system
+ConditionPathExists=/usr/bin/barrierc
+
+[Service]
+ExecStart=/usr/bin/barrierc --no-daemon
+Type=simple
+Restart=on-failure
+RestartSec=3s
+
+[Install]
+WantedBy=default.target

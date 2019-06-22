@@ -63,6 +63,7 @@ function zsh/is-installed() {
 function zsh/install() {
 	ln -rs "${dot_dir}/zshrc" "${HOME}/.zshrc" || die
 	ln -rs "${dot_dir}/zshenv" "${HOME}/.zshenv" || die
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma/zplugin/master/doc/install.sh)"
 }
 
 ######################

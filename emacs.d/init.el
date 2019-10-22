@@ -561,7 +561,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	;(set-variable 'lsp-ui-sideline-enable nil)
 	;(set-variable 'lsp-ui-doc-enable nil)
 	)
-(package-invoke 'lsp 'require-only)
+(package-invoke 'lsp 'require-only 'lsp-mode)
 ;;; }}}
 
 ;;; Magit Settings {{{

@@ -52,19 +52,20 @@
 
 (let* ((fontset-name "mejiro")
 	   (asciifont "Inconsolata")
-	   (size 12)
 	   (weight "normal")
 	   (slant "normal")
-	   (fsn (create-fontset-from-ascii-font (format "%s-%d:weight=%s:slant=%s" asciifont size weight slant) nil fontset-name)))
-  (set-fontset-font fsn 'unicode (font-spec :family "Migu 1M") nil 'append))
+	   (fsn (create-fontset-from-ascii-font (format "%s:weight=%s:slant=%s" asciifont weight slant) nil fontset-name)))
+  (set-fontset-font fsn 'japanese-jisx0213.2004-1 "Migu 1M")
+  (set-fontset-font fsn 'japanese-jisx0213-2 "Migu 1M"))
 
 (let* ((fontset-name "kawasemi")
 	   (asciifont "Inconsolata")
-	   (size 12)
+	   (size 17)
 	   (weight "normal")
 	   (slant "normal")
 	   (fsn (create-fontset-from-ascii-font (format "%s-%d:weight=%s:slant=%s" asciifont size weight slant) nil fontset-name)))
-  (set-fontset-font fsn 'unicode (font-spec :family "Migu 1C") nil 'prepend))
+  (set-fontset-font fsn 'japanese-jisx0213.2004-1 "Migu 1M")
+  (set-fontset-font fsn 'japanese-jisx0213-2 "Migu 1M"))
 
 (defun set-frame-fontset (fontset)
   "I cannot set fontset to the current frame with set-frame-font function.
@@ -90,7 +91,7 @@ If you want to set fontset to current frame, use set-frame-perameter instead of 
 ;;;  Japanese: あア亜、。’”；：！＠＃＄％＾＆＊（）「」｛｝＋ー＝＼／〜
 ;;;  Japanese-JISX0208: 乱 便 啜 刧
 ;;;  Japanese-JISX0212: 吧 佘 巠
-;;;  Japanese-XISX0213: 吞 䖝 汶 步
+;;;  Japanese-JISX0213: 吞 䖝 汶 步
 ;;;  Japanese-IVS:(string ?辻 #xe0100) (string ?辻 #xe0101)
 ;;;               (insert ?邊 #xe0100 ?邊 #xe0101 ?邊 #xe0102 ?邊 #xe0103 ?邊 #xe0104)
 ;;;

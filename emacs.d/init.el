@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;;  Heavily personalized Emacs configuration file
 ;;; Code:
-
+(setq debug-on-error t)
 ;;; Local variable {{{
 (when (< emacs-major-version 23)
 	(defvar user-emacs-directory (file-name-directory (or buffer-file-name load-file-name))))
@@ -67,12 +67,22 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 ;;; Font Setting {{{
 (when (and (display-graphic-p) (file-readable-p (init/locate-user-config "fonts.el")))
 	(ext-config "fonts.el")
-	(if (< emacs-major-version 24)
-		(progn (set-face-font 'default "fontset-mejiro")
-					 (set-frame-font "fontset-kawasemi"))
-		(progn (add-to-list 'default-frame-alist '(font . "fontset-mejiro"))
-					 (set-face-attribute 'variable-pitch nil :fontset "fontset-kawasemi")
-					 (set-face-attribute 'fixed-pitch nil :fontset "fontset-mejiro"))))
+	;(set-fontset-font "fontset-startup" 'ascii "Inconsolata")
+	;(set-fontset-font "fontset-startup" 'japanese-jisx0208 "Migu 1M")
+	;(set-face-attribute 'default nil :height 180))
+	(add-to-list 'default-frame-alist '(font . "fontset-kawasemi")))
+	;(set-face-attribute 'default nil 28))
+	;(set-face-font 'default "fontset-kawasemi"))
+	;(set-face-attribute 'default nil :fontset "fontset-kawasemi"))
+;	(set-frame-font "fontset-kawasemi"))
+;	(if (< emacs-major-version 24)
+;		(progn (set-face-font 'default "fontset-mejiro")
+;					 (set-frame-font "fontset-kawasemi"))
+;		(progn (add-to-list 'default-frame-alist '(font . "fontset-mejiro"))
+;					 (set-face-attribute 'variable-pitch nil :fontset "fontset-kawasemi")
+;					 (set-face-attribute 'fixed-pitch nil :fontset "fontset-mejiro")
+;					 ;(set-variable use-default-font-for-symbols nil)
+;					 )))
 ;;; }}}
 
 ;;; Custom Patch Loading {{{
@@ -130,7 +140,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Language Setting {{{
 ;;;	 If you want to know charset priority, (print (charset-priority-list))
-;; (set-language-environment 'Japanese)	; set for using japanese ONLY
+(set-language-environment 'Japanese)	; set for using japanese ONLY
+(set-variable 'default-input-method "japanese-skk")
 (prefer-coding-system 'utf-8)
 (when (eq system-type 'darwin)
 	(require 'ucs-normalize)
@@ -186,13 +197,15 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;(set-variable 'scroll-margin 5) ; keep lines on scrolling
 (set-variable 'line-number-mode t) ; show line number at modeline
 (set-variable 'column-number-mode t) ; show column number at modeline
+(toggle-indicate-empty-lines)
 (setq-default truncate-lines nil)
 (set-variable 'auto-hscroll-mode 'current-line) ; scroll one line or whole screen
 (when (< emacs-major-version 26) (global-linum-mode t)) ; show line number at left margin
 (global-hl-line-mode t) ; highlight a line cursor is on
 (defun init/prog-mode-editor-style ()
 	"Settings for 'prog-mode."
-	(set-variable 'display-line-numbers 'relative))
+	(set-variable 'display-line-numbers 'relative)
+	(set-variable 'indicate-empty-lines t))
 (add-hook 'prog-mode-hook 'init/prog-mode-editor-style)
 (defface dspace-emphasis '((t :background "red")) "Used for dspace emphasis")
 (defun init/emphasis-dspace ()
@@ -261,6 +274,15 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 				(setcdr m (list (cdr mode)))))))
 (add-hook 'after-change-major-mode-hook 'init/clean-modeline)
 (add-hook 'emacs-startup-hook 'init/clean-modeline)
+(package-config 'telephone-line		; Extension: telephone-line
+	(telephone-line-mode))
+;(package-invoke 'telephone-line)
+(package-config 'doom-modeline		; Extension: doom-modeline
+	(set-variable doom-modeline-height 1)
+	(set-face-attribute 'mode-line nil :height 100)
+	(set-face-attribute 'mode-line-inactive nil :height 100)
+	(doom-modeline-mode))
+;(package-invoke 'doom-modeline)
 ;;;}}}
 
 ;;; Suppress warning {{{
@@ -355,15 +377,32 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Major Mode }}}
 
 ;;; Extensions {{{
+;;; Hydra Settings {{{
+(package-config 'hydra		; Extension: hydra
+	)
+(package-invoke 'hydra)
+;;; }}}
+
+;;; Counsel, Swiper, Ivy Settings {{{
+(package-config 'ivy		; Extension: ivy
+	(set-variable 'ivy-use-virtual-buffers t))
+(package-config 'swiper		; Extension: swiper
+	)
+(package-config 'counsel		; Extension: counsel
+	(counsel-mode))
+(package-invoke 'counsel)
+;;; }}}
 
 ;;; Avy Settings {{{
 (package-config 'avy		; Extension: avy
 	(avy-setup-default))
 (package-invoke 'avy)
+;;; }}}
 
 ;;; Dashbord Settings {{{
 (package-config 'dashboard		; Extension: dashboard
 	(dashboard-setup-startup-hook))
+;;; }}}
 
 ;;; Which-Key Settings {{{
 (package-config 'which-key		; Extension: which-key
@@ -441,12 +480,16 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Helm Settings {{{
 (package-config 'helm-mode		; Extension: helm
 	(package-invoke 'helm-config 'require-only)
-	(define-key global-map (kbd "C-x b") 'helm-buffers-list)
-	(define-key global-map (kbd "C-x f") 'helm-find-files)
+	(define-key global-map (kbd "C-x b") 'helm-mini)
+	(define-key global-map (kbd "C-x f") 'helm-multi-files)
 	(define-key global-map (kbd "M-x") 'helm-M-x)
-	(define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
-	(define-key helm-map (kbd "C-z") 'helm-select-action))
-(package-invoke 'helm-mode nil 'helm)
+	(define-key global-map (kbd "M-y") 'helm-show-kill-ring)
+	(define-key global-map (kbd "C-x /") 'helm-occur)
+	(define-key isearch-mode-map (kbd "C-t") 'helm-occur-from-isearch)
+	;;(define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
+	;;(define-key helm-map (kbd "C-z") 'helm-select-action)
+	)
+;(package-invoke 'helm-mode nil 'helm)
 ;;; }}}
 
 ;;; Evil Settings {{{
@@ -459,6 +502,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "m") 'evil-search-next)
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "M") 'evil-search-previous))
 	(define-key evil-insert-state-map (kbd "M-SPC") 'evil-normal-state)
+	(define-key evil-insert-state-map (kbd "<henkan>") 'evil-normal-state)
 	(define-key evil-insert-state-map (kbd "C-e") nil)
 	(define-key evil-insert-state-map (kbd "C-t") nil)
 	(set-variable 'evil-move-cursor-back nil)
@@ -524,7 +568,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (package-config 'magit		; Extension: magit
 	(define-key global-map (kbd "<f12>") 'magit-status)
 	(set-variable 'magit-last-seen-setup-instruction "1.4.0"))
-(package-invoke 'magit)
+;(package-invoke 'magit)
 ;;; }}}
 
 ;;; Yasnippet Settings {{{
@@ -536,7 +580,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Projectile Settings {{{
 (package-config 'projectile		; Extension: projectile
-	(set-variable 'projectile-mode-line (format " Proj[%s]" (projectile-project-name))))
+	;;(set-variable 'projectile-mode-line (format " Proj[%s]" (projectile-project-name)))
+	(set-variable 'projectile-mode-line-prefix " Pj"))
 (package-invoke 'projectile-mode nil 'projectile)
 ;;; }}}
 
@@ -579,7 +624,26 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(require 'skk-hint nil t)
 	(when (require 'skk-search-web nil t)
 		;;(add-to-list 'skk-search-prog-list '(skk-search-web 'skk-google-cgi-api-for-japanese-input) t)
-		(add-to-list 'skk-search-prog-list '(skk-search-web 'skk-google-suggest) t)))
+		(add-to-list 'skk-search-prog-list '(skk-search-web 'skk-google-suggest) t))
+	(defun my/skk-kutouten-style-ja ()
+		(interactive)
+		(set-variable 'skk-kutouten-type 'jp))
+	(defun my/skk-kutouten-style-en ()
+		(interactive)
+		(set-variable 'skk-kutouten-type 'en))
+	(defun my/replace-punctual-style ()
+  (interactive)
+  (let ((prefer-period (if (consp skk-kutouten-type) (car skk-kutouten-type) (cadr (assoc skk-kutouten-type skk-kuten-touten-alist))))
+		(prefer-comma (if (consp skk-kutouten-type) (cdr skk-kutouten-type) (cddr (assoc skk-kutouten-type skk-kuten-touten-alist)))))
+	(save-excursion
+	  (goto-char 0)
+	  (while (search-forward "、" nil t) (replace-match prefer-comma nil t))
+	  (goto-char 0)
+	  (while (search-forward "，" nil t) (replace-match prefer-comma nil t))
+	  (goto-char 0)
+	  (while (search-forward "。" nil t) (replace-match prefer-period nil t))
+	  (goto-char 0)
+	  (while (search-forward "．" nil t) (replace-match prefer-period nil t))))))
 (package-invoke 'skk-preload 'text-mode-hook 'ddskk)
 ;;; }}}
 
@@ -592,7 +656,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Whitespace Settings {{{
 (package-config 'whitespace		; Extension: whitespace
-	(set-variable 'whitespace-style '(face tabs trailing space-before-tab empty tab-mark)))
+	(set-variable 'whitespace-style '(face tabs trailing space-before-tab tab-mark)))
 (package-invoke 'whitespace-mode 'prog-mode-hook)
 ;;; }}}
 

@@ -14,4 +14,4 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-	(typescript-mode treemacs treemacs-evil treemacs-icons-dired treemacs-projectile yasnippet which-key web-mode ox-pandoc magit lsp-ui helm evil-surround ddskk dart-mode cquery company-lsp ccls avy))))
+	(lsp-mode pipenv dashboard doom-themes doom-modeline elpy vterm typescript-mode treemacs treemacs-evil treemacs-icons-dired treemacs-projectile yasnippet which-key web-mode ox-pandoc magit lsp-ui helm evil-surround ddskk dart-mode cquery company-lsp ccls avy))))

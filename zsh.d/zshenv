@@ -1,6 +1,9 @@
 #!/bin/zsh
 # -*- mode: shell-script -*-
 
+typeset -x LANG
+LANG=en_US.UTF-8
+
 typeset -U fpath path manpath
 typeset -TU INFOPATH infopath
 fpath=(${fpath[@]} ~/.local/share/zsh(N-/) ~/.linuxbrew/share/zsh/site-functions(N-/))

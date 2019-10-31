@@ -7,8 +7,9 @@ autoload -Uz _zplugin
 (( ${+_comps} )) && _comps[zplugin]=_zplugin
 ### End of Zplugin's installer chunk
 
-zplugin ice pick"async.zsh" src"pure.zsh"
-zplugin light sindresorhus/pure
+#zplugin ice pick"async.zsh" src"pure.zsh"
+#zplugin light sindresorhus/pure
+zplugin light denysdovhan/spaceship-prompt
 
 zplugin light zsh-users/zsh-completions
 zplugin light zsh-users/zsh-autosuggestions
@@ -38,9 +39,11 @@ zplugin light zdharma/fast-syntax-highlighting
 ##
 ##zplug load --verbose
 
+# options
+setopt ignoreeof # prevent logout with Ctrl-D
 
 # history related
-HISTFILE="~/.zsh-history"
+HISTFILE="${HOME}/.zhistory"
 HISTSIZE=100000
 SAVEHIST=1000000
 setopt inc_append_history

@@ -3,7 +3,6 @@
 declare -a fonts_name
 declare -a fonts_url
 
-cat << COMMENTOUT
 fonts_name+=("Inconsolata")
 fonts_url+=('http://levien.com/type/myfonts/Inconsolata.otf')
 
@@ -72,7 +71,7 @@ fonts_url+=('http://font.gloomy.jp/dl-font-s5a4ik5w/antique-kaku.zip')
 
 fonts_name+=("ShinComic")
 fonts_url+=('http://www.font910.jp/freefont_i6wiwk5/f910-shin-comic-2.04.zip')
-COMMENTOUT
+
 fonts_name+=("Hannari-mincho")
 fonts_url+=('http://typingart.net/fontdata/hannari.zip --referer http://typingart.net/?p=44')
 
@@ -90,6 +89,12 @@ fonts_url+=('https://github.com/kazesawa/kazesawa/releases/download/alpha-v1/kaz
 
 fonts_name+=("Noto_Emoji")
 fonts_url+=('https://noto-website-2.storage.googleapis.com/pkgs/NotoEmoji-unhinted.zip')
+
+fonts_name+=("PowerlineSymbols")
+fonts_url+=('https://github.com/powerline/powerline/raw/develop/font/PowerlineSymbols.otf')
+
+fonts_name+=("DejaVu")
+fonts_url+=('http://sourceforge.net/projects/dejavu/files/dejavu/2.37/dejavu-fonts-ttf-2.37.tar.bz2')
 
 #--------------
 

@@ -402,7 +402,13 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Dashbord Settings {{{
 (package-config 'dashboard		; Extension: dashboard
 	(dashboard-setup-startup-hook))
+(package-invoke 'dashboard)
 ;;; }}}
+
+;;; Doom Mode Line Settings {{{
+(package-config 'doom-modeline		; Extension: doom-modeline
+	)
+(package-invoke 'doom-modeline-mode nil 'doom-modeline)
 
 ;;; Which-Key Settings {{{
 (package-config 'which-key		; Extension: which-key

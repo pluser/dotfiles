@@ -13,6 +13,7 @@
  '(company-preview-common ((t (:inherit company-preview :foreground "orange"))))
  '(warning ((t (:foreground "orchid"))))
  '(error ((t (:foreground "violet" :weight bold))))
+ '(success ((t (:foreground "seagreen"))))
  '(compilation-error ((t (:foreground "yellow"))))
  '(flycheck-error ((t (:underline (:color "chartreuse" :style wave)))))
  '(flycheck-info ((t (:underline (:color "deep sky blue" :style wave)))))

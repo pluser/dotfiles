@@ -277,11 +277,11 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (package-config 'telephone-line		; Extension: telephone-line
 	(telephone-line-mode))
 ;(package-invoke 'telephone-line)
-(package-config 'doom-modeline		; Extension: doom-modeline
-	(set-variable doom-modeline-height 1)
-	(set-face-attribute 'mode-line nil :height 100)
-	(set-face-attribute 'mode-line-inactive nil :height 100)
-	(doom-modeline-mode))
+;(package-config 'doom-modeline		; Extension: doom-modeline
+;	(set-variable doom-modeline-height 1)
+;	(set-face-attribute 'mode-line nil :height 100)
+;	(set-face-attribute 'mode-line-inactive nil :height 100)
+;	(doom-modeline-mode))
 ;(package-invoke 'doom-modeline)
 ;;;}}}
 

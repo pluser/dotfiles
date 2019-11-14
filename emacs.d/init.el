@@ -2,7 +2,11 @@
 ;;; Commentary:
 ;;;  Heavily personalized Emacs configuration file
 ;;; Code:
-(setq debug-on-error t)
+
+;;; Debug Setting {{{
+;(setq debug-on-error t)
+;;; }}}
+
 ;;; Local variable {{{
 (when (< emacs-major-version 23)
 	(defvar user-emacs-directory (file-name-directory (or buffer-file-name load-file-name))))

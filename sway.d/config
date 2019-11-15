@@ -73,9 +73,19 @@ input "1:1:AT_Translated_Set_2_keyboard" {
 	xkb_options ctrl:swapcaps,ctrl:swap_lalt_lctl
 }
 
+input "1739:31251:DLL080D:01_06CB:7A13_Touchpad" {
+	natural_scroll enabled
+}
+
 input "3690:780:TrulyErgonomic.com_Truly_Ergonomic_Computer_Keyboard" {
 	xkb_layout us
 	xkb_variant ""
+	xkb_options ""
+}
+
+input "76:615:Magic_Keyboard" {
+	xkb_layout us
+	xkb_variant dvorak
 	xkb_options ""
 }
 

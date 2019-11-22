@@ -11,7 +11,7 @@ path=(${path[@]} ~/.local/*/bin(N-/) ~/.local/bin(N-/) ~/.linuxbrew/bin(N-/))
 manpath=(${manpath[@]} ~/.local/*/share/man(N-/) ~/.local/share/man(N-/) ~/.linuxbrew/share/man(N-/))
 infopath=(${infopath[@]} ~/.local/*/share/info(N-/) ~/.local/share/info(N-/) ~/.linuxbrew/share/info(N-/))
 
-path=(${path[@]} /app/*/bin(N-/) /app/*/(N-/))
+path=(${path[@]} /app/*/bin(N-/) /app/*(N-/))
 
 path=(${path[@]} /app/TeXLive/bin/x86_64-linux(N-/))
 manpath=(${manpath[@]} /app/TeXLive/texmf-dist/doc/man(N-/))

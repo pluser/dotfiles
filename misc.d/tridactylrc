@@ -8,12 +8,16 @@ bind l fillcmdline open search
 bind L fillcmdline tabopen search
 
 bind t scrollline 10
-bind T tabprev
+"bind T tabprev
+bind T back
 bind n scrollline -10
-bind N tabnext
-bind h scrollpx -50
-bind H back
-bind s scrollpx 50
+"bind N tabnext
+bind N forward
+"bind h scrollpx -50
+bind h tabprev
+bind H scrollpx -50
+"bind s scrollpx 50
+bind s tabnext
 bind S forward
 
 bind <C-g> unfocus

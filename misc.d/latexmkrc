@@ -1,0 +1,3 @@
+#!/usr/bin/perl
+
+$pdf_previewer = "start zathura %O %S";

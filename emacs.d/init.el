@@ -74,7 +74,9 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 	;(set-fontset-font "fontset-startup" 'ascii "Inconsolata")
 	;(set-fontset-font "fontset-startup" 'japanese-jisx0208 "Migu 1M")
 	;(set-face-attribute 'default nil :height 180))
-	(add-to-list 'default-frame-alist '(font . "fontset-kawasemi")))
+	;(add-to-list 'default-frame-alist '(font . "fontset-kawasemi"))
+	(set-face-attribute 'default nil :family "Inconsolata" :height 120)
+  (set-fontset-font nil 'cp932 (font-spec :family "Migu 1M")))
 	;(set-face-attribute 'default nil 28))
 	;(set-face-font 'default "fontset-kawasemi"))
 	;(set-face-attribute 'default nil :fontset "fontset-kawasemi"))
@@ -173,8 +175,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (set-variable 'custom-theme-directory (init/locate-user-config "theme/"))
 (if (fboundp 'load-theme)
 		(progn
-			(load-theme 'deeper-blue)
-			(load-theme 'pluser-deeper-blue t))
+			(load-theme 'doom-city-lights t))
+;			(load-theme 'deeper-blue)
+;			(load-theme 'pluser-deeper-blue t))
 	(package-config 'color-theme		; Extension: color-theme
 		(color-theme-initialize)
 		(color-theme-deep-blue))
@@ -281,12 +284,14 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (package-config 'telephone-line		; Extension: telephone-line
 	(telephone-line-mode))
 ;(package-invoke 'telephone-line)
-;(package-config 'doom-modeline		; Extension: doom-modeline
+(package-config 'doom-modeline		; Extension: doom-modeline
 ;	(set-variable doom-modeline-height 1)
 ;	(set-face-attribute 'mode-line nil :height 100)
 ;	(set-face-attribute 'mode-line-inactive nil :height 100)
-;	(doom-modeline-mode))
+	)
 ;(package-invoke 'doom-modeline)
+(package-invoke 'doom-modeline-mode nil 'doom-modeline)
+
 ;;;}}}
 
 ;;; Suppress warning {{{
@@ -412,7 +417,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Doom Mode Line Settings {{{
 (package-config 'doom-modeline		; Extension: doom-modeline
 	)
-(package-invoke 'doom-modeline-mode nil 'doom-modeline)
 
 ;;; Which-Key Settings {{{
 (package-config 'which-key		; Extension: which-key

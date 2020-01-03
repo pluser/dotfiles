@@ -633,7 +633,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-variable 'skk-background-mode 'dark) ; For DDSKK 15.1 Hot-Fix
 	(require 'skk-hint nil t)
 	(when (require 'skk-search-web nil t)
-		;;(add-to-list 'skk-search-prog-list '(skk-search-web 'skk-google-cgi-api-for-japanese-input) t)
+		(add-to-list 'skk-search-prog-list '(skk-search-web 'skk-google-cgi-api-for-japanese-input) t)
 		(add-to-list 'skk-search-prog-list '(skk-search-web 'skk-google-suggest) t))
 	(defun my/skk-kutouten-style-ja ()
 		(interactive)

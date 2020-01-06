@@ -135,6 +135,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(require 'ucs-normalize)
 	(set-file-name-coding-system 'utf-8-hfs))
 (use-package uim
+	:disabled
 	:config
 	(set-variable 'default-input-method 'japanese-google-cgiapi-jp-uim))
 (when (eq window-system 'mac)
@@ -262,7 +263,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	:config
 	(telephone-line-mode))
 (use-package doom-modeline		; Extension: doom-modeline
-	)
+	:hook (emacs-startup . doom-modeline-mode))
 ;;;}}}
 
 ;;; Suppress warning {{{
@@ -301,6 +302,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; JS2-mode Settings {{{
 (use-package js2-mode		; Extension: js2-mode
+	:disabled
 	:config
 	(add-to-list 'auto-mode-alist '("\\.html?\\'" . js2-mode))
 	(package-depend 'lsp
@@ -330,14 +332,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(package-invoke 'lsp 'c-mode-hook)))
 ;;; }}}
 
-;;; Jinja2 Settings {{{
-(use-package jinja2-mode
-	:config
-	(add-to-list 'auto-mode-alist '("\\.tmpl\\'" . jinja2-mode)))
-;;; }}}
-
 ;;; Dart Settings {{{
 (use-package dart-mode
+	:no-require t
 	:config
 	(defun init/setting-dart-mode ()
 		(setq tab-width 4))
@@ -385,7 +382,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Dashbord Settings {{{
 (use-package dashboard		; Extension: dashboard
-	)
+	:config
+	(dashboard-setup-startup-hook))
 ;;; }}}
 
 ;;; Which-Key Settings {{{
@@ -394,22 +392,14 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(which-key-setup-side-window-right-bottom))
 ;;; }}}
 
-;;; Gtags(GNU GLOBAL) Settings {{{
-(use-package gtags)		; Extension: gtags
-;;; }}}
-
 ;;; Flycheck Settings {{{
-(use-package flycheck)		; Extension: flycheck
+(use-package flycheck
+	:disabled)		; Extension: flycheck
 ;;; }}}
 
 ;;; TeX/LaTeX Settings {{{
-(use-package tex		; Extension: tex
-	:config
-	(set-variable 'TeX-engine 'luatex)
-	(add-to-list 'TeX-view-program-list '("MuPDF" "mupdf %o"))
-	(setq TeX-view-program-selection '((output-pdf "MuPDF"))))
-
 (use-package latex-math-preview
+	:disabled
 	:config
 	(add-to-list 'latex-math-preview-latex-usepackage-for-not-tex-file "\\usepackage{tikz}")
 	;(setq-default latex-math-preview-tex-to-png-for-preview '(lualatex-to-pdf convert))
@@ -440,6 +430,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		:config
 		(set-variable 'org-export-allow-bind-keywords t))
 	(use-package ox-pandoc
+		:disabled
 		:config
 		(set-variable 'org-pandoc-options-for-latex-pdf '((pdf-engine . "lualatex"))))
 	(use-package ox-latex
@@ -467,6 +458,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Helm Settings {{{
 (use-package helm		; Extension: helm
+	:disabled
 	:config
 	(package-invoke 'helm-config 'require-only)
 	(define-key global-map (kbd "C-x b") 'helm-mini)
@@ -508,6 +500,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	:config
 	(set-variable 'company-transformers '(company-sort-by-backend-importance company-sort-by-occurrence))
 	(use-package company-statistics		; Extension: company-statistics
+		:disabled
 		:config
 		(add-to-list 'company-transformars 'company-sort-by-statistics))
 	(set-variable 'company-frontends '(company-pseudo-tooltip-unless-just-one-frontend-with-delay company-echo-metadata-frontend company-preview-frontend))
@@ -517,9 +510,11 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-variable 'company-selection-wrap-around t)
 	(setq company-show-numbers t)
 	(use-package company-math		; Extension: company-math
+		:disabled
 		:config
 		(add-to-list 'company-backends 'company-math-symbols-unicode))
 	(use-package company-tern		; Extension: company-tern
+		:disabled
 		:config
 		(set-variable 'company-tern-property-marker nil))
 	(defun init/company-jedi-enable ()
@@ -575,6 +570,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Mozc Settings {{{
 (use-package mozc		; Extension: mozc
+	:disabled
 	:config
 	(set-variable 'mozc-candidate-style 'echo-area))
 ;;; }}}

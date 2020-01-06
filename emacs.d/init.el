@@ -124,6 +124,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 (when (not (package-installed-p 'use-package))
 	(package-install 'use-package))
+(setq use-package-always-defer t)
+(setq use-package-verbose t)
+(setq use-package-compute-statistics t)
 ;;; }}}
 
 ;;; Language Setting {{{
@@ -269,7 +272,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	:config
 	(telephone-line-mode))
 (use-package doom-modeline		; Extension: doom-modeline
-	:hook (emacs-startup . doom-modeline-mode))
+	:hook ((emacs-startup . doom-modeline-mode)))
 ;;;}}}
 
 ;;; Suppress warning {{{
@@ -378,6 +381,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (use-package swiper		; Extension: swiper
 	)
 (use-package counsel		; Extension: counsel
+	:config
+	(global-set-key (kbd "M-x") 'counsel-M-x)
+	(global-set-key (kbd "C-x C-f") 'counsel-find-file)
 	)
 ;;; }}}
 
@@ -394,6 +400,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Which-Key Settings {{{
 (use-package which-key		; Extension: which-key
+	:hook ((emacs-startup . which-key-mode))
 	:config
 	(which-key-setup-side-window-right-bottom))
 ;;; }}}
@@ -478,6 +485,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Evil Settings {{{
 (use-package evil		; Extension: evil
+	:hook ((emacs-startup . evil-mode))
 	:config
 	(dolist (state '(normal motion visual))
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "h") 'evil-backward-char)
@@ -503,6 +511,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Company Settings {{{
 (use-package company		; Extension: company
+	:hook ((prog-mode . company-mode))
 	:config
 	(set-variable 'company-transformers '(company-sort-by-backend-importance company-sort-by-occurrence))
 	(use-package company-statistics		; Extension: company-statistics
@@ -533,20 +542,21 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; LSP Settings {{{
 (use-package lsp		; Extension: lsp-mode
+	:hook ((prog-mode . lsp-mode))
 	:config
 	(set-variable 'lsp-prefer-flymake :none)
 	(package-depend 'company-lsp
 		(defun init/company-lsp-enable ()
 			(add-to-list 'company-backends 'company-lsp))
-		(add-hook 'lsp-mode-hook 'init/company-lsp-enable)))
-(use-package lsp-ui		; Extension: lsp-ui
-	)
+		(add-hook 'lsp-mode-hook 'init/company-lsp-enable))
+	(use-package lsp-ui		; Extension: lsp-ui
+		))
 ;;; }}}
 
 ;;; Magit Settings {{{
 (use-package magit		; Extension: magit
+	:bind (("<f12>" . magit-status))
 	:config
-	(define-key global-map (kbd "<f12>") 'magit-status)
 	(set-variable 'magit-last-seen-setup-instruction "1.4.0"))
 ;;; }}}
 
@@ -558,6 +568,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Projectile Settings {{{
 (use-package projectile		; Extension: projectile
+	:hook ((emacs-startup . projectile-mode))
 	:config
 	(set-variable 'projectile-mode-line-prefix " Pj"))
 ;;; }}}

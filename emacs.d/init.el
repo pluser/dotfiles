@@ -70,25 +70,9 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 
 ;;; Font Setting {{{
 (when (and (display-graphic-p) (file-readable-p (init/locate-user-config "fonts.el")))
-	(ext-config "fonts.el")
-	;(set-fontset-font "fontset-startup" 'ascii "Inconsolata")
-	;(set-fontset-font "fontset-startup" 'japanese-jisx0208 "Migu 1M")
-	;(set-face-attribute 'default nil :height 180))
-	;(add-to-list 'default-frame-alist '(font . "fontset-kawasemi"))
+	;(ext-config "fonts.el")
 	(set-face-attribute 'default nil :family "Inconsolata" :height 120)
   (set-fontset-font nil 'cp932 (font-spec :family "Migu 1M")))
-	;(set-face-attribute 'default nil 28))
-	;(set-face-font 'default "fontset-kawasemi"))
-	;(set-face-attribute 'default nil :fontset "fontset-kawasemi"))
-;	(set-frame-font "fontset-kawasemi"))
-;	(if (< emacs-major-version 24)
-;		(progn (set-face-font 'default "fontset-mejiro")
-;					 (set-frame-font "fontset-kawasemi"))
-;		(progn (add-to-list 'default-frame-alist '(font . "fontset-mejiro"))
-;					 (set-face-attribute 'variable-pitch nil :fontset "fontset-kawasemi")
-;					 (set-face-attribute 'fixed-pitch nil :fontset "fontset-mejiro")
-;					 ;(set-variable use-default-font-for-symbols nil)
-;					 )))
 ;;; }}}
 
 ;;; Custom Patch Loading {{{
@@ -140,13 +124,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 (when (not (package-installed-p 'use-package))
 	(package-install 'use-package))
-
-;	(dolist (pkg init/autoinstall-packages)
-;		(unless (package-installed-p pkg)
-;			(unless package-archive-contents (package-refresh-contents))
-;			(package-install pkg))))
-;(package-invoke 'package)
-
 ;;; }}}
 
 ;;; Language Setting {{{
@@ -157,12 +134,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (when (eq system-type 'darwin)
 	(require 'ucs-normalize)
 	(set-file-name-coding-system 'utf-8-hfs))
-;;(reset-language-environment)
-;;(set-charset-priority 'unicode)
 (use-package uim
 	:config
 	(set-variable 'default-input-method 'japanese-google-cgiapi-jp-uim))
-;;(package-invoke 'uim-leim)
 (when (eq window-system 'mac)
 	(package-invoke 'mac-auto-ascii-mode))
 ;;; }}}
@@ -195,11 +169,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (use-package filecache
 	:config
 	(file-cache-add-file (init/locate-user-config "init.el")))
-;(package-invoke 'filecache)
 (use-package recentf
 	:config
 	(set-variable 'recentf-max-saved-items 2000))
-;(package-invoke 'recentf-mode)
 ;;; }}}
 
 ;;; Diff Setting {{{
@@ -235,28 +207,22 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (setq-default indent-tabs-mode t)
 (setq-default c-basic-offset 4)
 (setq-default tab-width 4)
-(set-variable 'c-default-style
+(setq c-default-style
 			'((c++-mode . "k&r")
 				(java-mode . "java")
 				(awk-mode . "awk")
 				(other . "gnu")))
-(set-variable 'c-tab-always-indent 'indent)
-;;(setq-default require-final-newline nil)
-;;(set-variable 'mode-require-final-newline nil)
+(setq c-tab-always-indent 'indent)
 ;;; }}}
 
 ;;; Completion {{{
 (setq completion-ignore-case t)
-;;(setq read-file-name-completion-ignore-case t)
-;;(partial-completion-mode t)
-;;(icomplete-mode t)
 ;;; }}}
 
 ;;; History {{{
 (use-package savehist
 	:config
 	(set-variable 'history-length 100000))
-;(package-invoke 'savehist-mode)
 ;;; }}}
 
 ;;; Compression {{{
@@ -295,15 +261,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	:disabled
 	:config
 	(telephone-line-mode))
-;(package-invoke 'telephone-line)
 (use-package doom-modeline		; Extension: doom-modeline
-;	(set-variable doom-modeline-height 1)
-;	(set-face-attribute 'mode-line nil :height 100)
-;	(set-face-attribute 'mode-line-inactive nil :height 100)
 	)
-;(package-invoke 'doom-modeline)
-;(package-invoke 'doom-modeline-mode nil 'doom-modeline)
-
 ;;;}}}
 
 ;;; Suppress warning {{{
@@ -344,7 +303,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (use-package js2-mode		; Extension: js2-mode
 	:config
 	(add-to-list 'auto-mode-alist '("\\.html?\\'" . js2-mode))
-	;;(add-hook 'js-mode-hook 'init/company-tern-enable)
 	(package-depend 'lsp
 		(add-hook 'js2-mode-hook 'lsp)))
 ;;; }}}
@@ -364,7 +322,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; CC-Mode Settings {{{
 (use-package cc-mode
 	:config
-	;;(set-default 'c-hungry-delete-key t)
+	;(set-default 'c-hungry-delete-key t)
 	(package-depend 'ensime-mode
 		(add-hook 'java-mode-hook 'ensime-mode))
 	(package-depend 'lsp
@@ -408,7 +366,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Hydra Settings {{{
 (use-package hydra		; Extension: hydra
 	)
-;(package-invoke 'hydra)
 ;;; }}}
 
 ;;; Counsel, Swiper, Ivy Settings {{{
@@ -419,39 +376,30 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	)
 (use-package counsel		; Extension: counsel
 	)
-;	(counsel-mode))
-;(package-invoke 'counsel)
 ;;; }}}
 
 ;;; Avy Settings {{{
 (use-package avy		; Extension: avy
 	)
-;(avy-setup-default))
-;(package-invoke 'avy)
 ;;; }}}
 
 ;;; Dashbord Settings {{{
 (use-package dashboard		; Extension: dashboard
 	)
-;	(dashboard-setup-startup-hook))
-;(package-invoke 'dashboard)
 ;;; }}}
 
 ;;; Which-Key Settings {{{
 (use-package which-key		; Extension: which-key
 	:config
 	(which-key-setup-side-window-right-bottom))
-;(package-invoke 'which-key-mode nil 'which-key)
 ;;; }}}
 
 ;;; Gtags(GNU GLOBAL) Settings {{{
 (use-package gtags)		; Extension: gtags
-;(package-invoke 'gtags-mode 'prog-mode-hook)
 ;;; }}}
 
 ;;; Flycheck Settings {{{
 (use-package flycheck)		; Extension: flycheck
-;(package-invoke 'flycheck-mode 'prog-mode-hook 'flycheck)
 ;;; }}}
 
 ;;; TeX/LaTeX Settings {{{
@@ -527,10 +475,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(define-key global-map (kbd "M-y") 'helm-show-kill-ring)
 	(define-key global-map (kbd "C-x /") 'helm-occur)
 	(define-key isearch-mode-map (kbd "C-t") 'helm-occur-from-isearch)
-	;;(define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
-	;;(define-key helm-map (kbd "C-z") 'helm-select-action)
 	)
-;(package-invoke 'helm-mode nil 'helm)
 ;;; }}}
 
 ;;; Evil Settings {{{
@@ -556,10 +501,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(global-evil-surround-mode))
 	(add-to-list 'evil-emacs-state-modes 'text-mode)
 	(add-to-list 'evil-emacs-state-modes 'org-mode))
-;(autoload 'evil-local-mode "evil"); to support lazy load of eval-local-mode minor mode
-;(package-invoke 'evil-local-mode 'prog-mode-hook 'evil)
-;(package-invoke 'evil-mode 'prog-mode-hook 'evil)
-;(package-invoke 'evil-surround 'evil-mode-hook)
 ;;; }}}
 
 ;;; Company Settings {{{
@@ -570,8 +511,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		:config
 		(add-to-list 'company-transformars 'company-sort-by-statistics))
 	(set-variable 'company-frontends '(company-pseudo-tooltip-unless-just-one-frontend-with-delay company-echo-metadata-frontend company-preview-frontend))
-	;;(define-key global-map (kbd "C-t") 'company-complete)
-	;;(define-key company-active-map 'company-complete-common nil)
 	(define-key company-mode-map (kbd "C-t") 'company-complete-common)
 	(set-variable 'company-idle-delay 0.5)
 	(set-variable 'company-tooltip-idle-delay 0.5)
@@ -584,31 +523,23 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		:config
 		(set-variable 'company-tern-property-marker nil))
 	(defun init/company-jedi-enable ()
-		;(make-local-variable 'company-backends)
 		(add-to-list 'company-backends 'company-jedi))
 	(defun init/company-tern-enable ()
 		(interactive)
 		(tern-mode t)
-		;(make-local-variable 'company-backends)
 		(add-to-list 'company-backends '(company-tern :with company-dabbrev-code))))
-;(package-invoke 'company-mode 'prog-mode-hook 'company)
 ;;; }}}
 
 ;;; LSP Settings {{{
 (use-package lsp		; Extension: lsp-mode
 	:config
-	;(package-invoke 'lsp-clients 'require-only)
-	;(set-variable 'lsp-enable-indentation nil)
 	(set-variable 'lsp-prefer-flymake :none)
 	(package-depend 'company-lsp
 		(defun init/company-lsp-enable ()
 			(add-to-list 'company-backends 'company-lsp))
 		(add-hook 'lsp-mode-hook 'init/company-lsp-enable)))
 (use-package lsp-ui		; Extension: lsp-ui
-	;(set-variable 'lsp-ui-sideline-enable nil)
-	;(set-variable 'lsp-ui-doc-enable nil)
 	)
-;(package-invoke 'lsp 'require-only 'lsp-mode)
 ;;; }}}
 
 ;;; Magit Settings {{{
@@ -616,35 +547,18 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	:config
 	(define-key global-map (kbd "<f12>") 'magit-status)
 	(set-variable 'magit-last-seen-setup-instruction "1.4.0"))
-;(package-invoke 'magit)
 ;;; }}}
 
 ;;; Yasnippet Settings {{{
 (use-package yasnippet		; Extension: yasnippet
 	:config
 	(set-variable 'yas-snippet-dirs (list (init/locate-user-config "yasnippets/"))))
-;(package-invoke 'yas-minor-mode 'prog-mode-hook 'yasnippet)
-;(package-invoke 'yas-minor-mode 'org-mode-hook 'yasnippet)
 ;;; }}}
 
 ;;; Projectile Settings {{{
 (use-package projectile		; Extension: projectile
 	:config
-	;;(set-variable 'projectile-mode-line (format " Proj[%s]" (projectile-project-name)))
 	(set-variable 'projectile-mode-line-prefix " Pj"))
-;(package-invoke 'projectile-mode nil 'projectile)
-;;; }}}
-
-;;; Auto-Complete Settings {{{
-(use-package auto-complete		; Extension: auto-complete
-	:config
-	;;(add-to-list 'ac-dictionary-directories (locate-user-emacs-file "acdict/"))
-	(require 'auto-complete-config)
-	(ac-config-default)
-	(set-variable 'ac-auto-show-menu nil)
-	(set-variable 'ac-use-quick-help nil)
-	;;(define-key ac-mode-map "\M-/" 'auto-complete)
-	)
 ;;; }}}
 
 ;;; Elpy Settings {{{
@@ -663,7 +577,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (use-package mozc		; Extension: mozc
 	:config
 	(set-variable 'mozc-candidate-style 'echo-area))
-;(package-invoke 'mozc)
 ;;; }}}
 
 ;;; Skk Settings {{{
@@ -671,7 +584,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	:init
 	(setq skk-user-directory (locate-user-emacs-file "ddskk/"))
 	:config
-	;;(define-key global-map "\C-x\C-j" 'skk-mode)
 	(set-variable 'skk-henkan-show-candidates-keys (list ?a ?o ?e ?u ?h ?t ?n ?s))
 	(set-variable 'skk-indicator-use-cursor-color nil)
 	(set-variable 'skk-kakutei-key (kbd "C-t"))
@@ -700,47 +612,21 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	  (while (search-forward "。" nil t) (replace-match prefer-period nil t))
 	  (goto-char 0)
 	  (while (search-forward "．" nil t) (replace-match prefer-period nil t))))))
-;(package-invoke 'skk-preload 'text-mode-hook 'ddskk)
-;;; }}}
-
-;;; w3m Settings {{{
-;(use-package w3m-filter		; Extension: w3m
-	;;(defun w3m-filter-alc-lay (url) (w3m-filter-delete-regions url "<!-- interest_match_relevant_zone_start -->" "<!-- ▲ 英辞郎ヘッダ ▲ -->"))
-;	(defun w3m-filter-alc-lay (url) (w3m-filter-delete-regions url "<!-- interest_match_relevant_zone_start -->" "<!-- ▼ 検索結果本体 ▼ -->"))
-;	(add-to-list 'w3m-filter-configuration '(t "Suck!" "\\`http://eow\\.alc\\.co\\.jp/search" w3m-filter-alc-lay)))
 ;;; }}}
 
 ;;; Whitespace Settings {{{
 (use-package whitespace		; Extension: whitespace
 	:config
 	(set-variable 'whitespace-style '(face tabs trailing space-before-tab tab-mark)))
-;(package-invoke 'whitespace-mode 'prog-mode-hook)
-;;; }}}
-
-;;; Xah-math-input-mode Settings {{{
-(use-package xah-math-input
-	:config
-	(puthash "wb" "◦" xah-math-input-abrvs))
 ;;; }}}
 
 ;;; Uniquify Settings {{{
 (use-package uniquify
 	:config
 	(set-variable 'uniquify-buffer-name-style 'post-forward-angle-brackets))
-;(package-invoke 'uniquify)
 ;;; }}}
 
 ;;; Extension }}}
-
-;;; Tramp Settings {{{
-;; A workaround for Tramp for text corruption.
-;;(set-variable 'tramp-remote-process-environment (quote ("HISTFILE=$HOME/.tramp_history" "HISTSIZE=1" "LC_MESSAGE=C" "TERM=dumb" "EMACS=t" "INSIDE_EMACS='24.3.1,tramp:2.2.6-24.3'" "CDPATH=" "HISTORY=" "MAIL=" "MAILCHECK=" "MAILPATH=" "PAGER=\"\"" "autocorrect=" "correct=")))
-;;; }}}
-
-;;; Terminal Emulator Settings {{{
-;;(when (require 'term+ nil t)
-;;(require 'xterm-256color nil t))
-;;; }}}
 
 ;;; Dired Settings {{{
 (use-package dired

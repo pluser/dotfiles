@@ -394,7 +394,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Dashbord Settings {{{
 (use-package dashboard		; Extension: dashboard
-	:config
+	:init
 	(dashboard-setup-startup-hook))
 ;;; }}}
 

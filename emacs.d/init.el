@@ -135,13 +135,18 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 					("gnu" . 7)
 					("melpa-stable" . 3)
 					("org" . 6)))
-	(set-variable 'package-user-dir (init/locate-user-config "packages/"))
-	(package-initialize))
+	(set-variable 'package-user-dir (init/locate-user-config "packages/")))
+(package-initialize)
+
+(when (not (package-installed-p 'use-package))
+	(package-install 'use-package))
+
 ;	(dolist (pkg init/autoinstall-packages)
 ;		(unless (package-installed-p pkg)
 ;			(unless package-archive-contents (package-refresh-contents))
 ;			(package-install pkg))))
-(package-invoke 'package)
+;(package-invoke 'package)
+
 ;;; }}}
 
 ;;; Language Setting {{{
@@ -154,7 +159,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-file-name-coding-system 'utf-8-hfs))
 ;;(reset-language-environment)
 ;;(set-charset-priority 'unicode)
-(package-config 'uim
+(use-package uim
+	:config
 	(set-variable 'default-input-method 'japanese-google-cgiapi-jp-uim))
 ;;(package-invoke 'uim-leim)
 (when (eq window-system 'mac)
@@ -174,7 +180,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Color / Theme Setting {{{
 (set-variable 'custom-theme-directory (init/locate-user-config "theme/"))
 (if (fboundp 'load-theme)
-		(progn
+	(progn
+			(package-invoke 'doom-themes)
 			(load-theme 'doom-city-lights t))
 ;			(load-theme 'deeper-blue)
 ;			(load-theme 'pluser-deeper-blue t))
@@ -185,28 +192,30 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; File Opener {{{
-(package-config 'filecache
+(use-package filecache
+	:config
 	(file-cache-add-file (init/locate-user-config "init.el")))
-(package-invoke 'filecache)
-(package-config 'recentf
+;(package-invoke 'filecache)
+(use-package recentf
+	:config
 	(set-variable 'recentf-max-saved-items 2000))
-(package-invoke 'recentf-mode)
+;(package-invoke 'recentf-mode)
 ;;; }}}
 
 ;;; Diff Setting {{{
-(package-config 'diff)
+;(package-config 'diff)
 ;;; }}}
 
 ;;; Code Ornament / Visual {{{
 (show-paren-mode t)
-(set-variable 'show-paren-style 'mixed)
-(set-variable 'scroll-conservatively 1) ; amount of scrolling
+(setq show-paren-style 'mixed)
+(setq scroll-conservatively 1) ; amount of scrolling
 ;(set-variable 'scroll-margin 5) ; keep lines on scrolling
-(set-variable 'line-number-mode t) ; show line number at modeline
-(set-variable 'column-number-mode t) ; show column number at modeline
-(toggle-indicate-empty-lines)
+(setq line-number-mode t) ; show line number at modeline
+(setq column-number-mode t) ; show column number at modeline
+(setq indicate-empty-lines t)
 (setq-default truncate-lines nil)
-(set-variable 'auto-hscroll-mode 'current-line) ; scroll one line or whole screen
+(setq auto-hscroll-mode 'current-line) ; scroll one line or whole screen
 (when (< emacs-major-version 26) (global-linum-mode t)) ; show line number at left margin
 (global-hl-line-mode t) ; highlight a line cursor is on
 (defun init/prog-mode-editor-style ()
@@ -244,9 +253,10 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; History {{{
-(package-config 'savehist
+(use-package savehist
+	:config
 	(set-variable 'history-length 100000))
-(package-invoke 'savehist-mode)
+;(package-invoke 'savehist-mode)
 ;;; }}}
 
 ;;; Compression {{{
@@ -281,16 +291,18 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 				(setcdr m (list (cdr mode)))))))
 (add-hook 'after-change-major-mode-hook 'init/clean-modeline)
 (add-hook 'emacs-startup-hook 'init/clean-modeline)
-(package-config 'telephone-line		; Extension: telephone-line
+(use-package telephone-line		; Extension: telephone-line
+	:disabled
+	:config
 	(telephone-line-mode))
 ;(package-invoke 'telephone-line)
-(package-config 'doom-modeline		; Extension: doom-modeline
+(use-package doom-modeline		; Extension: doom-modeline
 ;	(set-variable doom-modeline-height 1)
 ;	(set-face-attribute 'mode-line nil :height 100)
 ;	(set-face-attribute 'mode-line-inactive nil :height 100)
 	)
 ;(package-invoke 'doom-modeline)
-(package-invoke 'doom-modeline-mode nil 'doom-modeline)
+;(package-invoke 'doom-modeline-mode nil 'doom-modeline)
 
 ;;;}}}
 
@@ -309,7 +321,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; File Local Variable Settings {{{
-(package-config 'files
+(use-package files
+	:config
 	(add-to-list 'safe-local-variable-values '(origami-fold-style . triple-braces))
 	(add-to-list 'safe-local-eval-forms '(outline-minor-mode t)))
 ;;; }}}
@@ -318,7 +331,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Major Mode {{{
 
 ;;; Web-mode Settings {{{
-(package-config 'web-mode		; Extension: web-mode
+(use-package web-mode		; Extension: web-mode
+	:config
 	(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 	(add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode))
 	(set-variable 'web-mode-code-indent-offset 4)
@@ -327,7 +341,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; JS2-mode Settings {{{
-(package-config 'js2-mode		; Extension: js2-mode
+(use-package js2-mode		; Extension: js2-mode
+	:config
 	(add-to-list 'auto-mode-alist '("\\.html?\\'" . js2-mode))
 	;;(add-hook 'js-mode-hook 'init/company-tern-enable)
 	(package-depend 'lsp
@@ -335,7 +350,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Python-mode Settings {{{
-(package-config 'python		; Extension: python-mode
+(use-package python		; Extension: python-mode
+	:config
 	(defun init/setting-python-mode ()
 		(setq indent-tabs-mode t)
 		(setq python-indent-offset 4)
@@ -346,7 +362,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; CC-Mode Settings {{{
-(package-config 'cc-mode
+(use-package cc-mode
+	:config
 	;;(set-default 'c-hungry-delete-key t)
 	(package-depend 'ensime-mode
 		(add-hook 'java-mode-hook 'ensime-mode))
@@ -356,12 +373,14 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Jinja2 Settings {{{
-(package-config 'jinja2-mode
+(use-package jinja2-mode
+	:config
 	(add-to-list 'auto-mode-alist '("\\.tmpl\\'" . jinja2-mode)))
 ;;; }}}
 
 ;;; Dart Settings {{{
-(package-config 'dart-mode
+(use-package dart-mode
+	:config
 	(defun init/setting-dart-mode ()
 		(setq tab-width 4))
 	(package-depend 'lsp
@@ -387,60 +406,63 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Extensions {{{
 ;;; Hydra Settings {{{
-(package-config 'hydra		; Extension: hydra
+(use-package hydra		; Extension: hydra
 	)
-(package-invoke 'hydra)
+;(package-invoke 'hydra)
 ;;; }}}
 
 ;;; Counsel, Swiper, Ivy Settings {{{
-(package-config 'ivy		; Extension: ivy
+(use-package ivy		; Extension: ivy
+	:config
 	(set-variable 'ivy-use-virtual-buffers t))
-(package-config 'swiper		; Extension: swiper
+(use-package swiper		; Extension: swiper
 	)
-(package-config 'counsel		; Extension: counsel
-	(counsel-mode))
-(package-invoke 'counsel)
+(use-package counsel		; Extension: counsel
+	)
+;	(counsel-mode))
+;(package-invoke 'counsel)
 ;;; }}}
 
 ;;; Avy Settings {{{
-(package-config 'avy		; Extension: avy
-	(avy-setup-default))
-(package-invoke 'avy)
+(use-package avy		; Extension: avy
+	)
+;(avy-setup-default))
+;(package-invoke 'avy)
 ;;; }}}
 
 ;;; Dashbord Settings {{{
-(package-config 'dashboard		; Extension: dashboard
-	(dashboard-setup-startup-hook))
-(package-invoke 'dashboard)
+(use-package dashboard		; Extension: dashboard
+	)
+;	(dashboard-setup-startup-hook))
+;(package-invoke 'dashboard)
 ;;; }}}
 
-;;; Doom Mode Line Settings {{{
-(package-config 'doom-modeline		; Extension: doom-modeline
-	)
-
 ;;; Which-Key Settings {{{
-(package-config 'which-key		; Extension: which-key
+(use-package which-key		; Extension: which-key
+	:config
 	(which-key-setup-side-window-right-bottom))
-(package-invoke 'which-key-mode nil 'which-key)
+;(package-invoke 'which-key-mode nil 'which-key)
 ;;; }}}
 
 ;;; Gtags(GNU GLOBAL) Settings {{{
-(package-config 'gtags)		; Extension: gtags
+(use-package gtags)		; Extension: gtags
 ;(package-invoke 'gtags-mode 'prog-mode-hook)
 ;;; }}}
 
 ;;; Flycheck Settings {{{
-(package-config 'flycheck)		; Extension: flycheck
-(package-invoke 'flycheck-mode 'prog-mode-hook 'flycheck)
+(use-package flycheck)		; Extension: flycheck
+;(package-invoke 'flycheck-mode 'prog-mode-hook 'flycheck)
 ;;; }}}
 
 ;;; TeX/LaTeX Settings {{{
-(package-config 'tex		; Extension: tex
+(use-package tex		; Extension: tex
+	:config
 	(set-variable 'TeX-engine 'luatex)
 	(add-to-list 'TeX-view-program-list '("MuPDF" "mupdf %o"))
 	(setq TeX-view-program-selection '((output-pdf "MuPDF"))))
 
-(package-config 'latex-math-preview
+(use-package latex-math-preview
+	:config
 	(add-to-list 'latex-math-preview-latex-usepackage-for-not-tex-file "\\usepackage{tikz}")
 	;(setq-default latex-math-preview-tex-to-png-for-preview '(lualatex-to-pdf convert))
 	;;(setq-default latex-math-preview-tex-to-png-for-preview '(lualatex-to-pdf gs-to-png))
@@ -455,7 +477,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Org-mode Settings {{{
-(package-config 'org		; Extension: org
+(use-package org		; Extension: org
+	:config
 	;;(set-variable 'org-babel-no-eval-on-ctrl-c-ctrl-c t)
 	(set-variable 'org-startup-truncated nil)
 	(org-babel-do-load-languages
@@ -465,11 +488,14 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-variable 'org-format-latex-header (replace-match "\\documentclass[autodetect-engine,dvipdfmx-if-dvi,ja=standard,enablejfam=true]{bxjsarticle}" t t org-format-latex-header))
 	(add-to-list 'org-preview-latex-process-alist '(xelatex-dvisvgm :programs ("xelatex" "dvisvgm") :description "xdv > svg" :message "you need to install the programs: xelatex and dvisvgm." :use-xcolor t :image-input-type "xdv" :image-output-type "svg" :image-size-adjust (2.0 . 2.0) :latex-compiler ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f") :image-converter ("dvisvgm %f -n -b min -c %S -o %O")))
 	(set-variable 'org-preview-latex-default-process 'xelatex-dvisvgm)
-	(package-config 'ox
+	(use-package ox
+		:config
 		(set-variable 'org-export-allow-bind-keywords t))
-	(package-config 'ox-pandoc
+	(use-package ox-pandoc
+		:config
 		(set-variable 'org-pandoc-options-for-latex-pdf '((pdf-engine . "lualatex"))))
-	(package-config 'ox-latex
+	(use-package ox-latex
+		:config
 		(add-to-list
 		 'org-latex-classes
 		 '("ltjsarticle" "\\documentclass[autodetect-engine,dvipdfmx-if-dvi,ja=standard]{bxjsarticle}"
@@ -492,7 +518,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Helm Settings {{{
-(package-config 'helm-mode		; Extension: helm
+(use-package helm		; Extension: helm
+	:config
 	(package-invoke 'helm-config 'require-only)
 	(define-key global-map (kbd "C-x b") 'helm-mini)
 	(define-key global-map (kbd "C-x f") 'helm-multi-files)
@@ -507,7 +534,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Evil Settings {{{
-(package-config 'evil		; Extension: evil
+(use-package evil		; Extension: evil
+	:config
 	(dolist (state '(normal motion visual))
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "h") 'evil-backward-char)
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "t") 'evil-next-line)
@@ -530,14 +558,16 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(add-to-list 'evil-emacs-state-modes 'org-mode))
 ;(autoload 'evil-local-mode "evil"); to support lazy load of eval-local-mode minor mode
 ;(package-invoke 'evil-local-mode 'prog-mode-hook 'evil)
-(package-invoke 'evil-mode 'prog-mode-hook 'evil)
-(package-invoke 'evil-surround 'evil-mode-hook)
+;(package-invoke 'evil-mode 'prog-mode-hook 'evil)
+;(package-invoke 'evil-surround 'evil-mode-hook)
 ;;; }}}
 
 ;;; Company Settings {{{
-(package-config 'company		; Extension: company
+(use-package company		; Extension: company
+	:config
 	(set-variable 'company-transformers '(company-sort-by-backend-importance company-sort-by-occurrence))
-	(package-config 'company-statistics		; Extension: company-statistics
+	(use-package company-statistics		; Extension: company-statistics
+		:config
 		(add-to-list 'company-transformars 'company-sort-by-statistics))
 	(set-variable 'company-frontends '(company-pseudo-tooltip-unless-just-one-frontend-with-delay company-echo-metadata-frontend company-preview-frontend))
 	;;(define-key global-map (kbd "C-t") 'company-complete)
@@ -546,10 +576,12 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-variable 'company-idle-delay 0.5)
 	(set-variable 'company-tooltip-idle-delay 0.5)
 	(set-variable 'company-selection-wrap-around t)
-	(set-variable 'company-show-numbers t)
-	(package-config 'company-math		; Extension: company-math
+	(setq company-show-numbers t)
+	(use-package company-math		; Extension: company-math
+		:config
 		(add-to-list 'company-backends 'company-math-symbols-unicode))
-	(package-config 'company-tern		; Extension: company-tern
+	(use-package company-tern		; Extension: company-tern
+		:config
 		(set-variable 'company-tern-property-marker nil))
 	(defun init/company-jedi-enable ()
 		;(make-local-variable 'company-backends)
@@ -559,48 +591,53 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(tern-mode t)
 		;(make-local-variable 'company-backends)
 		(add-to-list 'company-backends '(company-tern :with company-dabbrev-code))))
-(package-invoke 'company-mode 'prog-mode-hook 'company)
+;(package-invoke 'company-mode 'prog-mode-hook 'company)
 ;;; }}}
 
 ;;; LSP Settings {{{
-(package-config 'lsp		; Extension: lsp-mode
-	(package-invoke 'lsp-clients 'require-only)
+(use-package lsp		; Extension: lsp-mode
+	:config
+	;(package-invoke 'lsp-clients 'require-only)
 	;(set-variable 'lsp-enable-indentation nil)
 	(set-variable 'lsp-prefer-flymake :none)
 	(package-depend 'company-lsp
 		(defun init/company-lsp-enable ()
 			(add-to-list 'company-backends 'company-lsp))
 		(add-hook 'lsp-mode-hook 'init/company-lsp-enable)))
-(package-config 'lsp-ui		; Extension: lsp-ui
+(use-package lsp-ui		; Extension: lsp-ui
 	;(set-variable 'lsp-ui-sideline-enable nil)
 	;(set-variable 'lsp-ui-doc-enable nil)
 	)
-(package-invoke 'lsp 'require-only 'lsp-mode)
+;(package-invoke 'lsp 'require-only 'lsp-mode)
 ;;; }}}
 
 ;;; Magit Settings {{{
-(package-config 'magit		; Extension: magit
+(use-package magit		; Extension: magit
+	:config
 	(define-key global-map (kbd "<f12>") 'magit-status)
 	(set-variable 'magit-last-seen-setup-instruction "1.4.0"))
 ;(package-invoke 'magit)
 ;;; }}}
 
 ;;; Yasnippet Settings {{{
-(package-config 'yasnippet		; Extension: yasnippet
+(use-package yasnippet		; Extension: yasnippet
+	:config
 	(set-variable 'yas-snippet-dirs (list (init/locate-user-config "yasnippets/"))))
-(package-invoke 'yas-minor-mode 'prog-mode-hook 'yasnippet)
-(package-invoke 'yas-minor-mode 'org-mode-hook 'yasnippet)
+;(package-invoke 'yas-minor-mode 'prog-mode-hook 'yasnippet)
+;(package-invoke 'yas-minor-mode 'org-mode-hook 'yasnippet)
 ;;; }}}
 
 ;;; Projectile Settings {{{
-(package-config 'projectile		; Extension: projectile
+(use-package projectile		; Extension: projectile
+	:config
 	;;(set-variable 'projectile-mode-line (format " Proj[%s]" (projectile-project-name)))
 	(set-variable 'projectile-mode-line-prefix " Pj"))
-(package-invoke 'projectile-mode nil 'projectile)
+;(package-invoke 'projectile-mode nil 'projectile)
 ;;; }}}
 
 ;;; Auto-Complete Settings {{{
-(package-config 'auto-complete		; Extension: auto-complete
+(use-package auto-complete		; Extension: auto-complete
+	:config
 	;;(add-to-list 'ac-dictionary-directories (locate-user-emacs-file "acdict/"))
 	(require 'auto-complete-config)
 	(ac-config-default)
@@ -611,24 +648,29 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Elpy Settings {{{
-(package-config 'elpy		; Extension: elpy
+(use-package elpy		; Extension: elpy
+	:config
 	(set-variable 'elpy-modules (delete 'elpy-module-highlight-indentation elpy-modules)))
 ;;; }}}
 
 ;;; Undo-Tree Settings {{{
-(package-config 'undo-tree		; Extension: undo-tree
+(use-package undo-tree		; Extension: undo-tree
+	:config
 	(set-variable 'undo-tree-mode-lighter ""))
 ;;; }}}
 
 ;;; Mozc Settings {{{
-(package-config 'mozc		; Extension: mozc
+(use-package mozc		; Extension: mozc
+	:config
 	(set-variable 'mozc-candidate-style 'echo-area))
-(package-invoke 'mozc)
+;(package-invoke 'mozc)
 ;;; }}}
 
 ;;; Skk Settings {{{
-(setq skk-user-directory (locate-user-emacs-file "ddskk/"))
-(package-config 'skk		; Extension: SKK
+(use-package skk		; Extension: SKK
+	:init
+	(setq skk-user-directory (locate-user-emacs-file "ddskk/"))
+	:config
 	;;(define-key global-map "\C-x\C-j" 'skk-mode)
 	(set-variable 'skk-henkan-show-candidates-keys (list ?a ?o ?e ?u ?h ?t ?n ?s))
 	(set-variable 'skk-indicator-use-cursor-color nil)
@@ -658,31 +700,34 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	  (while (search-forward "。" nil t) (replace-match prefer-period nil t))
 	  (goto-char 0)
 	  (while (search-forward "．" nil t) (replace-match prefer-period nil t))))))
-(package-invoke 'skk-preload 'text-mode-hook 'ddskk)
+;(package-invoke 'skk-preload 'text-mode-hook 'ddskk)
 ;;; }}}
 
 ;;; w3m Settings {{{
-;(package-config 'w3m-filter		; Extension: w3m
+;(use-package w3m-filter		; Extension: w3m
 	;;(defun w3m-filter-alc-lay (url) (w3m-filter-delete-regions url "<!-- interest_match_relevant_zone_start -->" "<!-- ▲ 英辞郎ヘッダ ▲ -->"))
 ;	(defun w3m-filter-alc-lay (url) (w3m-filter-delete-regions url "<!-- interest_match_relevant_zone_start -->" "<!-- ▼ 検索結果本体 ▼ -->"))
 ;	(add-to-list 'w3m-filter-configuration '(t "Suck!" "\\`http://eow\\.alc\\.co\\.jp/search" w3m-filter-alc-lay)))
 ;;; }}}
 
 ;;; Whitespace Settings {{{
-(package-config 'whitespace		; Extension: whitespace
+(use-package whitespace		; Extension: whitespace
+	:config
 	(set-variable 'whitespace-style '(face tabs trailing space-before-tab tab-mark)))
-(package-invoke 'whitespace-mode 'prog-mode-hook)
+;(package-invoke 'whitespace-mode 'prog-mode-hook)
 ;;; }}}
 
 ;;; Xah-math-input-mode Settings {{{
-(package-config 'xah-math-input
+(use-package xah-math-input
+	:config
 	(puthash "wb" "◦" xah-math-input-abrvs))
 ;;; }}}
 
 ;;; Uniquify Settings {{{
-(package-config 'uniquify
+(use-package uniquify
+	:config
 	(set-variable 'uniquify-buffer-name-style 'post-forward-angle-brackets))
-(package-invoke 'uniquify)
+;(package-invoke 'uniquify)
 ;;; }}}
 
 ;;; Extension }}}
@@ -698,13 +743,15 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Dired Settings {{{
-(package-config 'dired
+(use-package dired
+	:config
 	(set-variable 'dired-listing-switches "-alh")
 	(set-variable 'dired-dwim-target t))
 ;;; }}}
 
 ;;; Ediff Settiings {{{
-(package-config 'ediff
+(use-package ediff
+	:config
 	(set-variable 'ediff-window-setup-function 'ediff-setup-windows-plain))
 ;;; }}}
 

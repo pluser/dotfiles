@@ -139,7 +139,13 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	:config
 	(set-variable 'default-input-method 'japanese-google-cgiapi-jp-uim))
 (when (eq window-system 'mac)
-	(package-invoke 'mac-auto-ascii-mode))
+  (package-invoke 'mac-auto-ascii-mode))
+(defun my/replace-kutouten-from-ja-to-en ()
+  (interactive)
+  (format-replace-strings '(("、" . "，") ("。" . "．"))))
+(defun my/replace-kutouten-from-en-to-ja ()
+  (interactive)
+  (format-replace-strings '(("，" . "、") ("．" . "。"))))
 ;;; }}}
 
 ;;; User Interface Setting {{{

@@ -381,9 +381,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (use-package swiper		; Extension: swiper
 	)
 (use-package counsel		; Extension: counsel
-	:config
-	(global-set-key (kbd "M-x") 'counsel-M-x)
-	(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+	:bind (("M-x" . counsel-M-x)
+				 ("C-x C-f" . counsel-find-file))
 	)
 ;;; }}}
 

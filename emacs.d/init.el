@@ -379,7 +379,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	:config
 	(set-variable 'ivy-use-virtual-buffers t))
 (use-package swiper		; Extension: swiper
-	)
+	:bind (("C-s" . swiper-isearch)
+				 ("C-r" . swiper-isearch-backwards)))
 (use-package counsel		; Extension: counsel
 	:bind (("M-x" . counsel-M-x)
 				 ("C-x C-f" . counsel-find-file))

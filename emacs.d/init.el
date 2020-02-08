@@ -411,6 +411,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; TeX/LaTeX Settings {{{
+(add-hook 'LaTeX-mode-hook 'outline-minor-mode)
 (use-package latex-math-preview
 	:disabled
 	:config
@@ -506,7 +507,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(package-depend
 		(global-evil-surround-mode))
 	(add-to-list 'evil-emacs-state-modes 'text-mode)
-	(add-to-list 'evil-emacs-state-modes 'org-mode))
+	(add-to-list 'evil-emacs-state-modes 'org-mode)
+	(add-to-list 'evil-emacs-state-modes 'tex-mode)
+	(define-key evil-emacs-state-map (kbd "<f8>") 'evil-toggle-fold))
 ;;; }}}
 
 ;;; Company Settings {{{

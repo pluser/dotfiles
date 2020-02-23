@@ -123,10 +123,12 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (package-initialize)
 
 (when (not (package-installed-p 'use-package))
+	(package-refresh-contents)
 	(package-install 'use-package))
 (setq use-package-always-defer t)
 (setq use-package-verbose t)
 (setq use-package-compute-statistics t)
+(setq use-package-always-ensure t)
 ;;; }}}
 
 ;;; Language Setting {{{
@@ -291,6 +293,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; File Local Variable Settings {{{
 (use-package files
+	:ensure nil
 	:config
 	(add-to-list 'safe-local-variable-values '(origami-fold-style . triple-braces))
 	(add-to-list 'safe-local-eval-forms '(outline-minor-mode t)))
@@ -440,14 +443,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-variable 'org-format-latex-header (replace-match "\\documentclass[autodetect-engine,dvipdfmx-if-dvi,ja=standard,enablejfam=true]{bxjsarticle}" t t org-format-latex-header))
 	(add-to-list 'org-preview-latex-process-alist '(xelatex-dvisvgm :programs ("xelatex" "dvisvgm") :description "xdv > svg" :message "you need to install the programs: xelatex and dvisvgm." :use-xcolor t :image-input-type "xdv" :image-output-type "svg" :image-size-adjust (2.0 . 2.0) :latex-compiler ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f") :image-converter ("dvisvgm %f -n -b min -c %S -o %O")))
 	(set-variable 'org-preview-latex-default-process 'xelatex-dvisvgm)
-	(use-package ox
-		:config
-		(set-variable 'org-export-allow-bind-keywords t))
-	(use-package ox-pandoc
-		:disabled
-		:config
-		(set-variable 'org-pandoc-options-for-latex-pdf '((pdf-engine . "lualatex"))))
+	(set-variable 'org-export-allow-bind-keywords t)
 	(use-package ox-latex
+		:disabled
 		:config
 		(add-to-list
 		 'org-latex-classes
@@ -504,8 +502,10 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-variable 'evil-echo-state nil)
 	(set-variable 'evil-insert-state-cursor nil)
 	(eval-after-load 'help-mode '(evil-make-overriding-map help-mode-map))
-	(package-depend
+	(use-package evil-surround
+		:config
 		(global-evil-surround-mode))
+	(global-evil-surround-mode)
 	(add-to-list 'evil-emacs-state-modes 'text-mode)
 	(add-to-list 'evil-emacs-state-modes 'org-mode)
 	(add-to-list 'evil-emacs-state-modes 'tex-mode)
@@ -544,7 +544,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; LSP Settings {{{
-(use-package lsp		; Extension: lsp-mode
+(use-package lsp-mode		; Extension: lsp-mode
 	:hook ((prog-mode . lsp-mode))
 	:config
 	(set-variable 'lsp-prefer-flymake :none)
@@ -596,7 +596,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Skk Settings {{{
-(use-package skk		; Extension: SKK
+(use-package ddskk		; Extension: SKK
 	:init
 	(setq skk-user-directory (locate-user-emacs-file "ddskk/"))
 	:config
@@ -638,6 +638,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Uniquify Settings {{{
 (use-package uniquify
+	:ensure nil
 	:config
 	(set-variable 'uniquify-buffer-name-style 'post-forward-angle-brackets))
 ;;; }}}
@@ -646,6 +647,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Dired Settings {{{
 (use-package dired
+	:ensure nil
 	:config
 	(set-variable 'dired-listing-switches "-alh")
 	(set-variable 'dired-dwim-target t))

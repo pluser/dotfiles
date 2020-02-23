@@ -1,43 +1,18 @@
 #!/bin/zsh
 # -*- mode: shell-script -*-
 
-### Added by Zplugin's installer
-source "${HOME}/.zplugin/bin/zplugin.zsh"
-autoload -Uz _zplugin
-(( ${+_comps} )) && _comps[zplugin]=_zplugin
-### End of Zplugin's installer chunk
-
-#zplugin ice pick"async.zsh" src"pure.zsh"
-#zplugin light sindresorhus/pure
-zplugin light denysdovhan/spaceship-prompt
-
-zplugin light zsh-users/zsh-completions
-zplugin light zsh-users/zsh-autosuggestions
-
-autoload compinit
-compinit
-
-zplugin light zdharma/fast-syntax-highlighting
-
-### zplug related setting
-##source ~/.zplug/init.zsh
-##
-##zplug 'zplug/zplug', hook-build:'zplug --self-manage' from:github
-##
-##zplug "zsh-users/zsh-syntax-highlighting", from:github, defer:2
-##zplug "zsh-users/zsh-autosuggestions", from:github
-##zplug "zsh-users/zsh-completions", from:github
-##
-##if (( $+commands[fzf] )); then
-##echo "fzf is installed"
-##zplug "b4b4r07/enhancd", from:github, use:init.sh
-##fi
-##
-###zplug "denysdovhan/spaceship-prompt", use:spaceship.zsh, from:github, as:theme
-##zplug "mafredri/zsh-async", from:github
-##zplug "sindresorhus/pure", use:pure.zsh,  from:github, as:theme
-##
-##zplug load --verbose
+### Added by Zinit's installer
+if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
+    print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
+    command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
+    command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
+        print -P "%F{33}▓▒░ %F{34}Installation successful.%f" || \
+        print -P "%F{160}▓▒░ The clone has failed.%f"
+fi
+source "$HOME/.zinit/bin/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+### End of Zinit installer's chunk
 
 # options
 setopt ignoreeof # prevent logout with Ctrl-D
@@ -49,7 +24,7 @@ SAVEHIST=1000000
 setopt inc_append_history
 setopt share_history
 
-# chdir related
-#autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
-#add-zsh-hook chpwd chpwd_recent_dirs
-#zstyle ':completion:*:*:cdr:*:*' menu selection
+zinit light denysdovhan/spaceship-prompt
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-autosuggestions
+

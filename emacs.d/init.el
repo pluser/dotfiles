@@ -300,7 +300,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 
-;;; Major Mode {{{
+;;; Major Mode / Application {{{
 
 ;;; Web-mode Settings {{{
 (use-package web-mode		; Extension: web-mode
@@ -369,6 +369,13 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(add-hook 'dart-mode-hook 'init/setting-dart-mode)
 	(add-hook 'dart-mode-hook 'init/flutter-hot-reload-enable))
 ;;; }}}
+
+;;; EIN: Emacs IPython Notebook {{{
+(use-package ein
+	:config
+	(setq ein:output-area-inlined-images t))
+;;; }}}
+
 ;;; Major Mode }}}
 
 ;;; Extensions {{{

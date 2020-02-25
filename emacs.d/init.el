@@ -119,7 +119,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 					("gnu" . 7)
 					("melpa-stable" . 3)
 					("org" . 6)))
-	(set-variable 'package-user-dir (init/locate-user-config "packages/")))
+	(set-variable 'package-user-dir (init/locate-user-config "packages/"))
+	(when (and (= emacs-major-version 26) (= emacs-minor-version 2))
+		(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")))
 (package-initialize)
 
 (when (not (package-installed-p 'use-package))
@@ -292,11 +294,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; File Local Variable Settings {{{
-(use-package files
-	:ensure nil
-	:config
-	(add-to-list 'safe-local-variable-values '(origami-fold-style . triple-braces))
-	(add-to-list 'safe-local-eval-forms '(outline-minor-mode t)))
+(add-to-list 'safe-local-variable-values '(origami-fold-style . triple-braces))
+(add-to-list 'safe-local-eval-forms '(outline-minor-mode t))
 ;;; }}}
 
 

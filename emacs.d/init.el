@@ -602,7 +602,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Skk Settings {{{
-(use-package ddskk		; Extension: SKK
+(use-package skk		; Extension: SKK
+	:ensure ddskk
 	:init
 	(setq skk-user-directory (locate-user-emacs-file "ddskk/"))
 	:config

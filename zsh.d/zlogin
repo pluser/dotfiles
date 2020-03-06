@@ -3,5 +3,6 @@
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export XMODIFIERS=@im=fcitx
+export _JAVA_AWT_WM_NONREPARENTING=1 # for java application; see https://wiki.archlinux.jp/index.php/Java
 
 alias start='dbus-launch --exit-with-session sway'

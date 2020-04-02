@@ -13,9 +13,9 @@ infopath=(${infopath[@]} ~/.local/*/share/info(N-/) ~/.local/share/info(N-/) ~/.
 
 path=(${path[@]} /app/*/bin(N-/) /app/*(N-/))
 
-path=(${path[@]} /app/TeXLive/bin/x86_64-linux(N-/))
-manpath=(${manpath[@]} /app/TeXLive/texmf-dist/doc/man(N-/))
-infopath=(${infopath[@]} /app/TeXLive/texmf-dist/doc/info(N-/))
+path=(${path[@]} ~/.texlive/2019/bin/x86_64-linux(N-/))
+manpath=(${manpath[@]} ~/.texlive/2019/texmf-dist/doc/man(N-/))
+infopath=(${infopath[@]} ~/.texlive/2019/texmf-dist/doc/info(N-/))
 
 typeset -xTU PYTHONUSERBASE python_user_base
 python_user_base=(~/.local/python(N-/))

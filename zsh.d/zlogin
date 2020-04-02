@@ -6,3 +6,5 @@ export XMODIFIERS=@im=fcitx
 export _JAVA_AWT_WM_NONREPARENTING=1 # for java application; see https://wiki.archlinux.jp/index.php/Java
 
 alias start='dbus-launch --exit-with-session sway'
+
+alias update='sudo sh -c "emaint sync -a && emerge -vuDN1 @world @system --with-bdeps=y"'

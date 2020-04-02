@@ -210,6 +210,9 @@ input "1386:18538:Wacom_HID_486A_Pen" {
 
     # move focus to the parent container
     bindsym $mod+a focus parent
+
+    # always show the window in all workspace (sticky)
+    bindsym $mod+Shift+y sticky toggle
 #
 # Scratchpad:
 #

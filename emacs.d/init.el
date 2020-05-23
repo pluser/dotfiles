@@ -327,7 +327,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(setq indent-tabs-mode t)
 		(setq python-indent-offset 4)
 		(setq tab-width 4))
-	(add-hook 'python-mode-hook 'init/setting-python-mode)
+	;(add-hook 'python-mode-hook 'init/setting-python-mode)
 	(package-depend 'lsp
 		(package-invoke 'lsp 'python-mode-hook)))
 ;;; }}}
@@ -378,6 +378,12 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Major Mode }}}
 
 ;;; Extensions {{{
+
+;;; EditorConfig Settings {{{
+(use-package editorconfig
+	:config
+	(editorconfig-mode))
+
 ;;; Hydra Settings {{{
 (use-package hydra		; Extension: hydra
 	)

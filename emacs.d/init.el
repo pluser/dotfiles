@@ -510,7 +510,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(define-key evil-insert-state-map (kbd "C-e") nil)
 	(define-key evil-insert-state-map (kbd "C-t") nil)
 	(set-variable 'evil-move-cursor-back nil)
-	;;(set-variable 'evil-default-state 'emacs)
+	(set-variable 'evil-default-state 'emacs)
 	(set-variable 'evil-echo-state nil)
 	(set-variable 'evil-insert-state-cursor nil)
 	(eval-after-load 'help-mode '(evil-make-overriding-map help-mode-map))

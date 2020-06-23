@@ -71,7 +71,7 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 ;;; Font Setting {{{
 (when (and (display-graphic-p) (file-readable-p (init/locate-user-config "fonts.el")))
 	;(ext-config "fonts.el")
-	(set-face-attribute 'default nil :family "Inconsolata" :height 120)
+	(set-face-attribute 'default nil :family "Inconsolata" :height 180)
   (set-fontset-font nil 'cp932 (font-spec :family "Migu 1M")))
 ;;; }}}
 

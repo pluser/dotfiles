@@ -575,6 +575,18 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-variable 'magit-last-seen-setup-instruction "1.4.0"))
 ;;; }}}
 
+;;; Dumb Jump Settings {{{
+(use-package dumb-jump		; Extension: dumb-jump
+	:bind (("<f9>" . dumb-jump-go))
+	:config
+	(set-variable 'dumb-jump-selector 'ivy))
+;;; }}}
+
+;;; Deadgrep Settings {{{
+(use-package deadgrep		; Extension deadgrep
+	)
+;;; }}}
+
 ;;; Yasnippet Settings {{{
 (use-package yasnippet		; Extension: yasnippet
 	:config

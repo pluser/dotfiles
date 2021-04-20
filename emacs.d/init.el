@@ -343,6 +343,12 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(package-invoke 'lsp 'c-mode-hook)))
 ;;; }}}
 
+;;; Julia Settings {{{
+(use-package lsp-julia
+  :config
+  (setq lsp-julia-default-environment "~/.julia/environments/v1.5"))
+;;; }}}
+
 ;;; Dart Settings {{{
 (use-package dart-mode
 	:no-require t
@@ -383,6 +389,17 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (use-package editorconfig
 	:config
 	(editorconfig-mode))
+;;; }}}
+
+;;; Exec Path From Shell {{{
+(use-package exec-path-from-shell		; Extension: exec-path-from-shell
+	:disabled
+	:ensure nil
+	:config
+	(set-variable 'exec-path-from-shell-variables '("PATH" "PYTHONUSERBASE"))
+	;(set-variable 'exec-path-from-shell-arguments nil)
+	(exec-path-from-shell-initialize))
+;;; }}}
 
 ;;; Hydra Settings {{{
 (use-package hydra		; Extension: hydra
@@ -559,13 +576,16 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (use-package lsp-mode		; Extension: lsp-mode
 	:hook ((prog-mode . lsp-mode))
 	:config
-	(set-variable 'lsp-prefer-flymake :none)
-	(package-depend 'company-lsp
-		(defun init/company-lsp-enable ()
-			(add-to-list 'company-backends 'company-lsp))
-		(add-hook 'lsp-mode-hook 'init/company-lsp-enable))
-	(use-package lsp-ui		; Extension: lsp-ui
-		))
+	;(set-variable 'lsp-prefer-flymake :none)
+	;(package-depend 'company-lsp
+	;	(defun init/company-lsp-enable ()
+	;		(add-to-list 'company-backends 'company-lsp))
+	;	(add-hook 'lsp-mode-hook 'init/company-lsp-enable))
+)
+(use-package lsp-ui		; Extension: lsp-ui
+	:no-require
+	:config
+	(set-variable 'lsp-ui-doc-show-with-cursor nil))
 ;;; }}}
 
 ;;; Magit Settings {{{
@@ -573,6 +593,12 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	:bind (("<f12>" . magit-status))
 	:config
 	(set-variable 'magit-last-seen-setup-instruction "1.4.0"))
+;;; }}}
+
+;;; Treemacs Settings {{{
+(use-package treemacs
+	:config
+	(treemacs-load-all-the-icons-with-workaround-font "Inconsolata"))
 ;;; }}}
 
 ;;; Dumb Jump Settings {{{

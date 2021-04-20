@@ -6,23 +6,27 @@ LANG=en_US.UTF-8
 
 typeset -U fpath path manpath
 typeset -TU INFOPATH infopath
-fpath=(${fpath[@]} ~/.local/share/zsh(N-/) ~/.linuxbrew/share/zsh/site-functions(N-/))
-path=(${path[@]} ~/.local/*/bin(N-/) ~/.local/bin(N-/) ~/.linuxbrew/bin(N-/) ~/.linuxbrew/sbin(N-/))
-manpath=(${manpath[@]} ~/.local/*/share/man(N-/) ~/.local/share/man(N-/) ~/.linuxbrew/share/man(N-/))
-infopath=(${infopath[@]} ~/.local/*/share/info(N-/) ~/.local/share/info(N-/) ~/.linuxbrew/share/info(N-/))
+fpath=(~/.local/share/zsh(N-/) ${fpath[@]} ~/.linuxbrew/share/zsh/site-functions(N-/))
+path=(~/.local/*/bin(N-/) ~/.local/bin(N-/) ${path[@]} ~/.linuxbrew/bin(N-/) ~/.linuxbrew/sbin(N-/))
+manpath=(~/.local/*/share/man(N-/) ~/.local/share/man(N-/) ${manpath[@]} ~/.linuxbrew/share/man(N-/))
+infopath=(~/.local/*/share/info(N-/) ~/.local/share/info(N-/) ${infopath[@]} ~/.linuxbrew/share/info(N-/))
 
-path=(${path[@]} /app/*/bin(N-/) /app/*(N-/))
+path=(/app/*/bin(N-/) /app/*(N-/) ${path[@]})
 
-path=(${path[@]} ~/.texlive/2019/bin/x86_64-linux(N-/))
-manpath=(${manpath[@]} ~/.texlive/2019/texmf-dist/doc/man(N-/))
-infopath=(${infopath[@]} ~/.texlive/2019/texmf-dist/doc/info(N-/))
+path=(~/.gem/ruby/*/bin(N-/) ${path[@]})
+
+path=(~/.texlive/2020/bin/x86_64-linux(N-/) ${path[@]})
+manpath=(~/.texlive/2020/texmf-dist/doc/man(N-/) ${manpath[@]})
+infopath=(~/.texlive/2020/texmf-dist/doc/info(N-/) ${infopath[@]})
 
 typeset -xTU PYTHONUSERBASE python_user_base
-python_user_base=(~/.local/python(N-/))
+python_user_base=(~/.local/Python(N-/))
 
 typeset -xTU ANDROID_HOME android_home
 android_home=(~/.local/Android/Sdk(N-/))
 path=(${path[@]} ~/.local/Android/Sdk/platform-tools(N-/) ~/.local/Android/Sdk/tools(N-/))
+
+path=(~/.cargo/bin(N-/) ${path[@]})
 
 typeset -xTU GOPATH gopath
 gopath=(~/.local/go(N-/))

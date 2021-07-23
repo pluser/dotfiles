@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
-$pdflatex = 'lualatex -interaction nonstopmode -shell-escape';
-$pdf_mode = 1;
-$pdf_previewer = "zathura %O %S";
+$lualatex = 'lualatex -shell-escape -synctex=1 %O %S';
+$latex = 'uplatex -synctex=1 %O %S';
+$dvipdf = 'dvipdfmx %O -o %D %S';
+$pdf_mode = 4;
+$pdf_previewer = 'zathura -x \'emacsclient "+%{line}" "%{input}" \' %O %S';

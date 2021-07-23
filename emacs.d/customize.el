@@ -13,5 +13,5 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(exec-path-from-shell lsp-julia julia-mode ess treemacs-all-the-icons ivy-rich git-gutter rustic realgud dap-mode flycheck-mypy flycheck deadgrep dumb-jump company-box yaml-mode editorconfig ein ox-latex ox auctex lsp-mode lsp-ui treemacs-magit counsel dashboard hydra ivy projectile swiper elpy lua-mode pipenv vterm doom-modeline doom-themes typescript-mode treemacs treemacs-evil treemacs-icons-dired treemacs-projectile yasnippet which-key web-mode magit helm evil-surround ddskk dart-mode company-lsp ccls avy))
+   '(which-key web-mode use-package treemacs selectrum-prescient projectile orderless marginalia magit lsp-ui lsp-julia evil-surround embark-consult elpy ein editorconfig dumb-jump doom-themes doom-modeline deadgrep ddskk dashboard dart-mode auctex))
  '(skk-jisyo-edit-user-accepts-editing t))

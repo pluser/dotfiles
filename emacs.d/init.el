@@ -14,7 +14,7 @@
 
 ;;; A hack for cache {{{
 (defvar user-emacs-top-directory user-emacs-directory)
-(setq user-emacs-directory (expand-file-name "cache/" (or user-emacs-top-directory user-emacs-directory)))
+(setq user-emacs-directory (expand-file-name "var/" (or user-emacs-top-directory user-emacs-directory)))
 (defun init/locate-user-config (filename)
 	"Return an path for Emacs configuration FILENAME."
 	(let ((user-emacs-directory user-emacs-top-directory))
@@ -48,6 +48,7 @@
 	"Get and add PATH to 'exec-path from shell."
 	(let ((path-from-shell (split-string (replace-regexp-in-string "[ \t\n]*" "" (shell-command-to-string "${SHELL} -c 'echo ${PATH}'")) path-separator)))
 		(init/add-exec-path path-from-shell)))
+(setenv "PATH" (shell-command-to-string "${SHELL} -c 'echo ${PATH}'"))
 (init/add-exec-path (init/locate-user-config "external-tools/npm/bin/"))
 (init/add-exec-path-from-shell)
 ;;(add-to-list 'exec-path "~/.local/bin/")
@@ -123,15 +124,34 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(when (and (= emacs-major-version 26) (= emacs-minor-version 2))
 		(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")))
 (package-initialize)
+;;; }}}
 
-(when (not (package-installed-p 'use-package))
+;;; Use-Package Settings {{{
+(unless (package-installed-p 'use-package)
 	(package-refresh-contents)
 	(package-install 'use-package))
-(setq use-package-always-defer t)
-(setq use-package-verbose t)
-(setq use-package-compute-statistics t)
-(setq use-package-always-ensure t)
+(package-config 'use-package-core
+	(setq use-package-always-defer t)
+	(setq use-package-verbose t)
+	(setq use-package-compute-statistics t)
+	(package-config 'use-package-ensure
+		(setq use-package-always-ensure t)))
+;(package-invoke 'use-package)
 ;;; }}}
+
+;;; Color / Theme Setting {{{
+(set-variable 'custom-theme-directory (init/locate-user-config "theme/"))
+(if (fboundp 'load-theme)
+	(progn
+		(package-invoke 'doom-themes)
+			(load-theme 'doom-city-lights t))
+;			(load-theme 'deeper-blue)
+;			(load-theme 'pluser-deeper-blue t))
+	(package-config 'color-theme		; Extension: color-theme
+		(color-theme-initialize)
+		(color-theme-deep-blue))
+	(package-invoke 'color-theme))
+;; }}}
 
 ;;; Language Setting {{{
 ;;;	 If you want to know charset priority, (print (charset-priority-list))
@@ -156,27 +176,16 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; User Interface Setting {{{
-(set-frame-parameter nil 'inhibit-double-buffering t) ; workaround for inordinate cursor blinking.
+;(set-frame-parameter nil 'inhibit-double-buffering t) ; workaround for inordinate cursor blinking.
 (transient-mark-mode 0)
 (set-variable 'visible-bell t)
 (set-variable 'ring-bell-function 'ignore)
 (set-variable 'use-dialog-box nil)
+(setq inhibit-startup-screen t)
+(setq initial-major-mode 'fundamental-mode)
+(setq initial-scratch-message nil)
 (if (< emacs-major-version 24) (tool-bar-mode nil) (tool-bar-mode 0))
 (if (< emacs-major-version 24) (menu-bar-mode nil) (menu-bar-mode 0))
-;;; }}}
-
-;;; Color / Theme Setting {{{
-(set-variable 'custom-theme-directory (init/locate-user-config "theme/"))
-(if (fboundp 'load-theme)
-	(progn
-			(package-invoke 'doom-themes)
-			(load-theme 'doom-city-lights t))
-;			(load-theme 'deeper-blue)
-;			(load-theme 'pluser-deeper-blue t))
-	(package-config 'color-theme		; Extension: color-theme
-		(color-theme-initialize)
-		(color-theme-deep-blue))
-	(package-invoke 'color-theme))
 ;;; }}}
 
 ;;; File Opener {{{
@@ -244,7 +253,11 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Define global keymap {{{
-(define-key global-map (kbd "C-h") 'backward-delete-char-untabify)
+;;(define-key global-map (kbd "C-h") 'backward-delete-char-untabify)
+(define-key global-map (kbd "C-h") 'left-char)
+(define-key global-map (kbd "C-t") 'next-line)
+(define-key global-map (kbd "C-n") 'previous-line)
+(define-key global-map (kbd "C-s") 'right-char)
 (define-key global-map (kbd "<muhenkan>") 'pop-to-mark-command)
 (define-key global-map (kbd "<menu>") 'repeat)
 ;;; }}}
@@ -403,20 +416,79 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Hydra Settings {{{
 (use-package hydra		; Extension: hydra
+	:disabled
 	)
 ;;; }}}
 
 ;;; Counsel, Swiper, Ivy Settings {{{
 (use-package ivy		; Extension: ivy
+	:disabled
 	:config
 	(set-variable 'ivy-use-virtual-buffers t))
 (use-package swiper		; Extension: swiper
+	:disabled
 	:bind (("C-s" . swiper-isearch)
 				 ("C-r" . swiper-isearch-backwards)))
 (use-package counsel		; Extension: counsel
+	:disabled
 	:bind (("M-x" . counsel-M-x)
-				 ("C-x C-f" . counsel-find-file))
+				 ("C-x C-f" . counsel-find-file)
+				 ("C-x b" . counsel-switch-buffer)
+				 ("<f1> f" . counsel-describe-function)
+				 ("<f1> v" . counsel-describe-variable))
 	)
+;;; }}}
+
+;;; Selectrum Settings {{{
+(use-package selectrum		; Extension: selectrum
+	:demand
+	:config
+	(selectrum-mode 1)
+	)
+(use-package selectrum-prescient		; Extension: selectrum-prescient
+	:after (selectrum)
+	:demand
+	:config
+	(selectrum-prescient-mode 1)
+	(prescient-persist-mode 1)
+	)
+(use-package orderless		; Extension: orderless
+	:after (selectrum)
+	:custom
+	(completion-styles '(orderless))
+	;; highlighting only the visible candidates for performance.
+	(orderless-skip-highlighting (lambda () selectrum-is-active))
+	(selectrum-highlight-candidates-function #'orderless-highlight-matches))
+(use-package embark-consult		; Extension: embark-consult
+	:after (embark consult)
+	:hook
+	(embark-collect-mode . consult-preview-at-point-mode))
+;;; }}}
+
+;;; Consult Settings {{{
+(use-package consult		; Extension: consult
+	:bind
+	(("C-x C-f" . consult-find)
+	 ("C-x b" . consult-buffer)
+	 ("C-x C-b" . consult-buffer)
+	 ("C-s" . consult-line))
+	:custom
+	(consult-project-root-function #'projectile-project-root))
+;;; }}}
+
+;;; Marginalia Settings {{{
+(use-package marginalia
+	:demand
+	:config
+	(marginalia-mode 1)
+	)
+;;; }}}
+
+;;; Embark Settings {{{
+(use-package embark
+	:bind
+	(("C-." . embark-act)
+	 ))
 ;;; }}}
 
 ;;; Avy Settings {{{
@@ -426,7 +498,10 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Dashbord Settings {{{
 (use-package dashboard		; Extension: dashboard
-	:init
+	:demand
+	:custom
+	(dashboard-items '((recents . 5) (bookmarks . 5)))
+	:config
 	(dashboard-setup-startup-hook))
 ;;; }}}
 
@@ -444,6 +519,17 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; TeX/LaTeX Settings {{{
 (add-hook 'LaTeX-mode-hook 'outline-minor-mode)
+(use-package tex		; Extension: auctex
+	:ensure auctex
+	:config
+	(add-to-list 'TeX-view-program-selection '(output-pdf "Zathura"))
+	(setq TeX-source-correlate-mode t)
+	(setq TeX-parse-self t)
+	(setq japanese-TeX-engine-default 'uptex)
+	(setq-default TeX-engine 'luatex)
+	(add-to-list 'TeX-command-list '("Latexmk" "latexmk %t" TeX-run-TeX nil (latex-mode) :help "Run Latexmk"))
+  (add-to-list 'TeX-command-list '("Latexmk-upLaTeX" "latexmk -e '$latex=q/uplatex %%O %(file-line-error) %(extraopts) %S %(mode) %%S/' -e '$bibtex=q/upbibtex %%O %%B/' -e '$biber=q/biber %%O --bblencoding=utf8 -u -U --output_safechars %%B/' -e '$makeindex=q/upmendex %%O -o %%D %%S/' -e '$dvipdf=q/dvipdfmx %%O -o %%D %%S/' -norc -gg -pdfdvi %t" TeX-run-TeX nil (latex-mode) :help "Run Latexmk-upLaTeX"))
+  (add-to-list 'TeX-command-list '("Latexmk-LuaLaTeX" "latexmk -e '$lualatex=q/lualatex %%O %(file-line-error) %(extraopts) %S %(mode) %%S/' -e '$bibtex=q/upbibtex %%O %%B/' -e '$biber=q/biber %%O --bblencoding=utf8 -u -U --output_safechars %%B/' -e '$makeindex=q/upmendex %%O -o %%D %%S/' -norc -gg -pdflua %t" TeX-run-TeX nil (latex-mode) :help "Run Latexmk-LuaLaTeX")))
 (use-package latex-math-preview
 	:disabled
 	:config
@@ -463,6 +549,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Org-mode Settings {{{
 (use-package org		; Extension: org
 	:config
+	(message "hogehoge")
 	;;(set-variable 'org-babel-no-eval-on-ctrl-c-ctrl-c t)
 	(set-variable 'org-startup-truncated nil)
 	(org-babel-do-load-languages
@@ -513,8 +600,13 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Evil Settings {{{
 (use-package evil		; Extension: evil
-	:hook ((emacs-startup . evil-mode))
+	:demand
+	:bind
+	(:map evil-emacs-state-map
+				("<delete>" . evil-execute-in-normal-state)
+				("<f8>" . evil-toggle-fold))
 	:config
+	(evil-mode 1)
 	(dolist (state '(normal motion visual))
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "h") 'evil-backward-char)
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "t") 'evil-next-line)
@@ -522,28 +614,22 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "s") 'evil-forward-char)
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "m") 'evil-search-next)
 		(define-key (symbol-value (intern (concat "evil-" (symbol-name state) "-state-map"))) (kbd "M") 'evil-search-previous))
-	(define-key evil-insert-state-map (kbd "M-SPC") 'evil-normal-state)
-	(define-key evil-insert-state-map (kbd "<henkan>") 'evil-normal-state)
-	(define-key evil-insert-state-map (kbd "C-e") nil)
-	(define-key evil-insert-state-map (kbd "C-t") nil)
 	(set-variable 'evil-move-cursor-back nil)
 	(set-variable 'evil-default-state 'emacs)
 	(set-variable 'evil-echo-state nil)
-	(set-variable 'evil-insert-state-cursor nil)
-	(eval-after-load 'help-mode '(evil-make-overriding-map help-mode-map))
-	(use-package evil-surround
-		:config
-		(global-evil-surround-mode))
-	(global-evil-surround-mode)
-	(add-to-list 'evil-emacs-state-modes 'text-mode)
-	(add-to-list 'evil-emacs-state-modes 'org-mode)
-	(add-to-list 'evil-emacs-state-modes 'tex-mode)
-	(define-key evil-emacs-state-map (kbd "<f8>") 'evil-toggle-fold))
+	(set-variable 'evil-insert-state-cursor nil))
+(use-package evil-surround		; Extension: evil-surround
+	:after (evil)
+	:config
+	(global-evil-surround-mode))
 ;;; }}}
 
 ;;; Company Settings {{{
 (use-package company		; Extension: company
 	:hook ((prog-mode . company-mode))
+	:bind
+	(:map company-mode-map
+				("C-t" . company-complete-common))
 	:config
 	(set-variable 'company-transformers '(company-sort-by-backend-importance company-sort-by-occurrence))
 	(use-package company-statistics		; Extension: company-statistics
@@ -551,7 +637,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		:config
 		(add-to-list 'company-transformars 'company-sort-by-statistics))
 	(set-variable 'company-frontends '(company-pseudo-tooltip-unless-just-one-frontend-with-delay company-echo-metadata-frontend company-preview-frontend))
-	(define-key company-mode-map (kbd "C-t") 'company-complete-common)
 	(set-variable 'company-idle-delay 0.5)
 	(set-variable 'company-tooltip-idle-delay 0.5)
 	(set-variable 'company-selection-wrap-around t)
@@ -583,7 +668,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	;	(add-hook 'lsp-mode-hook 'init/company-lsp-enable))
 )
 (use-package lsp-ui		; Extension: lsp-ui
-	:no-require
+	:requires lsp-mode
 	:config
 	(set-variable 'lsp-ui-doc-show-with-cursor nil))
 ;;; }}}
@@ -596,7 +681,10 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Treemacs Settings {{{
+(use-package treemacs-all-the-icons
+	:no-require)
 (use-package treemacs
+;	:after (treemacs-all-the-icons)
 	:config
 	(treemacs-load-all-the-icons-with-workaround-font "Inconsolata"))
 ;;; }}}
@@ -615,13 +703,16 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Yasnippet Settings {{{
 (use-package yasnippet		; Extension: yasnippet
+	:hook ((text-mode . yas-minor-mode-on) (prog-mode . yas-minor-mode-on))
 	:config
-	(set-variable 'yas-snippet-dirs (list (init/locate-user-config "yasnippets/"))))
+	(set-variable 'yas-snippet-dirs (list (init/locate-user-config "yasnippets/")))
+	(yas-reload-all))
 ;;; }}}
 
 ;;; Projectile Settings {{{
 (use-package projectile		; Extension: projectile
-	:hook ((emacs-startup . projectile-mode))
+	:init
+	(autoload 'projectile-project-root "projectile")
 	:config
 	(set-variable 'projectile-mode-line-prefix " Pj"))
 ;;; }}}
@@ -634,6 +725,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Undo-Tree Settings {{{
 (use-package undo-tree		; Extension: undo-tree
+	:disabled
 	:config
 	(set-variable 'undo-tree-mode-lighter ""))
 ;;; }}}

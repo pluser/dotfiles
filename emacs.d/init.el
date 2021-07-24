@@ -267,27 +267,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Cleaning major/minor mode in modeline {{{
-;; (defvar init/mode-line-cleaner-alist
-;; 	'((emacs-lisp-mode . "ELisp")
-;; 		(helm-mode . "")
-;; 		(company-mode . "")
-;; 		(whitespace-mode . "")
-;; 		(which-key-mode . "")
-;; 		(yas-minor-mode . "")))
-;; (defun init/clean-modeline ()
-;; 	"Cleaning modeline up."
-;; 	(dolist (mode init/mode-line-cleaner-alist)
-;; 		(when (eq (car mode) major-mode)
-;; 			(setq mode-name (cdr mode)))
-;; 		(when (assq (car mode) minor-mode-alist)
-;; 			(let ((m (assq (car mode) minor-mode-alist)))
-;; 				(setcdr m (list (cdr mode)))))))
-;; (add-hook 'after-change-major-mode-hook 'init/clean-modeline)
-;; (add-hook 'emacs-startup-hook 'init/clean-modeline)
-;; (use-package telephone-line		; Extension: telephone-line
-;; 	:disabled
-;; 	:config
-;; 	(telephone-line-mode))
 (use-package doom-modeline		; Extension: doom-modeline
 	:defer nil
 	:config
@@ -574,20 +553,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(add-to-list 'TeX-command-list '("Latexmk" "latexmk %t" TeX-run-TeX nil (latex-mode) :help "Run Latexmk"))
   (add-to-list 'TeX-command-list '("Latexmk-upLaTeX" "latexmk -e '$latex=q/uplatex %%O %(file-line-error) %(extraopts) %S %(mode) %%S/' -e '$bibtex=q/upbibtex %%O %%B/' -e '$biber=q/biber %%O --bblencoding=utf8 -u -U --output_safechars %%B/' -e '$makeindex=q/upmendex %%O -o %%D %%S/' -e '$dvipdf=q/dvipdfmx %%O -o %%D %%S/' -norc -gg -pdfdvi %t" TeX-run-TeX nil (latex-mode) :help "Run Latexmk-upLaTeX"))
   (add-to-list 'TeX-command-list '("Latexmk-LuaLaTeX" "latexmk -e '$lualatex=q/lualatex %%O %(file-line-error) %(extraopts) %S %(mode) %%S/' -e '$bibtex=q/upbibtex %%O %%B/' -e '$biber=q/biber %%O --bblencoding=utf8 -u -U --output_safechars %%B/' -e '$makeindex=q/upmendex %%O -o %%D %%S/' -norc -gg -pdflua %t" TeX-run-TeX nil (latex-mode) :help "Run Latexmk-LuaLaTeX")))
-(use-package latex-math-preview
-	:disabled
-	:config
-	(add-to-list 'latex-math-preview-latex-usepackage-for-not-tex-file "\\usepackage{tikz}")
-	;(setq-default latex-math-preview-tex-to-png-for-preview '(lualatex-to-pdf convert))
-	;;(setq-default latex-math-preview-tex-to-png-for-preview '(lualatex-to-pdf gs-to-png))
-	;(setq-default latex-math-preview-command-trim-option-alist '((dvipng "-T" "tight") (dvips-to-ps "-E" "-x" "3000") (dvips-to-eps "-E" "-x" "3000") (convert "-trim"))"Options of commands to trim margin.")
-	;(add-to-list 'latex-math-preview-command-create-argument-alist (convert . init/latex-math-preview-argument-convert))
-	(defun init/latex-math-preview-argument-convert (command input)
-		(let* ((out (latex-math-preview-change-file-extension command input))
-					(args (append (latex-math-preview-get-command-option command) (list input output))))
-			(cons out args)))
-	;(setq-default latex-math-preview-trim-image t)
-	(latex-math-preview-define-convert-function 'convert))
 ;;; }}}
 
 ;;; Org-mode Settings {{{
@@ -665,9 +630,10 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-variable 'evil-echo-state nil)
 	(set-variable 'evil-insert-state-cursor nil))
 (use-package evil-surround		; Extension: evil-surround
-	:after (evil)
+	:after evil
+	:defer nil
 	:config
-	(global-evil-surround-mode))
+	(global-evil-surround-mode 1))
 ;;; }}}
 
 ;;; Company Settings {{{
@@ -677,67 +643,39 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(:map company-mode-map
 				("C-." . company-complete-common))
 	:config
-	(set-variable 'company-transformers '(company-sort-by-backend-importance company-sort-by-occurrence))
-	(use-package company-statistics		; Extension: company-statistics
-		:disabled
-		:config
-		(add-to-list 'company-transformars 'company-sort-by-statistics))
-	(set-variable 'company-frontends '(company-pseudo-tooltip-unless-just-one-frontend-with-delay company-echo-metadata-frontend company-preview-frontend))
-	(set-variable 'company-idle-delay 0.5)
-	(set-variable 'company-tooltip-idle-delay 0.5)
-	(set-variable 'company-selection-wrap-around t)
-	(setq company-show-numbers t)
-	(use-package company-math		; Extension: company-math
-		:disabled
-		:config
-		(add-to-list 'company-backends 'company-math-symbols-unicode))
-	(use-package company-tern		; Extension: company-tern
-		:disabled
-		:config
-		(set-variable 'company-tern-property-marker nil))
-	(defun init/company-jedi-enable ()
-		(add-to-list 'company-backends 'company-jedi))
-	(defun init/company-tern-enable ()
-		(interactive)
-		(tern-mode t)
-		(add-to-list 'company-backends '(company-tern :with company-dabbrev-code))))
+	(set-variable 'company-transformers '(company-sort-by-backend-importance company-sort-by-occurrence)))
 (use-package company-prescient
   :after company
-  :demand
+  :defer nil
   :config
   (company-prescient-mode 1))
 ;;; }}}
 
 ;;; LSP Settings {{{
 (use-package lsp-mode		; Extension: lsp-mode
-	:hook ((prog-mode . lsp-mode))
-	:config
-	;(set-variable 'lsp-prefer-flymake :none)
-	;(package-depend 'company-lsp
-	;	(defun init/company-lsp-enable ()
-	;		(add-to-list 'company-backends 'company-lsp))
-	;	(add-hook 'lsp-mode-hook 'init/company-lsp-enable))
-)
+	:hook ((prog-mode . lsp-mode)))
 (use-package lsp-ui		; Extension: lsp-ui
 	:after lsp-mode
-	:config
-	(set-variable 'lsp-ui-doc-show-with-cursor nil))
+	:defer nil
+	:custom
+	(lsp-ui-doc-show-with-cursor nil))
 ;;; }}}
 
 ;;; Magit Settings {{{
 (use-package magit		; Extension: magit
 	:bind (("<f12>" . magit-status))
-	:config
-	(set-variable 'magit-last-seen-setup-instruction "1.4.0"))
+	:custom
+	(magit-last-seen-setup-instruction "1.4.0"))
 ;;; }}}
 
 ;;; Treemacs Settings {{{
-(use-package treemacs-all-the-icons
-	:no-require)
-(use-package treemacs
-;	:after (treemacs-all-the-icons)
+(use-package treemacs		; Extension: treemacs
 	:config
 	(treemacs-load-all-the-icons-with-workaround-font "Inconsolata"))
+(use-package treemacs-all-the-icons		; Extension: treemacs-all-the-icons
+	:after treemacs
+	:defer nil
+	)
 ;;; }}}
 
 ;;; Dumb Jump Settings {{{
@@ -826,6 +764,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Whitespace Settings {{{
 (use-package whitespace		; Extension: whitespace
+	:ensure nil
 	:config
 	(set-variable 'whitespace-style '(face tabs trailing space-before-tab tab-mark)))
 ;;; }}}
@@ -849,6 +788,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Ediff Settiings {{{
 (use-package ediff
+	:ensure nil
 	:config
 	(set-variable 'ediff-window-setup-function 'ediff-setup-windows-plain))
 ;;; }}}

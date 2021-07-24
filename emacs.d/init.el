@@ -7,6 +7,13 @@
 (setq debug-on-error t)
 ;;; }}}
 
+;; Minimize garbage collection during startup {{{
+(setq gc-cons-threshold most-positive-fixnum)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold (expt 2 23)))) ; 8MiB
+;;; }}}
+
 ;;; Local variable {{{
 (when (< emacs-major-version 23)
 	(defvar user-emacs-directory (file-name-directory (or buffer-file-name load-file-name))))

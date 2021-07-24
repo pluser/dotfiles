@@ -4,7 +4,7 @@
 ;;; Code:
 
 ;;; Debug Setting {{{
-;(setq debug-on-error t)
+(setq debug-on-error t)
 ;;; }}}
 
 ;;; Local variable {{{
@@ -229,7 +229,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;; tabs and indentation
 (setq-default indent-tabs-mode t)
 (setq-default c-basic-offset 4)
-(setq-default tab-width 4)
+;(setq-default tab-width 4)
 (setq c-default-style
 			'((c++-mode . "k&r")
 				(java-mode . "java")
@@ -267,29 +267,31 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Cleaning major/minor mode in modeline {{{
-(defvar init/mode-line-cleaner-alist
-	'((emacs-lisp-mode . "ELisp")
-		(helm-mode . "")
-		(company-mode . "")
-		(whitespace-mode . "")
-		(which-key-mode . "")
-		(yas-minor-mode . "")))
-(defun init/clean-modeline ()
-	"Cleaning modeline up."
-	(dolist (mode init/mode-line-cleaner-alist)
-		(when (eq (car mode) major-mode)
-			(setq mode-name (cdr mode)))
-		(when (assq (car mode) minor-mode-alist)
-			(let ((m (assq (car mode) minor-mode-alist)))
-				(setcdr m (list (cdr mode)))))))
-(add-hook 'after-change-major-mode-hook 'init/clean-modeline)
-(add-hook 'emacs-startup-hook 'init/clean-modeline)
-(use-package telephone-line		; Extension: telephone-line
-	:disabled
-	:config
-	(telephone-line-mode))
+;; (defvar init/mode-line-cleaner-alist
+;; 	'((emacs-lisp-mode . "ELisp")
+;; 		(helm-mode . "")
+;; 		(company-mode . "")
+;; 		(whitespace-mode . "")
+;; 		(which-key-mode . "")
+;; 		(yas-minor-mode . "")))
+;; (defun init/clean-modeline ()
+;; 	"Cleaning modeline up."
+;; 	(dolist (mode init/mode-line-cleaner-alist)
+;; 		(when (eq (car mode) major-mode)
+;; 			(setq mode-name (cdr mode)))
+;; 		(when (assq (car mode) minor-mode-alist)
+;; 			(let ((m (assq (car mode) minor-mode-alist)))
+;; 				(setcdr m (list (cdr mode)))))))
+;; (add-hook 'after-change-major-mode-hook 'init/clean-modeline)
+;; (add-hook 'emacs-startup-hook 'init/clean-modeline)
+;; (use-package telephone-line		; Extension: telephone-line
+;; 	:disabled
+;; 	:config
+;; 	(telephone-line-mode))
 (use-package doom-modeline		; Extension: doom-modeline
-	:hook ((emacs-startup . doom-modeline-mode)))
+	:defer nil
+	:config
+	(doom-modeline-mode 1))
 ;;;}}}
 
 ;;; Suppress warning {{{
@@ -322,6 +324,11 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-variable 'web-mode-code-indent-offset 4)
 	(set-variable 'web-mode-markup-indent-offset 4)
 	(set-variable 'web-mode-style-padding 4))
+;;; }}}
+
+;;; Rust Settings {{{
+(use-package rustic		; Extension: rustic
+	)
 ;;; }}}
 
 ;;; JS2-mode Settings {{{
@@ -422,30 +429,56 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Counsel, Swiper, Ivy Settings {{{
 (use-package ivy		; Extension: ivy
-	:disabled
+	:demand
+	:custom
+	(ivy-use-virtual-buffers t)
 	:config
-	(set-variable 'ivy-use-virtual-buffers t))
+	(ivy-mode 1))
 (use-package swiper		; Extension: swiper
-	:disabled
-	:bind (("C-s" . swiper-isearch)
-				 ("C-r" . swiper-isearch-backwards)))
+	:bind
+	(("C-r" . swiper-isearch)
+	 ("C-l" . swiper-isearch-backward))
+	(:map swiper-isearch-map
+				("C-r" . swiper-C-s)
+				("C-l" . swiper-isearch-C-r)))
 (use-package counsel		; Extension: counsel
+	:after ivy
+	:demand
+	:config
+	(counsel-mode 1))
+(use-package ivy-rich		; Extension: ivy-rich
+	:after ivy
+	:demand
+	:config
+	(ivy-rich-mode 1))
+(use-package all-the-icons-ivy-rich		; Extension: all-the-icons-ivy-rich
+	:after ivy
+	:demand
+	:config
+	(all-the-icons-ivy-rich-mode 1))
+(use-package ivy-prescient		; Extension: ivy-prescient
+	:after ivy
+	:demand
+	:config
+	(ivy-prescient-mode 1))
+(use-package orderless		; Extension: orderless
 	:disabled
-	:bind (("M-x" . counsel-M-x)
-				 ("C-x C-f" . counsel-find-file)
-				 ("C-x b" . counsel-switch-buffer)
-				 ("<f1> f" . counsel-describe-function)
-				 ("<f1> v" . counsel-describe-variable))
-	)
+	:after ivy
+	:demand
+	:custom
+	(completion-styles '(orderless))
+	(ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 ;;; }}}
 
 ;;; Selectrum Settings {{{
 (use-package selectrum		; Extension: selectrum
+	:disabled
 	:demand
 	:config
 	(selectrum-mode 1)
 	)
 (use-package selectrum-prescient		; Extension: selectrum-prescient
+	:disabled
 	:after (selectrum)
 	:demand
 	:config
@@ -453,13 +486,16 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(prescient-persist-mode 1)
 	)
 (use-package orderless		; Extension: orderless
+	:disabled
 	:after (selectrum)
+	:demand
 	:custom
 	(completion-styles '(orderless))
 	;; highlighting only the visible candidates for performance.
 	(orderless-skip-highlighting (lambda () selectrum-is-active))
 	(selectrum-highlight-candidates-function #'orderless-highlight-matches))
 (use-package embark-consult		; Extension: embark-consult
+	:disabled
 	:after (embark consult)
 	:hook
 	(embark-collect-mode . consult-preview-at-point-mode))
@@ -467,17 +503,24 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Consult Settings {{{
 (use-package consult		; Extension: consult
+	:disabled
 	:bind
-	(("C-x C-f" . consult-find)
-	 ("C-x b" . consult-buffer)
-	 ("C-x C-b" . consult-buffer)
-	 ("C-s" . consult-line))
+	(:map global-map
+				("C-x C-f" . consult-find)
+				("C-x b" . consult-buffer)
+				("C-x C-b" . consult-buffer)
+				("C-r" . consult-line)
+				("C-l" . consult-isearch))
+	(:map isearch-mode-map
+				("C-r" . consult-line)
+				("C-l" . consult-isearch))
 	:custom
 	(consult-project-root-function #'projectile-project-root))
 ;;; }}}
 
 ;;; Marginalia Settings {{{
 (use-package marginalia
+	:disabled
 	:demand
 	:config
 	(marginalia-mode 1)
@@ -486,6 +529,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Embark Settings {{{
 (use-package embark
+	:disabled
 	:bind
 	(("C-." . embark-act)
 	 ))
@@ -549,7 +593,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Org-mode Settings {{{
 (use-package org		; Extension: org
 	:config
-	(message "hogehoge")
 	;;(set-variable 'org-babel-no-eval-on-ctrl-c-ctrl-c t)
 	(set-variable 'org-startup-truncated nil)
 	(org-babel-do-load-languages
@@ -605,6 +648,9 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(:map evil-emacs-state-map
 				("<delete>" . evil-execute-in-normal-state)
 				("<f8>" . evil-toggle-fold))
+	(:map evil-normal-state-map
+				("<delete>" . evil-execute-in-emacs-state)
+				("<f8>" . evil-toggle-fold))	
 	:config
 	(evil-mode 1)
 	(dolist (state '(normal motion visual))
@@ -629,7 +675,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	:hook ((prog-mode . company-mode))
 	:bind
 	(:map company-mode-map
-				("C-t" . company-complete-common))
+				("C-." . company-complete-common))
 	:config
 	(set-variable 'company-transformers '(company-sort-by-backend-importance company-sort-by-occurrence))
 	(use-package company-statistics		; Extension: company-statistics
@@ -655,6 +701,11 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(interactive)
 		(tern-mode t)
 		(add-to-list 'company-backends '(company-tern :with company-dabbrev-code))))
+(use-package company-prescient
+  :after company
+  :demand
+  :config
+  (company-prescient-mode 1))
 ;;; }}}
 
 ;;; LSP Settings {{{
@@ -668,7 +719,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	;	(add-hook 'lsp-mode-hook 'init/company-lsp-enable))
 )
 (use-package lsp-ui		; Extension: lsp-ui
-	:requires lsp-mode
+	:after lsp-mode
 	:config
 	(set-variable 'lsp-ui-doc-show-with-cursor nil))
 ;;; }}}

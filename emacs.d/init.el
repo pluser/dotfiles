@@ -841,7 +841,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Customize Settings {{{
 (setq custom-file (init/locate-user-config "customize.el"))
-(load custom-file)
+(load custom-file t)
 ;;; }}}
 
 (provide 'init)

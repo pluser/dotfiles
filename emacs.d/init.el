@@ -131,34 +131,54 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-variable 'package-user-dir (init/locate-user-config "packages/"))
 	(when (and (= emacs-major-version 26) (= emacs-minor-version 2))
 		(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")))
-(package-initialize)
+;;(package-initialize) ; disabled
+;;; }}}
+
+;;; Straight Settings {{{
+(defvar straight-use-package-by-default t)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+(straight-use-package 'use-package)
 ;;; }}}
 
 ;;; Use-Package Settings {{{
-(unless (package-installed-p 'use-package)
-	(package-refresh-contents)
-	(package-install 'use-package))
+;(unless (package-installed-p 'use-package)
+;	(package-refresh-contents)
+;	(package-install 'use-package))
 (package-config 'use-package-core
 	(setq use-package-always-defer t)
 	(setq use-package-verbose t)
 	(setq use-package-compute-statistics t)
 	(package-config 'use-package-ensure
 		(setq use-package-always-ensure t)))
-;(package-invoke 'use-package)
+;;(package-invoke 'use-package)
 ;;; }}}
 
 ;;; Color / Theme Setting {{{
-(set-variable 'custom-theme-directory (init/locate-user-config "theme/"))
-(if (fboundp 'load-theme)
-	(progn
-		(package-invoke 'doom-themes)
-			(load-theme 'doom-city-lights t))
-;			(load-theme 'deeper-blue)
-;			(load-theme 'pluser-deeper-blue t))
-	(package-config 'color-theme		; Extension: color-theme
-		(color-theme-initialize)
-		(color-theme-deep-blue))
-	(package-invoke 'color-theme))
+;; (set-variable 'custom-theme-directory (init/locate-user-config "theme/"))
+;; (if (fboundp 'load-theme)
+;; 	(progn
+;; 		(package-invoke 'doom-themes)
+;; 			(load-theme 'doom-city-lights t))
+;; ;			(load-theme 'deeper-blue)
+;; ;			(load-theme 'pluser-deeper-blue t))
+;; 	(package-config 'color-theme		; Extension: color-theme
+;; 		(color-theme-initialize)
+;; 		(color-theme-deep-blue))
+;; 	(package-invoke 'color-theme))
+(use-package doom-themes
+	:demand
+	:config
+	(load-theme 'doom-city-lights t))
 ;; }}}
 
 ;;; Language Setting {{{
@@ -551,6 +571,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; TeX/LaTeX Settings {{{
 (add-hook 'LaTeX-mode-hook 'outline-minor-mode)
 (use-package tex		; Extension: auctex
+	:straight auctex
 	:ensure auctex
 	:config
 	(add-to-list 'TeX-view-program-selection '(output-pdf "Zathura"))
@@ -737,6 +758,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Skk Settings {{{
 (use-package skk		; Extension: SKK
 	:ensure ddskk
+	:straight ddskk
 	:init
 	(setq skk-user-directory (locate-user-emacs-file "ddskk/"))
 	:config
@@ -773,6 +795,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Whitespace Settings {{{
 (use-package whitespace		; Extension: whitespace
 	:ensure nil
+	:straight (:type built-in)
 	:config
 	(set-variable 'whitespace-style '(face tabs trailing space-before-tab tab-mark)))
 ;;; }}}
@@ -780,6 +803,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Uniquify Settings {{{
 (use-package uniquify
 	:ensure nil
+	:straight (:type built-in)
 	:config
 	(set-variable 'uniquify-buffer-name-style 'post-forward-angle-brackets))
 ;;; }}}
@@ -789,6 +813,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Dired Settings {{{
 (use-package dired
 	:ensure nil
+	:straight (:type built-in)
 	:config
 	(set-variable 'dired-listing-switches "-alh")
 	(set-variable 'dired-dwim-target t))
@@ -797,6 +822,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; Ediff Settiings {{{
 (use-package ediff
 	:ensure nil
+	:straight (:type built-in)
 	:config
 	(set-variable 'ediff-window-setup-function 'ediff-setup-windows-plain))
 ;;; }}}

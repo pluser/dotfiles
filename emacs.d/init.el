@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; init.el --- A emacs setting file
 ;;; Commentary:
 ;;;  Heavily personalized Emacs configuration file

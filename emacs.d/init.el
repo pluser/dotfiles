@@ -6,6 +6,7 @@
 
 ;;; Debug Setting {{{
 (setq debug-on-error t)
+(setq warning-minimum-level :error)
 ;;; }}}
 
 ;; Minimize garbage collection during startup {{{
@@ -434,14 +435,27 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	)
 ;;; }}}
 
+;;; Tree-sitter Settings {{{
+(use-package tree-sitter		; Extension: tree-sitter
+	:init (global-tree-sitter-mode t)
+	:hook (tree-sitter-after-on . tree-sitter-hl-mode))
+(use-package tree-sitter-langs		; Extension: tree-sitter-langs
+	)
+(use-package evil-textobj-tree-sitter
+  :config
+	(define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer")))
+;;; }}}
+
 ;;; Counsel, Swiper, Ivy Settings {{{
 (use-package ivy		; Extension: ivy
+	:disabled
 	:demand
 	:custom
 	(ivy-use-virtual-buffers t)
 	:config
 	(ivy-mode 1))
 (use-package swiper		; Extension: swiper
+	:disabled
 	:bind
 	(("C-r" . swiper-isearch)
 	 ("C-l" . swiper-isearch-backward))
@@ -477,69 +491,31 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 ;;; }}}
 
-;;; Selectrum Settings {{{
-(use-package selectrum		; Extension: selectrum
-	:disabled
-	:demand
-	:config
-	(selectrum-mode 1)
-	)
-(use-package selectrum-prescient		; Extension: selectrum-prescient
-	:disabled
-	:after (selectrum)
-	:demand
-	:config
-	(selectrum-prescient-mode 1)
-	(prescient-persist-mode 1)
-	)
-(use-package orderless		; Extension: orderless
-	:disabled
-	:after (selectrum)
-	:demand
-	:custom
-	(completion-styles '(orderless))
-	;; highlighting only the visible candidates for performance.
-	(orderless-skip-highlighting (lambda () selectrum-is-active))
-	(selectrum-highlight-candidates-function #'orderless-highlight-matches))
-(use-package embark-consult		; Extension: embark-consult
-	:disabled
-	:after (embark consult)
-	:hook
-	(embark-collect-mode . consult-preview-at-point-mode))
-;;; }}}
-
-;;; Consult Settings {{{
-(use-package consult		; Extension: consult
-	:disabled
+;;; Completion Plugins {{{
+(use-package vertico
+  :hook ((emacs-startup . vertico-mode))
+  :custom
+  (vertico-count 20))
+(use-package consult
 	:bind
 	(:map global-map
-				("C-x C-f" . consult-find)
-				("C-x b" . consult-buffer)
-				("C-x C-b" . consult-buffer)
-				("C-r" . consult-line)
-				("C-l" . consult-isearch))
+		("C-x b" . consult-buffer)
+		("C-x C-b" . consult-buffer)
+		("C-r" . consult-line)
+		("C-l" . consult-isearch))
 	(:map isearch-mode-map
-				("C-r" . consult-line)
-				("C-l" . consult-isearch))
-	:custom
-	(consult-project-root-function #'projectile-project-root))
-;;; }}}
-
-;;; Marginalia Settings {{{
+		("C-r" . consult-line)
+		("C-l" . consult-isearch)))
 (use-package marginalia
-	:disabled
-	:demand
-	:config
-	(marginalia-mode 1)
-	)
-;;; }}}
-
-;;; Embark Settings {{{
+	:hook ((emacs-startup . marginalia-mode)))
+(use-package orderless
+	:custom
+	(completion-styles '(orderless)))
 (use-package embark
-	:disabled
 	:bind
-	(("C-." . embark-act)
-	 ))
+	(:map global-map
+				("C-'" . embark-act)))
+(use-package embark-consult)
 ;;; }}}
 
 ;;; Avy Settings {{{
@@ -565,7 +541,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Flycheck Settings {{{
 (use-package flycheck
-	:disabled)		; Extension: flycheck
+	)		; Extension: flycheck
 ;;; }}}
 
 ;;; TeX/LaTeX Settings {{{
@@ -682,12 +658,25 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; LSP Settings {{{
 (use-package lsp-mode		; Extension: lsp-mode
-	:hook ((prog-mode . lsp-mode)))
-(use-package lsp-ui		; Extension: lsp-ui
-	:after lsp-mode
-	:defer nil
+	:hook (
+				 (prog-mode . lsp)
+				 (lsp-mode . lsp-enable-which-key-integration))
+	:commands lsp
 	:custom
-	(lsp-ui-doc-show-with-cursor nil))
+	(read-process-output-max (* 1024 1024)))
+(use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+;;(use-package lsp-ui		; Extension: lsp-ui
+;;	:after lsp-mode
+;;	:defer nil
+;;	:custom
+;;	(lsp-ui-doc-show-with-cursor nil)
+;;	:config
+;;	(add-hook 'lsp-ui-doc-frame-hook
+;;						(lambda (frame _w)
+;;							(set-face-attribute 'default frame :font "Inconsolata" :height 160))))
+;;
 ;;; }}}
 
 ;;; Magit Settings {{{

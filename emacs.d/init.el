@@ -60,8 +60,6 @@
 (setenv "PATH" (shell-command-to-string "${SHELL} -c 'echo ${PATH}'"))
 (init/add-exec-path (init/locate-user-config "external-tools/npm/bin/"))
 (init/add-exec-path-from-shell)
-;;(add-to-list 'exec-path "~/.local/bin/")
-;;(add-to-list 'exec-path "~/.go/bin/")
 ;;; }}}
 
 ;;; External file loader {{{
@@ -90,53 +88,7 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 ;;; }}}
 
 ;;; Package Management {{{
-(defmacro package-config (package &rest body)
-	"If loaded PACKAGE, evaluate BODY."
-	(declare (indent defun))
-	(if (fboundp 'with-eval-after-load)
-			`(with-eval-after-load ,package ,@body)	; with-eval- is more better.
-		`(eval-after-load ,package (lambda () ,@body))))
-
-(defun package-invoke (package-initiater &optional hook autoinstall)
-	"Set the up PACKAGE-INITIATER in startup sequence.
-If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.  If AUTOINSTALL is non-nil and the package was not installed, installed automatically."
-	(if (and (fboundp package-initiater) (not (equal hook 'require-only)))
-			(add-hook (or hook 'emacs-startup-hook) package-initiater)
-		(unless (require package-initiater nil t)
-			(if (featurep 'package)
-				(let ((pkg (or autoinstall package-initiater)))
-					(unless (package-installed-p pkg)
-						(unless package-archive-contents (package-refresh-contents))
-						(condition-case err (package-install pkg)
-								(file-error (warn "Failed to install a package '%s'." err)))))
-				(warn "Failed to start up a package '%s'." package-initiater)))))
-
-(defmacro package-depend (package &rest body)
-	"Declare the BODY depends on PACKAGE."
-	(declare (indent defun))
-	`(when (or (featurep ,package) (fboundp ,package)) ,@body))
-
-(package-config 'package
-	(let ((pkgs
-				'(("melpa" . "https://melpa.org/packages/")
-					("melpa-stable" . "https://stable.melpa.org/packages/")
-					("org" . "https://orgmode.org/elpa/"))))
-		(dolist (pkg pkgs)
-			(add-to-list 'package-archives pkg t)))
-	(setq package-archive-priorities
-				'(("melpa" . 20)
-					("marmalade" . 10)
-					("gnu" . 7)
-					("melpa-stable" . 3)
-					("org" . 6)))
-	(set-variable 'package-user-dir (init/locate-user-config "packages/"))
-	(when (and (= emacs-major-version 26) (= emacs-minor-version 2))
-		(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")))
-;;(package-initialize) ; disabled
-;;; }}}
-
-;;; Straight Settings {{{
-(defvar straight-use-package-by-default t)
+(defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
       (bootstrap-version 5))
@@ -149,33 +101,17 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 (straight-use-package 'use-package)
-;;; }}}
+(use-package straight
+	:custom
+	(use-package-always-defer t)
+	(use-package-verbose t)
+	(use-package-compute-statistics t)
+	(use-package-always-ensure t)
+	(straight-use-package-by-default t))
 
-;;; Use-Package Settings {{{
-;(unless (package-installed-p 'use-package)
-;	(package-refresh-contents)
-;	(package-install 'use-package))
-(package-config 'use-package-core
-	(setq use-package-always-defer t)
-	(setq use-package-verbose t)
-	(setq use-package-compute-statistics t)
-	(package-config 'use-package-ensure
-		(setq use-package-always-ensure t)))
-;;(package-invoke 'use-package)
 ;;; }}}
 
 ;;; Color / Theme Setting {{{
-;; (set-variable 'custom-theme-directory (init/locate-user-config "theme/"))
-;; (if (fboundp 'load-theme)
-;; 	(progn
-;; 		(package-invoke 'doom-themes)
-;; 			(load-theme 'doom-city-lights t))
-;; ;			(load-theme 'deeper-blue)
-;; ;			(load-theme 'pluser-deeper-blue t))
-;; 	(package-config 'color-theme		; Extension: color-theme
-;; 		(color-theme-initialize)
-;; 		(color-theme-deep-blue))
-;; 	(package-invoke 'color-theme))
 (use-package doom-themes
 	:demand
 	:config
@@ -213,8 +149,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (setq inhibit-startup-screen t)
 (setq initial-major-mode 'fundamental-mode)
 (setq initial-scratch-message nil)
-(if (< emacs-major-version 24) (tool-bar-mode nil) (tool-bar-mode 0))
-(if (< emacs-major-version 24) (menu-bar-mode nil) (menu-bar-mode 0))
+(tool-bar-mode 0)
+(menu-bar-mode 0)
 ;;; }}}
 
 ;;; File Opener {{{
@@ -297,7 +233,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Cleaning major/minor mode in modeline {{{
 (use-package doom-modeline		; Extension: doom-modeline
-	:defer nil
+	:demand
 	:config
 	(doom-modeline-mode 1))
 ;;;}}}
@@ -343,9 +279,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 (use-package js2-mode		; Extension: js2-mode
 	:disabled
 	:config
-	(add-to-list 'auto-mode-alist '("\\.html?\\'" . js2-mode))
-	(package-depend 'lsp
-		(add-hook 'js2-mode-hook 'lsp)))
+	(add-to-list 'auto-mode-alist '("\\.html?\\'" . js2-mode)))
 ;;; }}}
 
 ;;; Python-mode Settings {{{
@@ -355,20 +289,13 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(setq indent-tabs-mode t)
 		(setq python-indent-offset 4)
 		(setq tab-width 4))
-	;(add-hook 'python-mode-hook 'init/setting-python-mode)
-	(package-depend 'lsp
-		(package-invoke 'lsp 'python-mode-hook)))
+	(add-hook 'python-mode-hook 'init/setting-python-mode))
 ;;; }}}
 
 ;;; CC-Mode Settings {{{
 (use-package cc-mode
 	:config
-	;(set-default 'c-hungry-delete-key t)
-	(package-depend 'ensime-mode
-		(add-hook 'java-mode-hook 'ensime-mode))
-	(package-depend 'lsp
-		(require 'ccls nil t) ; load ccls if it exists
-		(package-invoke 'lsp 'c-mode-hook)))
+	(set-default 'c-hungry-delete-key t))
 ;;; }}}
 
 ;;; Julia Settings {{{
@@ -415,35 +342,32 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; EditorConfig Settings {{{
 (use-package editorconfig
-	:config
-	(editorconfig-mode))
+	:init
+	(editorconfig-mode 1))
 ;;; }}}
 
 ;;; Exec Path From Shell {{{
 (use-package exec-path-from-shell		; Extension: exec-path-from-shell
-	:disabled
-	:ensure nil
 	:config
 	(set-variable 'exec-path-from-shell-variables '("PATH" "PYTHONUSERBASE"))
 	;(set-variable 'exec-path-from-shell-arguments nil)
 	(exec-path-from-shell-initialize))
 ;;; }}}
 
-;;; Hydra Settings {{{
-(use-package hydra		; Extension: hydra
-	:disabled
-	)
-;;; }}}
-
 ;;; Tree-sitter Settings {{{
 (use-package tree-sitter		; Extension: tree-sitter
-	:init (global-tree-sitter-mode t)
+	:config (global-tree-sitter-mode t)
 	:hook (tree-sitter-after-on . tree-sitter-hl-mode))
 (use-package tree-sitter-langs		; Extension: tree-sitter-langs
 	)
 (use-package evil-textobj-tree-sitter
   :config
 	(define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer")))
+;;; }}}
+
+;;; objed Settings {{{
+(use-package objed
+	:hook (prog-mode . objed-local-mode))
 ;;; }}}
 
 ;;; Counsel, Swiper, Ivy Settings {{{
@@ -491,7 +415,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 ;;; }}}
 
-;;; Completion Plugins {{{
+;;; Minibuffer related Plugins {{{
 (use-package vertico
   :hook ((emacs-startup . vertico-mode))
   :custom
@@ -505,7 +429,10 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		("C-l" . consult-isearch))
 	(:map isearch-mode-map
 		("C-r" . consult-line)
-		("C-l" . consult-isearch)))
+		("C-l" . consult-isearch))
+	:custom
+	(xref-show-xrefs-function #'consult-xref)
+	(xref-show-definitions-function #'consult-xref))
 (use-package marginalia
 	:hook ((emacs-startup . marginalia-mode)))
 (use-package orderless
@@ -515,7 +442,43 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	:bind
 	(:map global-map
 				("C-'" . embark-act)))
-(use-package embark-consult)
+(use-package embark-consult :after (embark consult))
+;;; }}}
+
+;;; Completion related Plugins {{{
+(use-package company		; Extension: company
+	:hook ((prog-mode . company-mode))
+	:bind
+	(:map company-mode-map
+				("C-." . company-complete-common)))
+(use-package company-prescient
+  :after company
+  :init
+  (company-prescient-mode 1))
+(use-package corfu
+	:init
+	(corfu-global-mode))
+;;; }}}
+
+;;; Xref related Plugins {{{
+(use-package dumb-jump)
+(use-package smart-jump
+	:bind (("M-." . smart-jump-go)
+				 ("M-," . smart-jump-back)
+				 ("M-?" . smart-jump-references)))
+;;; }}}
+
+;;; LSP related Settings {{{
+(use-package lsp-mode		; Extension: lsp-mode
+	:hook ((prog-mode . lsp)
+				 (lsp-mode . lsp-enable-which-key-integration))
+	:commands lsp
+	:custom
+	(read-process-output-max (* 1024 1024)))
+(use-package lsp-ui :disabled :after (lsp) :commands lsp-ui-mode)
+(use-package lsp-ivy :disabled :commands lsp-ivy-workspace-symbol)
+(use-package consult-lsp :after (consult lsp))
+(use-package lsp-treemacs :after (lsp treemacs) :commands lsp-treemacs-errors-list)
 ;;; }}}
 
 ;;; Avy Settings {{{
@@ -525,11 +488,10 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Dashbord Settings {{{
 (use-package dashboard		; Extension: dashboard
-	:demand
+	:init
+	(dashboard-setup-startup-hook)
 	:custom
-	(dashboard-items '((recents . 5) (bookmarks . 5)))
-	:config
-	(dashboard-setup-startup-hook))
+	(dashboard-items '((recents . 5) (bookmarks . 5))))
 ;;; }}}
 
 ;;; Which-Key Settings {{{
@@ -540,8 +502,14 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 ;;; }}}
 
 ;;; Flycheck Settings {{{
-(use-package flycheck
-	)		; Extension: flycheck
+(use-package flycheck		; Extension: flycheck
+	)
+;;; }}}
+
+;;; Hydra Settings {{{
+(use-package hydra		; Extension: hydra
+	:disabled
+	)
 ;;; }}}
 
 ;;; TeX/LaTeX Settings {{{
@@ -595,6 +563,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 		(set-variable 'org-latex-default-class "ltjsarticle")
 		(set-variable 'org-latex-compiler "lualatex")
 		))
+(use-package org-roam)
 ;;; }}}
 
 ;;; Helm Settings {{{
@@ -613,7 +582,7 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 
 ;;; Evil Settings {{{
 (use-package evil		; Extension: evil
-	:demand
+	:demand t
 	:bind
 	(:map evil-emacs-state-map
 				("<delete>" . evil-execute-in-normal-state)
@@ -636,47 +605,8 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(set-variable 'evil-insert-state-cursor nil))
 (use-package evil-surround		; Extension: evil-surround
 	:after evil
-	:defer nil
 	:config
 	(global-evil-surround-mode 1))
-;;; }}}
-
-;;; Company Settings {{{
-(use-package company		; Extension: company
-	:hook ((prog-mode . company-mode))
-	:bind
-	(:map company-mode-map
-				("C-." . company-complete-common))
-	:config
-	(set-variable 'company-transformers '(company-sort-by-backend-importance company-sort-by-occurrence)))
-(use-package company-prescient
-  :after company
-  :defer nil
-  :config
-  (company-prescient-mode 1))
-;;; }}}
-
-;;; LSP Settings {{{
-(use-package lsp-mode		; Extension: lsp-mode
-	:hook (
-				 (prog-mode . lsp)
-				 (lsp-mode . lsp-enable-which-key-integration))
-	:commands lsp
-	:custom
-	(read-process-output-max (* 1024 1024)))
-(use-package lsp-ui :commands lsp-ui-mode)
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-;;(use-package lsp-ui		; Extension: lsp-ui
-;;	:after lsp-mode
-;;	:defer nil
-;;	:custom
-;;	(lsp-ui-doc-show-with-cursor nil)
-;;	:config
-;;	(add-hook 'lsp-ui-doc-frame-hook
-;;						(lambda (frame _w)
-;;							(set-face-attribute 'default frame :font "Inconsolata" :height 160))))
-;;
 ;;; }}}
 
 ;;; Magit Settings {{{
@@ -696,18 +626,6 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	)
 ;;; }}}
 
-;;; Dumb Jump Settings {{{
-(use-package dumb-jump		; Extension: dumb-jump
-	:bind (("<f9>" . dumb-jump-go))
-	:config
-	(set-variable 'dumb-jump-selector 'ivy))
-;;; }}}
-
-;;; Deadgrep Settings {{{
-(use-package deadgrep		; Extension deadgrep
-	)
-;;; }}}
-
 ;;; Yasnippet Settings {{{
 (use-package yasnippet		; Extension: yasnippet
 	:hook ((text-mode . yas-minor-mode-on) (prog-mode . yas-minor-mode-on))
@@ -722,6 +640,20 @@ If HOOK is non-nil, hang invoking package into HOOK instead of startup sequence.
 	(autoload 'projectile-project-root "projectile")
 	:config
 	(set-variable 'projectile-mode-line-prefix " Pj"))
+;;; }}}
+
+;;; DAP Mode Settings {{{
+(use-package dap-mode
+	:hook (prog-mode . dap-mode))
+;;; }}}
+
+;;; Helpful Settings {{{
+(use-package helpful
+	:bind
+	([remap describe-function] . #'helpful-callable)
+	([remap describe-variable] . #'helpful-variable)
+	([remap describe-command] . #'helpful-command)
+	([remap describe-key] . #'helpful-key))
 ;;; }}}
 
 ;;; Elpy Settings {{{

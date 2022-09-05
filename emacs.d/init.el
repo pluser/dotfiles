@@ -455,9 +455,6 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
   :after company
   :init
   (company-prescient-mode 1))
-(use-package corfu
-	:init
-	(corfu-global-mode))
 ;;; }}}
 
 ;;; Xref related Plugins {{{
@@ -541,29 +538,40 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 	(add-to-list 'org-preview-latex-process-alist '(xelatex-dvisvgm :programs ("xelatex" "dvisvgm") :description "xdv > svg" :message "you need to install the programs: xelatex and dvisvgm." :use-xcolor t :image-input-type "xdv" :image-output-type "svg" :image-size-adjust (2.0 . 2.0) :latex-compiler ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f") :image-converter ("dvisvgm %f -n -b min -c %S -o %O")))
 	(set-variable 'org-preview-latex-default-process 'xelatex-dvisvgm)
 	(set-variable 'org-export-allow-bind-keywords t)
-	(use-package ox-latex
-		:disabled
-		:config
-		(add-to-list
-		 'org-latex-classes
-		 '("ltjsarticle" "\\documentclass[autodetect-engine,dvipdfmx-if-dvi,ja=standard]{bxjsarticle}"
-			 ("\\section{%s}" . "\\section*{%s}")
-			 ("\\subsection{%s}" . "\\subsection*{%s}")
-			 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-			 ("\\paragraph{%s}" . "\\paragraph*{%s}")
-			 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-		(add-to-list
-		 'org-latex-classes
-		 '("jxelatex" "\\documentclass[autodetect-engine,dvipdfmx-if-dvi,ja=standard,enablejfam=true]{bxjsarticle}"
-			 ("\\section{%s}" . "\\section*{%s}")
-			 ("\\subsection{%s}" . "\\subsection*{%s}")
-			 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-			 ("\\paragraph{%s}" . "\\paragraph*{%s}")
-			 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-		(set-variable 'org-latex-default-class "ltjsarticle")
-		(set-variable 'org-latex-compiler "lualatex")
-		))
-(use-package org-roam)
+	(setq org-export-headline-levels 5) ; prevent headlines from becoming lists. see https://orgmode.org/manual/Publishing-options.html
+	(add-to-list
+	 'org-latex-classes
+	 '("bxjsarticle"
+		 "\\documentclass[autodetect-engine,dvipdfmx-if-dvi,ja=standard,enablejfam=true]{bxjsarticle}"
+		 ("\\section{%s}" . "\\section*{%s}")
+		 ("\\subsection{%s}" . "\\subsection*{%s}")
+		 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+		 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+	(add-to-list
+	 'org-latex-classes
+	 '("bxjsreport"
+		 "\\documentclass[autodetect-engine,dvipdfmx-if-dvi,ja=standard,enablejfam=true]{bxjsreport}"
+		 ("\\chapter{%s}" . "\\chapter*{%s}")
+		 ("\\section{%s}" . "\\section*{%s}")
+		 ("\\subsection{%s}" . "\\subsection*{%s}")
+		 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+		 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+	(set-variable 'org-latex-default-class "bxjsarticle")
+	(set-variable 'org-latex-compiler "lualatex"))
+;;; }}}
+
+;;; Org Roam Settings {{{
+(use-package org-roam		; Extension: org-roam
+	:config
+	(org-roam-db-autosync-mode)
+	;; :custom
+	;; (org-roam-directory "~/Note")
+	;; (org-roam-dailies-directory "journals/")
+	)
+(use-package org-roam-ui		; Extension org-roam-ui
+	)
 ;;; }}}
 
 ;;; Helm Settings {{{
@@ -628,6 +636,7 @@ If IGNORE-MISSING is non-nil, the warning message will be suppress even if the f
 
 ;;; Yasnippet Settings {{{
 (use-package yasnippet		; Extension: yasnippet
+:disabled
 	:hook ((text-mode . yas-minor-mode-on) (prog-mode . yas-minor-mode-on))
 	:config
 	(set-variable 'yas-snippet-dirs (list (init/locate-user-config "yasnippets/")))

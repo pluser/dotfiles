@@ -13,3 +13,4 @@ mlterm.d/*.rgs
 mlterm.d/*.six
 zsh.d/.zsh_history
 fonts.d/
+neovim.d/plugin/packer_compiled.lua

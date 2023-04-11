@@ -30,11 +30,12 @@ fi
 typeset -U fpath path manpath
 typeset -TU INFOPATH infopath
 fpath=(~/.local/share/zsh(N-/) ${fpath[@]} ~/.linuxbrew/share/zsh/site-functions(N-/))
-path=(~/.local/*/bin(N-/) ~/.local/bin(N-/) ${path[@]} ~/.linuxbrew/bin(N-/) ~/.linuxbrew/sbin(N-/))
+path=(~/.local/*/bin(N-/) ~/.local/bin(N-/) ${path[@]} ~/.linuxbrew/bin(N-/) ~/.linuxbrew/sbin(N-/) /var/lib/snapd/snap/bin(N-/))
 manpath=(~/.local/*/share/man(N-/) ~/.local/share/man(N-/) ${manpath[@]} ~/.linuxbrew/share/man(N-/))
 infopath=(~/.local/*/share/info(N-/) ~/.local/share/info(N-/) ${infopath[@]} ~/.linuxbrew/share/info(N-/))
 
 path=(/app/*/bin(N-/) /app/*(N-/) ${path[@]})
+#path=(~/.tea/tea.xyz/v*/bin(N-/) ${path[@]})
 path=(~/.local/share/flatpak/exports/bin(N-/) ${path[@]})
 path=(~/.gem/ruby/*/bin(N-/) ${path[@]})
 path=(~/.local/google-cloud-sdk/bin(N-/) ${path[@]})
@@ -79,6 +80,13 @@ register_systemd INFOPATH
 register_systemd MANPATH
 
 if [ -e /home/${USER}/.nix-profile/etc/profile.d/nix.sh ]; then . /home/${USER}/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS=@im=fcitx
+export GLFW_IM_MODULE=ibus
+
+export _JAVA_AWT_WM_NONREPARENTING=1 # for java application; see https://wiki.archlinux.jp/index.php/Java
 
 ## skip update environment variable in next shell to keep performance
 typeset -x NEED_UPDATE_ENV

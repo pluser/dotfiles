@@ -49,7 +49,12 @@ return packer.startup(function(use)
 	use({ "nvim-lualine/lualine.nvim",
 		requires = { "kyazdani42/nvim-web-devicons" },
 		config = function() require("lualine_evil") end }) -- modeline
-	use({ "nvim-treesitter/nvim-treesitter" }) -- syntax recognition
+	use({ "nvim-treesitter/nvim-treesitter",
+		config = function()
+			require("nvim-treesitter.configs").setup {
+				ensure_installed = { "lua", "rust" },
+				highlight = { enable = true },
+			} end }) -- syntax recognition
 	use({ "nvim-telescope/telescope.nvim", -- fuzzyfinder
 		requires = {{ "nvim-lua/plenary.nvim" }},
 		config = function()
@@ -85,22 +90,33 @@ return packer.startup(function(use)
 				} end } end })
 	use({ "neovim/nvim-lspconfig" })
 	use({ "hrsh7th/nvim-cmp",
+		requires = {
+			{ "dcampos/cmp-snippy" },
+			{ "dcampos/nvim-snippy" }},
 		config = function()
 			local cmp = require("cmp")
 			cmp.setup {
+				snippet = {
+					expand = function(args)
+						require('snippy').expand_snippet(args.body)
+					end },
 				sources = cmp.config.sources {
-					{ name = "nvim_lsp" }
+					{ name = "nvim_lsp" },
+					{ name = "buffer" },
 				},
-				mapping = {
-				 	["<C-l>"] = cmp.mapping.complete()
-				}} end })
+				mapping = cmp.mapping.preset.insert({
+				 	["<C-l>"] = cmp.mapping.complete(),
+					["<CR>"] = cmp.mapping.confirm({ select = true })
+				})} end })
 	use({ "hrsh7th/cmp-nvim-lsp" })
 	use({ "hrsh7th/cmp-buffer" })
 	use({ "hrsh7th/cmp-path" })
 	use({ "lewis6991/gitsigns.nvim",
 		config = function()
 			require("gitsigns").setup()
-			require("scrollbar.handlers.gitsigns").setup()
+			if packer_plugins['nvim-scrollbar'] and packer_plugins['nvim-scrollbar'].loaded then
+				require("scrollbar.handlers.gitsigns").setup()
+			end
 		end })
 	use({ "TimUntersberger/neogit",
 		config = function()
@@ -118,12 +134,28 @@ return packer.startup(function(use)
 							require("nvim-navic").attach(client, bufnr)
 						end end	} end } end })
 	use({ "petertriho/nvim-scrollbar",
+		cond = function() return not vim.g.vscode end,
 		config = function() require("scrollbar").setup {} end })
 	use({ "kevinhwang91/nvim-hlslens",
 		config = function() 
 			require("hlslens").setup {}
-			require("scrollbar.handlers.search").setup {}
+			if packer_plugins['nvim-scrollbar'] and packer_plugins['nvim-scrollbar'].loaded then
+				require("scrollbar.handlers.search").setup {}
+			end
 		end })
+	use({ "nvim-neorg/neorg",
+		run = ":Neorg sync-parsers",
+		config = function()
+			require("neorg").setup {
+				load = {
+					["core.defaults"] = {},
+					["core.dirman"] = {
+						config = {
+							workspaces = {
+								work = "~/Note/work",
+								home = "~/Note/home",
+	}}}}} end })
+	use({ "rust-lang/rust.vim" })
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
 	if PACKER_BOOTSTRAP then

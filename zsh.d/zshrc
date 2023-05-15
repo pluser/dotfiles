@@ -47,6 +47,7 @@ zinit wait lucid blockf light-mode for \
 	@'olets/zsh-abbr' \
 	atpull'asdf plugin update --all' @'asdf-vm/asdf' \
 	@'romkatv/powerlevel10k'
+if [ "$(uname -m)" != "arm64" ]; then
 zinit wait lucid pack"binary+keys" for fzf
 zinit wait lucid light-mode as"program" from"gh-r" for \
 	pick'ripgrep*/rg' @'BurntSushi/ripgrep' \
@@ -55,6 +56,7 @@ zinit wait lucid light-mode as"program" from"gh-r" for \
 	pick'zed' @'brimdata/zed' \
 	pick'zoxide' atclone'./zoxide init zsh > init.zsh' atpull'%atclone' src'init.zsh' nocompile'!' @'ajeetdsouza/zoxide' \
 	pick'ghq*/ghq' @'x-motemen/ghq'
+fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

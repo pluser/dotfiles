@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Looking Glass
+Comment=Super low latency VGA path-through system
+Path=/home/pluser/.local/bin/
+Exec=sh -c looking-glass-client -k egl:scale=2 egl:vsync=yes input:rawMouse=yes /dev/shm/looking-glass
+Icon=looking-glass-client
+Category=Utility

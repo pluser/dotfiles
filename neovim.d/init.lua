@@ -48,11 +48,11 @@ require('lazy').setup({
         dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope-frecency.nvim' },
 	cmd = 'Telescope',
 	keys = {
-		{ '<C-x>', require('telescope.builtin').commands, 'Telescope commands' },
-		{ '<C-f>', require('telescope.builtin').find_files, 'Telescope find files' },
-		{ '<C-s>', require('telescope.builtin').live_grep, 'Telescope live grep' },
-		{ '<C-b>', require('telescope.builtin').buffers, 'Telescope buffers' },
-		{ '<C-h>', require('telescope.builtin').help_tags, 'Telescope help' },
+		{ '<C-x>', '<cmd>lua require("telescope.builtin").commands<cr>', 'Telescope commands' },
+		{ '<C-f>', '<cmd>lua require("telescope.builtin").find_files<cr>', 'Telescope find files' },
+		{ '<C-s>', '<cmd>lua require("telescope.builtin").live_grep<cr>', 'Telescope live grep' },
+		{ '<C-b>', '<cmd>lua require("telescope.builtin").buffers<cr>', 'Telescope buffers' },
+		{ '<C-h>', '<cmd>lua require("telescope.builtin").help_tags<cr>', 'Telescope help' },
 	},
         config = function()
 		local tele = require('telescope.builtin')
@@ -205,42 +205,4 @@ defaults = {
 	cond = fullspec,
 }})
 
---require('mason').setup()
---[[
-require('lazy').setup({
-	'folke/which-key.nvim',
-	{'EdenEast/nightfox.nvim',
-	lazy = false,
-	priority = 1000,
-	config = function()
-		require('nightfox').load()
-	end},
-	{'AlexvZyl/nordic.nvim',
-	enabled = false,
-	lazy = false,
-	config = function()
-		require('nordic').load()
-	end},
-	'nvim-lualine/lualine.nvim',
-	'nvim-treesitter/nvim-treesitter',
-	'nvim-telescope/telescope.nvim',
-	'nvim-telescope/telescope-frecency.nvim',
-	'williamboman/mason.nvim',
-	'williamboman/mason-lspconfig.nvim',
-	'neovim/nvim-lspconfig',
-	'hrsh7th/nvim-cmp',
-	'hrsh7th/cmp-nvim-lsp',
-	'hrsh7th/cmp-buffer',
-	'hrsh7th/cmp-path',
-	'lewis6991/gitsigns.nvim',
-	'TimUntersberger/neogit',
-	'nvim-tree/nvim-web-devicons',
-	'SmiteshP/nvim-navic',
-	'petertriho/nvim-scrollbar',
-	{'kevinhwang91/nvim-hlslens', main = 'hlslens', config = true, lazy = false},
-	'mfussenegger/nvim-dap',
-	'rcarriga/nvim-dap-ui',
-	'nvim-neorg/neorg',
-	'rust-lang/rust.vim'
-})
-]]
+require('which-key')

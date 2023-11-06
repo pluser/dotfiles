@@ -48,11 +48,11 @@ require('lazy').setup({
         dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope-frecency.nvim' },
 	cmd = 'Telescope',
 	keys = {
-		{ '<C-x>', '<cmd>lua require("telescope.builtin").commands<cr>', 'Telescope commands' },
-		{ '<C-f>', '<cmd>lua require("telescope.builtin").find_files<cr>', 'Telescope find files' },
-		{ '<C-s>', '<cmd>lua require("telescope.builtin").live_grep<cr>', 'Telescope live grep' },
-		{ '<C-b>', '<cmd>lua require("telescope.builtin").buffers<cr>', 'Telescope buffers' },
-		{ '<C-h>', '<cmd>lua require("telescope.builtin").help_tags<cr>', 'Telescope help' },
+		{ '<C-x>', ':Telescope commands<cr>', 'Telescope commands' },
+		{ '<C-f>', ':Telescope find_files', 'Telescope find files' },
+		{ '<C-s>', ':Telescope live_grep', 'Telescope live grep' },
+		{ '<C-b>', ':Telescope buffers', 'Telescope buffers' },
+		{ '<C-h>', ':Telescope help_tags', 'Telescope help' },
 	},
         config = function()
 		local tele = require('telescope.builtin')
@@ -188,6 +188,25 @@ require('lazy').setup({
 { 'kevinhwang91/nvim-hlslens',
 	enabled = false,
 	name = 'hlslens' },
+{ 'nvim-orgmode/orgmode',
+	dependencies = {{ 'nvim-treesitter/nvim-treesitter', lazy = true }},
+	event = { 'VeryLazy' },
+	config = function()
+		require('orgmode').setup_ts_grammar()
+		require('nvim-treesitter.configs').setup({
+			highlight = {
+				enable = true,
+				additional_vim_regex_highlighting = { 'org' },
+			},
+			ensure_installed = { 'org' },
+		})
+		
+		require('orgmode').setup({
+			org_agenda_files = '~/orgfiles/**/*',
+			org_default_notes_file = '~/orgfiles/refile.org',
+		})
+	end,
+},
 { 'nvim-neorg/neorg',
         run = ':Neorg sync-parsers',
 	ft = 'neorg',

@@ -217,6 +217,12 @@ require('lazy').setup({
                                 workspaces = {
                                         work = '~/Note/work',
                                         home = '~/Note/home' }}}}},
+{ 'glacambre/firenvim',
+	lazy = not vim.g.started_by_firenvim,
+	build = function()
+		vim.fn['firenvim#install'](0)
+	end	
+},
 { 'rust-lang/rust.vim',
 	ft = 'rs' },
 },{

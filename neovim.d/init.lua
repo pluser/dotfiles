@@ -25,10 +25,14 @@ require('lazy').setup({
 	config = function(plugin, opts) require('nightfox').load() end },
 { 'nvim-lualine/lualine.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
-	event = { 'VeryLazy' },
+	event = function()
+		if not vim.g.started_by_firenvim then return {'VeryLazy'} else return {} end
+	end,
 	config = function(plugin, opts) require('lualine_evil') end },
 { 'akinsho/bufferline.nvim',
-	event = 'VeryLazy',
+	event = function()
+		if not vim.g.started_by_firenvim then return {'VeryLazy'} else return {} end
+	end,
 	dependencies = { 'nvim-tree/nvim-web-devicons' },
 	config = true },
 { 'nvim-treesitter/nvim-treesitter',
@@ -221,7 +225,29 @@ require('lazy').setup({
 	lazy = not vim.g.started_by_firenvim,
 	build = function()
 		vim.fn['firenvim#install'](0)
-	end	
+	end,
+	init = function()
+		if vim.g.started_by_firenvim then
+			vim.o.laststatus = 0
+		end
+		vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+			pattern = 'github.com_*.txt',
+			command = 'set filetype=markdown',
+		})
+		vim.g.firenvim_config = {
+			globalSettings = { alt = 'all' },
+			localSettings = {
+				['https?://.*google.com/'] = { takeover = 'never', priority = 1 },		
+				['.*'] = {
+					-- cmdline = 'neovim',
+					-- content = 'text',
+					priority = 0,
+					-- selector = 'textarea:not([readonly], [aria-readonly], div[role="textbox"])',
+					takeover = 'never',
+				},
+			},
+		}
+	end,
 },
 { 'rust-lang/rust.vim',
 	ft = 'rs' },

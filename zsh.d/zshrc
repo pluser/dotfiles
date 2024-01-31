@@ -19,17 +19,14 @@ source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
-# Load a few important annexes, without Turbo
-# (this is currently required for annexes)
-zinit light-mode for \
-    zdharma-continuum/zinit-annex-as-monitor \
-    zdharma-continuum/zinit-annex-bin-gem-node \
-    zdharma-continuum/zinit-annex-patch-dl \
-    zdharma-continuum/zinit-annex-rust
+zinit ice depth=1; zinit light romkatv/powerlevel10k
 
-### End of Zinit's installer chunk
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-setopt ignoreeof # prevent logout with Ctrl-D
+bindkey "^[[3~" delete-char
+bindkey "^[[1;3C" forward-word
+bindkey "^[[1;3D" backward-word
 
 HISTFILE="${XDG_STATE_HOME:-$HOME/.cache}/zsh_history"
 HISTSIZE=100000
@@ -37,26 +34,31 @@ SAVEHIST=1000000
 setopt inc_append_history
 setopt share_history
 
-bindkey "^[[3~" delete-char
-# zinit light denysdovhan/spaceship-prompt
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-history-substring-search
+zinit light olets/zsh-abbr
+
 zinit light @'romkatv/powerlevel10k'
 zinit wait lucid blockf light-mode for \
-	@'zsh-users/zsh-autosuggestions' \
-	@'zsh-users/zsh-completions' \
-	@'zdharma-continuum/fast-syntax-highlighting' \
-	@'olets/zsh-abbr' \
-	atpull'asdf plugin update --all' @'asdf-vm/asdf' \
-	@'romkatv/powerlevel10k'
+  @'zsh-users/zsh-history-substring-search' \
+  @'zsh-users/zsh-autosuggestions' \
+  @'zsh-users/zsh-completions' \
+  @'zdharma-continuum/fast-syntax-highlighting' \
+  @'olets/zsh-abbr' \
+  atpull'asdf plugin update --all' @'asdf-vm/asdf' \
+  @'romkatv/powerlevel10k'
 if [ "$(uname -m)" != "arm64" ]; then
-zinit wait lucid pack"binary+keys" for fzf
+zinit wait lucid pack"default+keys" for fzf
 zinit wait lucid light-mode as"program" from"gh-r" for \
-	pick'ripgrep*/rg' @'BurntSushi/ripgrep' \
-	cp'yq* -> yq' atclone'./yq shell-competion zsh > _yq' atpull'%atclone' @'mikefarah/yq' \
-	pick'zq' @'brimdata/zed' \
-	pick'zed' @'brimdata/zed' \
-	pick'zoxide' atclone'./zoxide init zsh > init.zsh' atpull'%atclone' src'init.zsh' nocompile'!' @'ajeetdsouza/zoxide' \
-	pick'ghq*/ghq' @'x-motemen/ghq'
+  pick'ripgrep*/rg' @'BurntSushi/ripgrep' \
+  cp'yq* -> yq' atclone'./yq shell-competion zsh > _yq' atpull'%atclone' @'mikefarah/yq' \
+  pick'zq' @'brimdata/zed' \
+  pick'zed' @'brimdata/zed' \
+  pick'zoxide' atclone'./zoxide init zsh > init.zsh' atpull'%atclone' src'init.zsh' nocompile'!' @'ajeetdsouza/zoxide' \
+  pick'ghq*/ghq' @'x-motemen/ghq' \
+  pick'bat*/bat' @'sharkdp/bat' \
+  pick'eza' @'eza-community/eza' \
+  pick'chezmoi' completions @'twpayne/chezmoi'
 fi
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

@@ -1,0 +1,34 @@
+#!/bin/sh
+
+riverctl map normal Super+Shift E exit
+riverctl map normal Super+Shift Q exit
+riverctl map normal Super T spawn kitty
+riverctl map normal Super R spawn "wofi --show drun --allow-images"
+
+riverctl map normal Super H focus-output next
+riverctl map normal Super S focus-output previous
+riverctl map normal Super+Shift H send-to-output next
+riverctl map normal Super+Shift S send-to-output previous
+riverctl map normal Super C close
+
+for i in $(seq 1 9); do
+tags=$((1 << ($i - 1)))
+riverctl map normal Super $i set-focused-tags $tags
+riverctl map normal Super+Shift $i set-view-tags $tags
+riverctl map normal Super+Control $i toggle-focused-tags $tags
+riverctl map normal Super+Shift+Control $i toggle-view-tags $tags
+done
+
+all_tags=$(((1 << 32) - 1))
+riverctl map normal Super 0 set-focused-tags $all_tags
+riverctl map normal Super+Shift 0 set-view-tags $all_tags
+
+riverctl map normal Super V toggle-float
+riverctl map normal Super F toggle-fullscreen
+
+riverctl focus-follows-cursor normal
+
+riverctl default-layout rivertile
+rivertile -view-padding 6 -outer-padding 6 &
+riverctl spawn "dbus-update-activation-environment SEATD_SOCK DISPLAY WAYLAND _DISPLAY XDG_SESSION_TYPE XDG_CURRENT_DESKTOP=river"
+riverctl spawn waybar

@@ -15,8 +15,9 @@
 ;;; }}}
 
 ;;; Font settings {{{
-(set-face-attribute 'default nil :family "Inconsolata")
-(set-fontset-font nil 'cp932 (font-spec :family "Migu 1M"))
+(when (display-graphic-p)
+	(set-face-attribute 'default nil :family "Inconsolata")
+	(set-fontset-font nil 'cp932 (font-spec :family "Migu 1M")))
 ;(add-to-list 'default-frame-alist '(font . "Inconsolata-16"))
 ;;; }}}
 
@@ -92,7 +93,7 @@
 ;; Block until current queue processed.
 (elpaca-wait)
 
-(use-package seq) ;; FIXME: workaround the bug of elpaca. remove it.
+;(use-package seq) ;; FIXME: workaround the bug of elpaca. remove it.
 
 ;;; Visual / Theme settings {{{
 (use-package doom-themes

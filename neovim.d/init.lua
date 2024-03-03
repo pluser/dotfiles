@@ -13,6 +13,7 @@ vim.opt.rtp:prepend(lazypath)
 
 vim.wo.number = true
 vim.wo.relativenumber = true
+vim.wo.cursorline = true
 
 local function fullspec()
 	return not vim.g.vscode
@@ -53,20 +54,33 @@ require('lazy').setup({
 	cmd = 'Telescope',
 	keys = {
 		{ '<C-x>', ':Telescope commands<cr>', 'Telescope commands' },
-		{ '<C-f>', ':Telescope find_files', 'Telescope find files' },
-		{ '<C-s>', ':Telescope live_grep', 'Telescope live grep' },
-		{ '<C-b>', ':Telescope buffers', 'Telescope buffers' },
-		{ '<C-h>', ':Telescope help_tags', 'Telescope help' },
+		{ '<C-f>', ':Telescope find_files<cr>', 'Telescope find files' },
+		{ '<C-s>', ':Telescope live_grep<cr>', 'Telescope live grep' },
+		{ '<C-b>', ':Telescope buffers<cr>', 'Telescope buffers' },
+		{ '<C-h>', ':Telescope help_tags<cr>', 'Telescope help' },
 	},
         config = function()
 		local tele = require('telescope.builtin')
 		require('telescope').load_extension('frecency')
         end },
+{ 'nvim-telescope/telescope-project.nvim',
+	dependencies = { 'nvim-treesitter/nvim-treesitter' }},
 { 'nvim-telescope/telescope-frecency.nvim',
 	lazy = true,
         dependencies = { 'kkharji/sqlite.lua' }},
 { 'stevearc/dressing.nvim' },
 { 'folke/which-key.nvim', event = { 'VeryLazy' }},
+{ 'zbirenbaum/copilot.lua',
+	cmd = { 'Copilot' },
+	event = { 'InsertEnter' },
+	config = function()
+		require('copilot').setup{}
+	end },
+{ 'zbirenbaum/copilot-cmp',
+	dependencies = { 'zbirenbaum/copilot.lua' },
+	config = function()
+		require('copilot_cmp').setup()
+	end },
 { 'williamboman/mason.nvim',
 	event = { 'BufRead' },
 	cmd = { 'Mason', 'MasonInstall' },
@@ -154,6 +168,7 @@ require('lazy').setup({
                 sources = cmp.config.sources {
                         { name = 'nvim_lsp' },
                         { name = 'buffer' },
+			{ name = 'copilot' },
                 },
                 mapping = cmp.mapping.preset.insert({
                         ['<C-Space>'] = cmp.mapping.complete(),

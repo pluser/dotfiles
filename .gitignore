@@ -7,6 +7,7 @@ emacs.d/url
 emacs.d/packages
 emacs.d/elpaca
 emacs.d/eln-cache
+emacs.d/\.*
 emacs_old.d/history
 emacs_old.d/cache
 emacs_old.d/local

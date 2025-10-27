@@ -1,9 +1,0 @@
-#!/usr/bin/perl
-
-$lualatex = 'lualatex -shell-escape -synctex=1 %O %S';
-$latex = 'uplatex -shell-escape -synctex=1 %O %S';
-$dvipdf = 'dvipdfmx %O -o %D %S';
-$pdf_mode = 4;
-$pdf_previewer = 'zathura -x \'emacsclient "+%{line}" "%{input}" \' %O %S';
-#$bibtex = 'upbibtex';
-#$biber = 'biber --bblencoding=utf8 -u -U --output_safechars';

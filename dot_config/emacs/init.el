@@ -64,8 +64,8 @@
 (elpaca `(,@elpaca-order))
 
 (elpaca elpaca-use-package
-  (elpaca-use-package-mode)
-  (setq elpaca-use-package-by-default t))
+  (elpaca-use-package-mode))
+(setq use-package-always-ensure t)
 
 ;; Block until current queue processed.
 (elpaca-wait)
@@ -75,18 +75,35 @@
 ;;; }}}
 
 ;;; Visual / Theme settings {{{
-(use-package ef-themes
-	:init
-	(ef-themes-take-over-modus-themes-mode 1)
-	:config
-	(setq modus-themes-mixed-fonts t)
-	(setq modus-themes-italic-constructs t)
-	(modus-themes-load-theme 'ef-dream))
+;(use-package ef-themes
+;	:ensure t
+;	:init
+;	(ef-themes-take-over-modus-themes-mode 1)
+;	:config
+;	(setq modus-themes-mixed-fonts t)
+;	(setq modus-themes-italic-constructs t)
+;	(modus-themes-load-theme 'ef-dream))
+;(pixel-scroll-precision-mode t)
 (column-number-mode t)
 (line-number-mode t)
 (global-display-line-numbers-mode)
-(setq display-line-numbers-type 'relative)
+(setopt display-line-numbers-type 'relative)
 (modify-all-frames-parameters '((font . "Inconsolata 12")))
+(setq-default show-trailing-whitespace t)
+(global-hl-line-mode t)
+(use-package spacious-padding
+	:config
+	(spacious-padding-mode t))
+(use-package doom-themes
+	:custom
+	(doom-themes-enable-bold t)
+	(doom-themes-enable-italic t)
+	(doom-themes-treemacs-theme "doom-atom")
+	:config
+	(doom-themes-treemacs-config)
+	(doom-themes-visual-bell-config)
+	(doom-themes-org-config)
+	(load-theme 'doom-one))
 ;(use-package doom-themes
 ;	:config
 ;	(load-theme 'doom-city-lights t)
@@ -124,8 +141,8 @@
 
 ;;; (default) Coding style settings {{{
 (setq-default indent-tabs-mode t)
-(setq-default tab-width 4)
-(setq-default c-basic-offset 4)
+(setq-default tab-width 2)
+(setq-default c-basic-offset 2)
 (setq c-tab-always-indent 'indent)
 ;;; }}}
 
@@ -141,14 +158,14 @@
 ;;; }}}
 
 ;;; Modeline settings {{{
-(use-package moody
-	:config
-	(moody-replace-mode-line-front-space)
-	(moody-replace-mode-line-buffer-identification)
-	(moody-replace-vc-mode))
-;(use-package doom-modeline
+;(use-package moody
 ;	:config
-;	(doom-modeline-mode t))
+;	(moody-replace-mode-line-front-space)
+;	(moody-replace-mode-line-buffer-identification)
+;	(moody-replace-vc-mode))
+(use-package doom-modeline
+	:config
+	(doom-modeline-mode t))
 ;;; }}}
 
 ;;; Icons {{{
@@ -159,7 +176,7 @@
 	:config
 	(add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
 	(plist-put kind-icon-default-style :scale 0.8))
-(use-package nerd-icons :demand)
+(use-package nerd-icons)
 ;;; }}}
 
 ;;; EditorConfig settings {{{
@@ -187,14 +204,14 @@
 	("C-x C-r" . consult-recent-file)
 	("M-y" . consult-yank-pop)
 	("C-l" . 'consult-line)
-	("C-i" . consult-imenu)
+;	("C-i" . consult-imenu)
 	("C-x C-g" . consult-ripgrep)
 	("C-o" . consult-outline)
-	("C-k" . consult-bookmark)
-	("C-m" . consult-mark)
-	("M-m" . consult-global-mark)
-	([remap isearch-forward] . consult-isearch-forward)
-	([remap isearch-backward] . consult-isearch-backward)
+;	("M-m" . consult-bookmark)
+	("M-m" . consult-mark)
+;	("C-u C-M-m" . consult-global-mark)
+;	([remap isearch-forward] . consult-isearch-forward)
+;	([remap isearch-backward] . consult-isearch-backward)
 	("C-M-S" . consult-line-multi)
 	([remap goto-line] . consult-goto-line))
 (use-package embark
@@ -224,15 +241,14 @@
 
 ;;; Syntax settings {{{
 (use-package treesit
-  :elpaca nil
+  :ensure nil
   :custom
   (treesit-font-lock-level 4))
-(use-package treesit-auto
-  :custom
-  (treesit-auto-install 'prompt)
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
+;(use-package treesit-langs
+;	:ensure nil
+;	:config
+;	(treesit-langs-major-mode-setup))
+(use-package treesit-fold)
 ;;; }}}
 
 ;;; Modal edit {{{
@@ -243,8 +259,23 @@
 (use-package puni)
 ;;; }}}
 
+;;; AI related stuff {{{
+(use-package eca)
+(use-package ai-code
+	:config
+	(ai-code-set-backend 'opencode))
+;(use-package gptel)
+;(use-package gptel-commit
+;	:after (gptel magit))
+;;; }}}
+
 ;(use-package web-mode)
 
+(use-package which-key
+	:ensure nil
+	:config
+	(which-key-mode t)
+	(which-key-setup-side-window-bottom))
 ;(use-package which-key
 ;	:hook (emacs-startup . which-key-mode)
 ;	:config
@@ -257,7 +288,7 @@
 ;	(lsp-mode . lsp-enable-which-key-integration)
 ;	(rust-mode . lsp))
 (use-package eglot
-	:elpaca nil
+	:ensure nil
 	:hook
 	((python-ts-mode
 		rust-ts-mode
@@ -268,10 +299,15 @@
   :after lsp-mode)
 (use-package projectile)
 (use-package transient)
+
+;;; Version Control {{{
 (use-package magit
 	:defer t
 	:after transient
 	:bind ("<f12>" . magit-status))
+(use-package difftastic)
+;;; }}}
+
 (use-package treemacs)
 ;(use-package helpful
 ;	:defer t
@@ -281,9 +317,21 @@
 ;	([remap describe-command] . #'helpful-command)
 ;	([remap describe-key] . #'helpful-key))
 (use-package recentf
-	:elpaca nil
+	:ensure nil
 	:config
 	(recentf-mode t))
+(use-package vundo
+	:bind
+	([remap undo] . vundo))
+(use-package apheleia)
+;;; Templating {{{
+(use-package tempel
+	:bind
+	(("M-+" . tempel-complete)
+	 ("M-*" . tempel-insert)))
+(use-package tempel-collection)
+;;; }}}
+
 ;;; init.el ends here
 
 (custom-set-variables
@@ -291,13 +339,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+	 '("0325a6b5eea7e5febae709dab35ec8648908af12cf2d2b569bedc8da0a3a81c1"
+		 default))
  '(package-selected-packages '(seq)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(default ((t (:background "#282a36")))))
 ;;; Local Variables:
 ;;; mode: Emacs-Lisp
 ;;; coding: utf-8

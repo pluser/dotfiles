@@ -16,11 +16,11 @@
 (setq load-prefer-newer t)
 
 ;; Inhibit resizing frame
-(setq frame-inhibit-implied-resize t)
+;(setq frame-inhibit-implied-resize t)
 
 ;; Faster to disable these here (before they've been initialized)
-(push '(fullscreen . maximized) default-frame-alist)
-(push '(menu-bar-lines . 0) default-frame-alist)
+;(push '(fullscreen . maximized) default-frame-alist)
+;(push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
 
@@ -34,8 +34,7 @@
 			(redisplay)))
 
 ;; Startup setting
-(setq inhibit-splash-screen t)
-(setq inhibit-startup-message t)
+(setopt inhibit-startup-screen t)
 (setq byte-compile-warnings '(cl-functions))
 (custom-set-faces '(default ((t (:background "#282a36")))))
 

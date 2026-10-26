@@ -263,7 +263,7 @@
 (use-package eca)
 (use-package ai-code
 	:config
-	(ai-code-set-backend 'opencode))
+	(ai-code-set-backend 'kilo))
 ;(use-package gptel)
 ;(use-package gptel-commit
 ;	:after (gptel magit))
@@ -332,6 +332,8 @@
 (use-package tempel-collection)
 ;;; }}}
 
+(use-package vterm)
+
 ;;; init.el ends here
 
 (custom-set-variables
@@ -339,6 +341,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ai-code-onboarding-seen t)
  '(custom-safe-themes
 	 '("0325a6b5eea7e5febae709dab35ec8648908af12cf2d2b569bedc8da0a3a81c1"
 		 default))

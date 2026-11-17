@@ -261,6 +261,113 @@
 
 ;;; AI related stuff {{{
 (use-package eca)
+(use-package agent-shell
+  :ensure t
+  :commands agent-shell
+  :config
+  (defun my/agent-shell-kilo-config ()
+    "Create an agent-shell configuration for Kilo CLI."
+    (agent-shell-make-agent-config
+     :identifier 'kilo
+     :mode-line-name "Kilo"
+     :buffer-name "Kilo"
+     :shell-prompt "Kilo> "
+     :shell-prompt-regexp "Kilo> "
+     :welcome-function #'agent-shell-welcome-message
+     :client-maker (lambda (buffer)
+                     (agent-shell--make-acp-client
+                      :command "kilo"
+                      :command-params '("acp")
+                      :context-buffer buffer))
+     :install-instructions "See https://kilo.ai/docs/code-with-ai/platforms/cli for installation."))
+  (add-to-list 'agent-shell-agent-configs #'my/agent-shell-kilo-config)
+  (setq agent-shell-preferred-agent-config 'kilo)
+
+  (defvar my/agent-shell-model-history nil
+    "Recently selected agent model IDs, most recent first.")
+  (require 'savehist)
+  (add-to-list 'savehist-additional-variables 'my/agent-shell-model-history)
+  (unless savehist-mode
+    (savehist-mode 1))
+
+  (defun my/agent-shell-sort-models (models)
+    "Return a copy of MODELS in recent-use order."
+    (let ((ranks (make-hash-table :test #'equal)))
+      (cl-loop for id in my/agent-shell-model-history
+               for rank from 0 do (puthash id rank ranks))
+      (cl-stable-sort
+       (copy-sequence models)
+       (lambda (a b)
+         (< (gethash (map-elt a :model-id) ranks most-positive-fixnum)
+            (gethash (map-elt b :model-id) ranks most-positive-fixnum))))))
+
+  (defun my/agent-shell-apply-model (model-id &optional on-success)
+    "Set MODEL-ID and record it on success, then call ON-SUCCESS."
+    (let ((shell-buffer (current-buffer)))
+      (agent-shell--config-option-set-model-id
+       :model-id model-id
+       :on-success (lambda ()
+                     (when (and (buffer-live-p shell-buffer)
+                                (with-current-buffer shell-buffer
+                                  (equal model-id
+                                         (agent-shell--current-model-id
+                                          (agent-shell--state)))))
+                       (setq my/agent-shell-model-history
+                             (seq-take (cons model-id
+                                             (delete model-id my/agent-shell-model-history))
+                                       100)))
+                     (when on-success
+                       (funcall on-success))))))
+
+  (defun my/agent-shell-set-session-model (&optional on-success)
+    "Select a model in recent-use order and call ON-SUCCESS on success."
+    (interactive)
+    (unless (derived-mode-p 'agent-shell-mode)
+      (user-error "Not in an agent-shell buffer"))
+    (let* ((state (agent-shell--state))
+           (models (agent-shell--get-available-models state))
+           (current-id (agent-shell--current-model-id state)))
+      (unless (map-nested-elt state '(:session :id))
+        (user-error "No active session"))
+      (unless models
+        (user-error "No session models available"))
+      (let* ((models (my/agent-shell-sort-models models))
+             (choices (mapcar (lambda (model)
+                                (cons (format "%s (%s)" (map-elt model :name)
+                                              (map-elt model :model-id))
+                                      (map-elt model :model-id)))
+                              models))
+             (table (lambda (string predicate action)
+                      (if (eq action 'metadata)
+                          '(metadata (display-sort-function . identity)
+                                     (cycle-sort-function . identity))
+                        (complete-with-action action choices string predicate))))
+             (selection (completing-read "Set model: " table nil t))
+             (model-id (cdr (assoc selection choices))))
+        (unless model-id
+          (user-error "Unknown model: %s" selection))
+        (when (equal model-id current-id)
+          (user-error "Session model already %s" selection))
+        (my/agent-shell-apply-model model-id on-success))))
+
+  (defun my/agent-shell-model-menu ()
+    "Build the header model menu in recent-use order."
+    (let ((menu (make-sparse-keymap "LLM model"))
+          (shell-buffer (agent-shell--shell-buffer)))
+      (dolist (model (reverse (my/agent-shell-sort-models
+                              (agent-shell--get-available-models (agent-shell--state)))))
+        (define-key menu (vector (intern (concat "model-" (map-elt model :model-id))))
+                    `(menu-item ,(map-elt model :name)
+                                (lambda () (interactive)
+                                  (with-current-buffer ,shell-buffer
+                                    (my/agent-shell-apply-model ,(map-elt model :model-id))))
+                                :button (:toggle . ,(equal (map-elt model :model-id)
+                                                           (agent-shell--current-model-id
+                                                            (agent-shell--state)))))))
+      menu))
+  (advice-add 'agent-shell-set-session-model :override #'my/agent-shell-set-session-model)
+  (advice-add 'agent-shell--mode-line-model-menu :override #'my/agent-shell-model-menu))
+(global-set-key (kbd "C-c a s") #'agent-shell)
 (use-package ai-code
 	:config
 	(ai-code-set-backend 'kilo))
